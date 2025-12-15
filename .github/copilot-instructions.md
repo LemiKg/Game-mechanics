@@ -2,7 +2,7 @@
 
 ## Project Philosophy
 
-This project follows a **modular addon architecture** where each distinct feature is implemented as a self-contained Godot addon. The goal is maximum reusability, testability, and adherence to SOLID principles.
+This project follows a **modular addon architecture** where each distinct feature is implemented as a self-contained Godot addon. The goal is maximum reusability, testability, and adherence to SOLID principles, as well as use of Abstractions in the form of abstract classes.
 
 ---
 

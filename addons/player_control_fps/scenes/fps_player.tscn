@@ -1,0 +1,44 @@
+[gd_scene load_steps=2 format=3 uid="uid://dkfps3dplayer"]
+
+[ext_resource type="Script" path="res://addons/player_control_fps/core/player_controller_3d.gd" id="1_controller"]
+[ext_resource type="Script" path="res://addons/player_control_fps/core/player_input_router_3d.gd" id="2_input"]
+[ext_resource type="Script" path="res://addons/player_control_fps/core/player_motor_3d.gd" id="3_motor"]
+[ext_resource type="Script" path="res://addons/player_control_fps/core/player_look_controller_3d.gd" id="4_look"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
+radius = 0.4
+height = 1.8
+
+[node name="FPSPlayer" type="CharacterBody3D"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("CapsuleShape3D_1")
+
+[node name="PitchPivot" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
+
+[node name="Camera3D" type="Camera3D" parent="PitchPivot"]
+
+[node name="PlayerController3D" type="Node" parent="." node_paths=PackedStringArray("body", "pitch_pivot", "camera", "input_router", "motor", "look_controller")]
+script = ExtResource("1_controller")
+body = NodePath("..")
+pitch_pivot = NodePath("../PitchPivot")
+camera = NodePath("../PitchPivot/Camera3D")
+input_router = NodePath("../PlayerInputRouter3D")
+motor = NodePath("../PlayerMotor3D")
+look_controller = NodePath("../PlayerLookController3D")
+
+[node name="PlayerInputRouter3D" type="Node" parent="."]
+script = ExtResource("2_input")
+
+[node name="PlayerMotor3D" type="Node" parent="." node_paths=PackedStringArray("body", "input_router")]
+script = ExtResource("3_motor")
+body = NodePath("..")
+input_router = NodePath("../PlayerInputRouter3D")
+
+[node name="PlayerLookController3D" type="Node" parent="." node_paths=PackedStringArray("yaw_node", "pitch_node", "input_router")]
+script = ExtResource("4_look")
+yaw_node = NodePath("..")
+pitch_node = NodePath("../PitchPivot")
+input_router = NodePath("../PlayerInputRouter3D")
