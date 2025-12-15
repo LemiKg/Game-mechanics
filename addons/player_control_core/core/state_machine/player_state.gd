@@ -6,6 +6,10 @@ extends Node
 ## Override virtual methods to implement state-specific logic.
 
 
+## Emitted when an animation should play. Connect an AnimationController to this.
+signal animation_requested(animation_name: StringName, blend_time: float)
+
+
 ## Reference to the owning state machine. Set automatically.
 var state_machine: PlayerStateMachine
 
@@ -23,6 +27,16 @@ var motor: PlayerMotor3D:
 var input_router: PlayerInputRouter3D:
 	get:
 		return controller.input_router if controller else null
+
+## Reference to movement settings (via controller).
+var movement_settings: MovementSettings3D:
+	get:
+		return controller.movement_settings if controller else null
+
+
+## Request an animation to play. Override blend_time for custom transitions.
+func request_animation(anim_name: StringName, blend_time: float = 0.2) -> void:
+	animation_requested.emit(anim_name, blend_time)
 
 
 ## Called when entering this state.

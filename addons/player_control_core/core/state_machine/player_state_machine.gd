@@ -24,6 +24,9 @@ var states: Dictionary = {}
 ## The state that was active before entering UI state (for restoration).
 var _previous_state_name: StringName = &""
 
+## Stack for pushdown automata - stores states for temporary interrupts.
+var _state_stack: Array[PlayerState] = []
+
 
 func _ready() -> void:
 	_validate_dependencies()
@@ -117,3 +120,32 @@ func get_state(state_name: StringName) -> PlayerState:
 ## Check if a state exists by name.
 func has_state(state_name: StringName) -> bool:
 	return states.has(state_name)
+
+
+## Push current state onto stack and transition to a new state.
+## Use for temporary interrupts (attacks, stagger) that return to previous state.
+func push_state(state_name: StringName) -> bool:
+	if not states.has(state_name):
+		push_warning("PlayerStateMachine: Cannot push unknown state '%s'" % state_name)
+		return false
+	
+	if current_state:
+		_state_stack.push_back(current_state)
+	
+	return transition_to(state_name)
+
+
+## Pop the previous state from stack and transition back to it.
+## Returns false if stack is empty.
+func pop_state() -> bool:
+	if _state_stack.is_empty():
+		push_warning("PlayerStateMachine: Cannot pop, state stack is empty")
+		return false
+	
+	var previous_state := _state_stack.pop_back()
+	return transition_to(previous_state.name)
+
+
+## Clear the state stack. Use when forcibly changing state context.
+func clear_state_stack() -> void:
+	_state_stack.clear()

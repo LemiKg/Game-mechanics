@@ -29,6 +29,12 @@ extends Resource
 ## Gravity strength (positive = downward).
 @export_range(0.0, 50.0, 0.1) var gravity: float = 9.8
 
+@export_group("Jump Feel")
+## Grace period after leaving platform where jump still works (coyote time).
+@export_range(0.0, 0.3, 0.01) var coyote_time: float = 0.1
+## How long a jump input is buffered before landing.
+@export_range(0.0, 0.3, 0.01) var jump_buffer_time: float = 0.1
+
 @export_group("Crouch")
 ## Height of collision shape when crouching.
 @export_range(0.0, 3.0, 0.1) var crouch_height: float = 1.0

@@ -21,7 +21,8 @@ var enabled: bool = true:
 		if not value:
 			# Clear intent when disabled
 			movement_intent = Vector2.ZERO
-			jump_pressed = false
+			jump_requested = false
+			_jump_buffered = false
 			sprint_held = false
 			crouch_held = false
 			look_delta = Vector2.ZERO
@@ -29,8 +30,11 @@ var enabled: bool = true:
 ## Current movement intent as a normalized 2D vector (x = strafe, y = forward/back).
 var movement_intent: Vector2 = Vector2.ZERO
 
-## True if jump was pressed this frame.
-var jump_pressed: bool = false
+## True if jump was requested (buffered for physics frame).
+var jump_requested: bool = false
+
+## Internal buffer for jump input.
+var _jump_buffered: bool = false
 
 ## True if sprint is currently held.
 var sprint_held: bool = false
@@ -73,12 +77,29 @@ func _process(_delta: float) -> void:
 	# Read movement input
 	movement_intent = Input.get_vector(_move_left, _move_right, _move_forward, _move_back)
 	
-	# Read jump input (pressed this frame)
-	jump_pressed = Input.is_action_just_pressed(_jump)
+	# Buffer jump input (persists until consumed by physics)
+	if Input.is_action_just_pressed(_jump):
+		_jump_buffered = true
 	
 	# Read sprint/crouch (held)
 	sprint_held = Input.is_action_pressed(_sprint)
 	crouch_held = Input.is_action_pressed(_crouch)
+
+
+func _physics_process(_delta: float) -> void:
+	if not enabled:
+		return
+	
+	# Transfer buffered jump to physics-safe property
+	jump_requested = _jump_buffered
+	_jump_buffered = false
+
+
+## Consume and clear the jump request. Returns true if jump was requested.
+func consume_jump() -> bool:
+	var was_requested := jump_requested
+	jump_requested = false
+	return was_requested
 
 
 func _unhandled_input(event: InputEvent) -> void:
