@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EquipmentItem" load_steps=3 format=3 uid="uid://dm0mqa8f3bvub"]
+
+[ext_resource type="Script" uid="uid://cpwwgvl4f10kw" path="res://addons/inventory_system/core/equipment_item.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://d12ek0twpj7ag" path="res://items/icons/iron_chestplate.svg" id="2_icon"]
+
+[resource]
+script = ExtResource("1_script")
+slot_type_name = "Chest"
+defense = 12
+name = "Iron Chestplate"
+description = "Heavy iron armor for your torso."
+icon = ExtResource("2_icon")
+weight = 8.0
+value = 200
+id = "iron_chestplate"

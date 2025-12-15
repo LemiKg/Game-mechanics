@@ -1,0 +1,23 @@
+[gd_scene load_steps=2 format=3 uid="uid://tooltip_ui"]
+
+[ext_resource type="Script" path="res://addons/inventory_system/ui/item_tooltip_ui.gd" id="1_script"]
+
+[node name="ItemTooltipUI" type="PanelContainer" node_paths=PackedStringArray("label")]
+custom_minimum_size = Vector2(150, 0)
+script = ExtResource("1_script")
+label = NodePath("MarginContainer/RichTextLabel")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 6
+
+[node name="RichTextLabel" type="RichTextLabel" parent="MarginContainer"]
+layout_mode = 2
+mouse_filter = 2
+bbcode_enabled = true
+text = "[b]Item Name[/b]
+Description here"
+fit_content = true

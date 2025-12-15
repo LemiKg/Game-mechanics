@@ -1,0 +1,167 @@
+[gd_scene load_steps=40 format=3 uid="uid://be7jhvahhe344"]
+
+[ext_resource type="Script" uid="uid://ddprtht2qo7se" path="res://addons/inventory_system/core/inventory_component.gd" id="1_inv_comp"]
+[ext_resource type="Script" uid="uid://bgudcqpbogui8" path="res://addons/inventory_system/core/equipment_component.gd" id="2_equip_comp"]
+[ext_resource type="Script" uid="uid://cbq0osrr5prct" path="res://addons/inventory_system/core/item_category.gd" id="3_6qxox"]
+[ext_resource type="Script" uid="uid://cw07au03k3mfg" path="res://addons/inventory_system/core/inventory.gd" id="3_rnaij"]
+[ext_resource type="Script" uid="uid://dqg7l1xgdnk4k" path="res://addons/inventory_system/core/inventory_slot.gd" id="4_h3xc6"]
+[ext_resource type="PackedScene" path="res://addons/inventory_system/ui/item_tooltip_ui.tscn" id="8_s36qc"]
+[ext_resource type="Script" uid="uid://b7qhwhcj7pgjr" path="res://addons/inventory_system/ui/tooltip_controller.gd" id="9_h3xc6"]
+[ext_resource type="Script" uid="uid://dg7o5gjjv8mbg" path="res://scenes/test_scene.gd" id="9_test_script"]
+[ext_resource type="PackedScene" uid="uid://c4ciyr75aow6p" path="res://addons/inventory_system/ui/inventory_ui.tscn" id="10_inv_ui_scn"]
+[ext_resource type="Script" uid="uid://bxuwiwu17py1y" path="res://addons/inventory_system/core/inventory_interaction_handler.gd" id="11_gthg3"]
+[ext_resource type="PackedScene" path="res://addons/inventory_system/ui/quick_inventory_ui.tscn" id="11_quick_inv_ui"]
+
+[sub_resource type="Resource" id="Resource_6qxox"]
+script = ExtResource("4_h3xc6")
+
+[sub_resource type="Resource" id="Resource_gthg3"]
+script = ExtResource("4_h3xc6")
+
+[sub_resource type="Resource" id="Resource_ntc4i"]
+script = ExtResource("4_h3xc6")
+
+[sub_resource type="Resource" id="Resource_u0xbq"]
+script = ExtResource("4_h3xc6")
+
+[sub_resource type="Resource" id="Resource_pln1h"]
+script = ExtResource("4_h3xc6")
+
+[sub_resource type="Resource" id="Resource_8gixj"]
+script = ExtResource("4_h3xc6")
+
+[sub_resource type="Resource" id="Resource_hf2sn"]
+script = ExtResource("4_h3xc6")
+
+[sub_resource type="Resource" id="Resource_qq5q4"]
+script = ExtResource("4_h3xc6")
+
+[sub_resource type="Resource" id="Resource_gah1j"]
+script = ExtResource("4_h3xc6")
+
+[sub_resource type="Resource" id="Resource_ap2hy"]
+script = ExtResource("4_h3xc6")
+
+[sub_resource type="Resource" id="Resource_nlwlv"]
+script = ExtResource("4_h3xc6")
+
+[sub_resource type="Resource" id="Resource_6gkjt"]
+script = ExtResource("4_h3xc6")
+
+[sub_resource type="Resource" id="Resource_lmrlb"]
+script = ExtResource("4_h3xc6")
+
+[sub_resource type="Resource" id="Resource_nks25"]
+script = ExtResource("4_h3xc6")
+
+[sub_resource type="Resource" id="Resource_kub5s"]
+script = ExtResource("4_h3xc6")
+
+[sub_resource type="Resource" id="Resource_afgys"]
+script = ExtResource("4_h3xc6")
+
+[sub_resource type="Resource" id="Resource_sstcd"]
+script = ExtResource("4_h3xc6")
+
+[sub_resource type="Resource" id="Resource_2oq4n"]
+script = ExtResource("4_h3xc6")
+
+[sub_resource type="Resource" id="Resource_bnteq"]
+script = ExtResource("4_h3xc6")
+
+[sub_resource type="Resource" id="Resource_oimyc"]
+script = ExtResource("4_h3xc6")
+
+[sub_resource type="Resource" id="Resource_5csvr"]
+script = ExtResource("3_rnaij")
+slots = Array[ExtResource("4_h3xc6")]([SubResource("Resource_6qxox"), SubResource("Resource_gthg3"), SubResource("Resource_ntc4i"), SubResource("Resource_u0xbq"), SubResource("Resource_pln1h"), SubResource("Resource_8gixj"), SubResource("Resource_hf2sn"), SubResource("Resource_qq5q4"), SubResource("Resource_gah1j"), SubResource("Resource_ap2hy"), SubResource("Resource_nlwlv"), SubResource("Resource_6gkjt"), SubResource("Resource_lmrlb"), SubResource("Resource_nks25"), SubResource("Resource_kub5s"), SubResource("Resource_afgys"), SubResource("Resource_sstcd"), SubResource("Resource_2oq4n"), SubResource("Resource_bnteq"), SubResource("Resource_oimyc")])
+
+[sub_resource type="Resource" id="Resource_fftn7"]
+script = ExtResource("4_h3xc6")
+
+[sub_resource type="Resource" id="Resource_68ann"]
+script = ExtResource("4_h3xc6")
+
+[sub_resource type="Resource" id="Resource_lljex"]
+script = ExtResource("4_h3xc6")
+
+[sub_resource type="Resource" id="Resource_phh8q"]
+script = ExtResource("4_h3xc6")
+
+[sub_resource type="Resource" id="Resource_j5sap"]
+script = ExtResource("4_h3xc6")
+
+[sub_resource type="Resource" id="Resource_kqlge"]
+script = ExtResource("4_h3xc6")
+
+[sub_resource type="Resource" id="Resource_3dca5"]
+script = ExtResource("3_rnaij")
+slots = Array[ExtResource("4_h3xc6")]([SubResource("Resource_fftn7"), SubResource("Resource_68ann"), SubResource("Resource_lljex"), SubResource("Resource_phh8q"), SubResource("Resource_j5sap"), SubResource("Resource_kqlge")])
+size = 6
+
+[node name="TestScene" type="Node3D"]
+script = ExtResource("9_test_script")
+
+[node name="InventoryComponent" type="Node" parent="."]
+script = ExtResource("1_inv_comp")
+main_inventory = SubResource("Resource_5csvr")
+hotbar_inventory = SubResource("Resource_3dca5")
+
+[node name="EquipmentComponent" type="Node" parent="."]
+script = ExtResource("2_equip_comp")
+equipment_slots = {
+"Chest": null,
+"Feet": null,
+"Hands": null,
+"Head": null,
+"Legs": null,
+"MainHand": null,
+"Neck": null,
+"OffHand": null,
+"Ring1": null,
+"Ring2": null,
+"Shoulders": null,
+"Waist": null
+}
+defined_slots = Array[String](["Head", "Neck", "Shoulders", "Chest", "Hands", "MainHand", "Waist", "Legs", "OffHand", "Ring1", "Feet", "Ring2"])
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 3)
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="InventoryUI" parent="CanvasLayer" node_paths=PackedStringArray("tooltip_controller", "inventory_component", "equipment_component", "interaction_handler") instance=ExtResource("10_inv_ui_scn")]
+tooltip_controller = NodePath("../TooltipController")
+inventory_component = NodePath("../../InventoryComponent")
+equipment_component = NodePath("../../EquipmentComponent")
+interaction_handler = NodePath("../../InventoryInteractionHandler")
+
+[node name="QuickInventoryUI" parent="CanvasLayer" node_paths=PackedStringArray("tooltip_controller", "inventory_component", "equipment_component", "interaction_handler") instance=ExtResource("11_quick_inv_ui")]
+tooltip_controller = NodePath("../TooltipController")
+inventory_component = NodePath("../../InventoryComponent")
+equipment_component = NodePath("../../EquipmentComponent")
+interaction_handler = NodePath("../../InventoryInteractionHandler")
+
+[node name="Instructions" type="Label" parent="CanvasLayer"]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -150.0
+offset_top = -30.0
+offset_right = 150.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "Drag items between inventory and equipment slots"
+horizontal_alignment = 1
+
+[node name="ItemTooltipUI" parent="CanvasLayer" instance=ExtResource("8_s36qc")]
+
+[node name="TooltipController" type="Node" parent="CanvasLayer" node_paths=PackedStringArray("tooltip_ui")]
+script = ExtResource("9_h3xc6")
+tooltip_ui = NodePath("../ItemTooltipUI")
+
+[node name="InventoryInteractionHandler" type="Node" parent="."]
+script = ExtResource("11_gthg3")
+metadata/_custom_type_script = "uid://bxuwiwu17py1y"

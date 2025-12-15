@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="InventoryItem" load_steps=3 format=3 uid="uid://bv0pcr5b62htl"]
+
+[ext_resource type="Script" uid="uid://cnbjviqrefaew" path="res://addons/inventory_system/core/inventory_item.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://cn77y12pjwyio" path="res://items/icons/gold_coin.svg" id="2_icon"]
+
+[resource]
+script = ExtResource("1_script")
+name = "Gold Coin"
+description = "A shiny gold coin."
+icon = ExtResource("2_icon")
+max_stack = 99
+weight = 0.01
+value = 1
+id = "gold_coin"

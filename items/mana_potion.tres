@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ConsumableItem" load_steps=3 format=3 uid="uid://b23g6itd0d51a"]
+
+[ext_resource type="Script" path="res://addons/inventory_system/core/consumable_item.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://crx7oas5jxo1c" path="res://items/icons/mana_potion.svg" id="2_icon"]
+
+[resource]
+script = ExtResource("1_script")
+health_restore = 0
+mana_restore = 30
+name = "Mana Potion"
+description = "Restores 30 mana points."
+icon = ExtResource("2_icon")
+max_stack = 10
+weight = 0.5
+value = 30
+id = "mana_potion"

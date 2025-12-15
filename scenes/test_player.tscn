@@ -1,0 +1,105 @@
+[gd_scene load_steps=28 format=3 uid="uid://mgalvo6dsisi"]
+
+[ext_resource type="Script" uid="uid://dflqvwr77o2me" path="res://scenes/test_player.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://ddprtht2qo7se" path="res://addons/inventory_system/core/inventory_component.gd" id="2_inv_comp"]
+[ext_resource type="Script" uid="uid://bgudcqpbogui8" path="res://addons/inventory_system/core/equipment_component.gd" id="3_equip_comp"]
+[ext_resource type="Script" uid="uid://cw07au03k3mfg" path="res://addons/inventory_system/core/inventory.gd" id="3_gqg63"]
+[ext_resource type="Script" uid="uid://dqg7l1xgdnk4k" path="res://addons/inventory_system/core/inventory_slot.gd" id="4_hfou0"]
+[ext_resource type="PackedScene" path="res://addons/inventory_system/ui/inventory_ui.tscn" id="4_inv_ui"]
+
+[sub_resource type="Resource" id="Resource_oxvr6"]
+script = ExtResource("4_hfou0")
+
+[sub_resource type="Resource" id="Resource_10l1y"]
+script = ExtResource("4_hfou0")
+
+[sub_resource type="Resource" id="Resource_lwvfx"]
+script = ExtResource("4_hfou0")
+
+[sub_resource type="Resource" id="Resource_s11rc"]
+script = ExtResource("4_hfou0")
+
+[sub_resource type="Resource" id="Resource_qt7sb"]
+script = ExtResource("4_hfou0")
+
+[sub_resource type="Resource" id="Resource_ca63f"]
+script = ExtResource("4_hfou0")
+
+[sub_resource type="Resource" id="Resource_1as6o"]
+script = ExtResource("4_hfou0")
+
+[sub_resource type="Resource" id="Resource_b18lp"]
+script = ExtResource("4_hfou0")
+
+[sub_resource type="Resource" id="Resource_wbjsk"]
+script = ExtResource("4_hfou0")
+
+[sub_resource type="Resource" id="Resource_ebqom"]
+script = ExtResource("4_hfou0")
+
+[sub_resource type="Resource" id="Resource_nt2n8"]
+script = ExtResource("4_hfou0")
+
+[sub_resource type="Resource" id="Resource_33wjq"]
+script = ExtResource("4_hfou0")
+
+[sub_resource type="Resource" id="Resource_krsg4"]
+script = ExtResource("4_hfou0")
+
+[sub_resource type="Resource" id="Resource_ot1g1"]
+script = ExtResource("4_hfou0")
+
+[sub_resource type="Resource" id="Resource_5e817"]
+script = ExtResource("4_hfou0")
+
+[sub_resource type="Resource" id="Resource_5mocb"]
+script = ExtResource("4_hfou0")
+
+[sub_resource type="Resource" id="Resource_2k3oh"]
+script = ExtResource("4_hfou0")
+
+[sub_resource type="Resource" id="Resource_s2sou"]
+script = ExtResource("4_hfou0")
+
+[sub_resource type="Resource" id="Resource_b77rt"]
+script = ExtResource("4_hfou0")
+
+[sub_resource type="Resource" id="Resource_rj2jh"]
+script = ExtResource("4_hfou0")
+
+[sub_resource type="Resource" id="Resource_xce6g"]
+script = ExtResource("3_gqg63")
+slots = Array[Resource]([SubResource("Resource_oxvr6"), SubResource("Resource_10l1y"), SubResource("Resource_lwvfx"), SubResource("Resource_s11rc"), SubResource("Resource_qt7sb"), SubResource("Resource_ca63f"), SubResource("Resource_1as6o"), SubResource("Resource_b18lp"), SubResource("Resource_wbjsk"), SubResource("Resource_ebqom"), SubResource("Resource_nt2n8"), SubResource("Resource_33wjq"), SubResource("Resource_krsg4"), SubResource("Resource_ot1g1"), SubResource("Resource_5e817"), SubResource("Resource_5mocb"), SubResource("Resource_2k3oh"), SubResource("Resource_s2sou"), SubResource("Resource_b77rt"), SubResource("Resource_rj2jh")])
+
+[node name="TestPlayer" type="Node3D"]
+script = ExtResource("1_script")
+
+[node name="InventoryComponent" type="Node" parent="."]
+script = ExtResource("2_inv_comp")
+inventory = SubResource("Resource_xce6g")
+
+[node name="EquipmentComponent" type="Node" parent="."]
+script = ExtResource("3_equip_comp")
+equipment_slots = {
+"Chest": null,
+"Feet": null,
+"Hands": null,
+"Head": null,
+"Legs": null,
+"MainHand": null,
+"Neck": null,
+"OffHand": null,
+"Ring1": null,
+"Ring2": null,
+"Shoulders": null,
+"Waist": null
+}
+defined_slots = Array[String](["Head", "Neck", "Shoulders", "Chest", "Hands", "MainHand", "Waist", "Legs", "OffHand", "Ring1", "Feet", "Ring2"])
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="InventoryUI" parent="CanvasLayer" instance=ExtResource("4_inv_ui")]
+offset_left = -319.0
+offset_top = -202.0
+offset_right = 281.0
+offset_bottom = 198.0

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EquipmentItem" load_steps=3 format=3 uid="uid://dg8te2xa3a2i"]
+
+[ext_resource type="Script" uid="uid://cpwwgvl4f10kw" path="res://addons/inventory_system/core/equipment_item.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://xbljpmhr4j5w" path="res://items/icons/leather_boots.svg" id="2_icon"]
+
+[resource]
+script = ExtResource("1_script")
+slot_type_name = "Feet"
+defense = 2
+name = "Leather Boots"
+description = "Light leather boots for quick movement."
+icon = ExtResource("2_icon")
+weight = 1.5
+value = 50
+id = "leather_boots"

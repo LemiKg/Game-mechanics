@@ -1,0 +1,49 @@
+[gd_scene load_steps=3 format=3 uid="uid://equipmentslotui_placeholder"]
+
+[ext_resource type="Script" path="res://addons/inventory_system/ui/equipment_slot_ui.gd" id="1_script"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_slot"]
+bg_color = Color(0.3, 0.2, 0.15, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.5, 0.4, 0.2, 1)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[node name="EquipmentSlotUI" type="VBoxContainer" node_paths=PackedStringArray("icon_texture", "slot_label")]
+custom_minimum_size = Vector2(70, 85)
+offset_right = 70.0
+offset_bottom = 85.0
+size_flags_horizontal = 4
+size_flags_vertical = 4
+script = ExtResource("1_script")
+icon_texture = NodePath("SlotPanel/MarginContainer/Icon")
+slot_label = NodePath("Label")
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 2
+text = "Slot"
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 10
+
+[node name="SlotPanel" type="PanelContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_slot")
+
+[node name="MarginContainer" type="MarginContainer" parent="SlotPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="Icon" type="TextureRect" parent="SlotPanel/MarginContainer"]
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
