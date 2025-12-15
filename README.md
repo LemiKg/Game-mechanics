@@ -15,6 +15,19 @@ This project serves as a **library of production-ready game mechanics** that can
 | Addon | Description | Status |
 |-------|-------------|--------|
 | [Inventory System](addons/inventory_system/) | Resource-based inventory with equipment, consumables, and drag-drop UI | ✅ Complete |
+| [Player Control Core](addons/player_control_core/) | Shared player control framework with state machine, motor, and input routing | ✅ Complete |
+| [Player Control FPS](addons/player_control_fps/) | First-person camera controller with mouse look | ✅ Complete |
+| [Player Control 3rd Person](addons/player_control_3rd_person/) | Third-person orbit camera with collision | ✅ Complete |
+
+## Addon Dependencies
+
+```
+player_control_fps ─────┐
+                        ├──► player_control_core
+player_control_3rd_person ─┘
+
+inventory_system (standalone)
+```
 
 ## Planned Addons
 

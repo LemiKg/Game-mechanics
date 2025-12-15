@@ -44,6 +44,12 @@ func _enter_tree() -> void:
 		preload("res://addons/player_control_core/icons/controller.svg")
 	)
 	add_custom_type(
+		"DualPerspectiveController3D",
+		"Node",
+		preload("res://addons/player_control_core/core/dual_perspective_controller_3d.gd"),
+		preload("res://addons/player_control_core/icons/controller.svg")
+	)
+	add_custom_type(
 		"PlayerMotor3D",
 		"Node",
 		preload("res://addons/player_control_core/core/player_motor_3d.gd"),
@@ -81,6 +87,7 @@ func _exit_tree() -> void:
 	
 	# Core components
 	remove_custom_type("BasePlayerController3D")
+	remove_custom_type("DualPerspectiveController3D")
 	remove_custom_type("PlayerMotor3D")
 	remove_custom_type("PlayerInputRouter3D")
 	
