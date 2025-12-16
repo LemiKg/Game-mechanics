@@ -23,8 +23,8 @@
 [ext_resource type="Script" path="res://scenes/reusable_player.gd" id="21_player_script"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_player"]
-radius = 0.4
-height = 1.8
+radius = 0.2
+height = 0.9
 
 [sub_resource type="Resource" id="Slot_1"]
 script = ExtResource("4_slot")
@@ -117,18 +117,19 @@ size = 6
 script = ExtResource("21_player_script")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
 shape = SubResource("CapsuleShape3D_player")
 
 [node name="CharacterMesh" parent="." instance=ExtResource("19_character")]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
 
 [node name="FPSPitchPivot" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
 
 [node name="FPSCamera" type="Camera3D" parent="FPSPitchPivot"]
 
 [node name="CameraTarget" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
 
 [node name="PlayerInputRouter3D" type="Node" parent="."]
 script = ExtResource("6_input")

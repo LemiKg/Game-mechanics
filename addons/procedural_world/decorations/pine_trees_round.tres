@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="DecorationDefinition" load_steps=8 format=3 uid="uid://bqw2tefnpvmw"]
+
+[ext_resource type="Script" uid="uid://kxng7b8qpiu7" path="res://addons/procedural_world/core/decoration_definition.gd" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://dtvk3gjskhub6" path="res://assets/nature-kit/tree_pineRoundA.glb" id="2_scene1"]
+[ext_resource type="PackedScene" uid="uid://cnxdbabvkjvjr" path="res://assets/nature-kit/tree_pineRoundB.glb" id="3_scene2"]
+[ext_resource type="PackedScene" uid="uid://6o77cstuert4" path="res://assets/nature-kit/tree_pineRoundC.glb" id="4_scene3"]
+[ext_resource type="PackedScene" uid="uid://dioux4mofms3s" path="res://assets/nature-kit/tree_pineRoundD.glb" id="5_scene4"]
+[ext_resource type="PackedScene" uid="uid://cxhff1ydwn7d5" path="res://assets/nature-kit/tree_pineRoundE.glb" id="6_scene5"]
+[ext_resource type="PackedScene" uid="uid://haskr0fxh6jc" path="res://assets/nature-kit/tree_pineRoundF.glb" id="7_scene6"]
+
+[resource]
+script = ExtResource("1_script")
+scene_variants = Array[PackedScene]([ExtResource("2_scene1"), ExtResource("3_scene2"), ExtResource("4_scene3"), ExtResource("5_scene4"), ExtResource("6_scene5"), ExtResource("7_scene6")])
+density = 0.02
+min_scale = 1.8
+max_scale = 2.5
+random_rotation = 6.283
+cluster_strength = 0.45
+cluster_scale = 0.018
+has_collision = true
+collision_shape = 0
+collision_radius = 0.5
+collision_height = 8.0
+collision_distance = 50.0

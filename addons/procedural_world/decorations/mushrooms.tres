@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="DecorationDefinition" load_steps=5 format=3 uid="uid://bn7htv3ti0r5c"]
+
+[ext_resource type="Script" uid="uid://kxng7b8qpiu7" path="res://addons/procedural_world/core/decoration_definition.gd" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://btf1gcgb44c2w" path="res://assets/nature-kit/mushroom_red.glb" id="2_scene1"]
+[ext_resource type="PackedScene" uid="uid://ikw7vpjp67u4" path="res://assets/nature-kit/mushroom_redGroup.glb" id="3_scene2"]
+[ext_resource type="PackedScene" uid="uid://dc400qcb7ag67" path="res://assets/nature-kit/mushroom_tan.glb" id="4_scene3"]
+
+[resource]
+script = ExtResource("1_script")
+decoration_type = 3
+scene_variants = Array[PackedScene]([ExtResource("2_scene1"), ExtResource("3_scene2"), ExtResource("4_scene3")])
+density = 0.02
+min_scale = 0.6
+max_scale = 1.4
+max_slope = 0.3
+align_to_normal = true
+random_rotation = 6.283

@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="DesertBiome" load_steps=6 format=3 uid="uid://dtn2y0lesqjk6"]
+
+[ext_resource type="Script" uid="uid://baho7k721oe64" path="res://addons/procedural_world/core/biomes/desert_biome.gd" id="1_desert"]
+[ext_resource type="Script" uid="uid://kxng7b8qpiu7" path="res://addons/procedural_world/core/decoration_definition.gd" id="2_decdef"]
+[ext_resource type="Resource" path="res://addons/procedural_world/decorations/cactus_tall.tres" id="3_cactus_tall"]
+[ext_resource type="Resource" path="res://addons/procedural_world/decorations/cactus_short.tres" id="4_cactus_short"]
+[ext_resource type="Resource" path="res://addons/procedural_world/decorations/rocks_flat.tres" id="5_rocks_flat"]
+
+[resource]
+script = ExtResource("1_desert")
+biome_name = "Desert"
+priority = 25
+splatmap_channel = 2
+terrain_color = Color(0.9, 0.8, 0.5, 1)
+max_elevation = 0.7
+max_moisture = 0.4
+decorations = Array[ExtResource("2_decdef")]([ExtResource("3_cactus_tall"), ExtResource("4_cactus_short"), ExtResource("5_rocks_flat")])

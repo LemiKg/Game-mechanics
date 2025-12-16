@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="DecorationDefinition" load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://addons/procedural_world/core/decoration_definition.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://assets/nature-kit/rock_largeA.glb" id="2_scene1"]
+[ext_resource type="PackedScene" path="res://assets/nature-kit/rock_largeB.glb" id="3_scene2"]
+[ext_resource type="PackedScene" path="res://assets/nature-kit/rock_largeC.glb" id="4_scene3"]
+[ext_resource type="PackedScene" path="res://assets/nature-kit/rock_largeD.glb" id="5_scene4"]
+[ext_resource type="PackedScene" path="res://assets/nature-kit/rock_largeE.glb" id="6_scene5"]
+[ext_resource type="PackedScene" path="res://assets/nature-kit/rock_largeF.glb" id="7_scene6"]
+
+[resource]
+script = ExtResource("1_script")
+decoration_type = 1
+scene_variants = [ExtResource("2_scene1"), ExtResource("3_scene2"), ExtResource("4_scene3"), ExtResource("5_scene4"), ExtResource("6_scene5"), ExtResource("7_scene6")]
+density = 0.01
+min_scale = 0.7
+max_scale = 1.2
+min_slope = 0.0
+max_slope = 0.7
+align_to_normal = true
+y_offset = 0.0
+random_rotation = 6.283
+cluster_strength = 0.4
+cluster_scale = 0.02
+has_collision = true
+collision_shape = 1
+collision_radius = 0.7
+collision_height = 1.5
+collision_distance = 35.0

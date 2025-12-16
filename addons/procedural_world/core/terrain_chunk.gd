@@ -37,7 +37,6 @@ func _ready() -> void:
 ## Initializes the chunk with generated data and material
 func initialize(data: ChunkData, material: ShaderMaterial, cell_size: float = 1.0) -> void:
 	chunk_data = data
-	_material = material
 	_cell_size = cell_size
 	
 	# Clear existing meshes
@@ -46,6 +45,13 @@ func initialize(data: ChunkData, material: ShaderMaterial, cell_size: float = 1.
 	if not chunk_data or chunk_data.mesh_lods.is_empty():
 		push_warning("TerrainChunk: No mesh data to initialize")
 		return
+	
+	# Duplicate material for per-chunk splatmap
+	if material:
+		_material = material.duplicate() as ShaderMaterial
+		_setup_splatmap()
+	else:
+		_material = null
 	
 	# Create MeshInstance3D for each LOD level
 	for i in range(chunk_data.mesh_lods.size()):
@@ -66,6 +72,27 @@ func initialize(data: ChunkData, material: ShaderMaterial, cell_size: float = 1.
 		_lod_mesh_instances.append(mesh_instance)
 	
 	chunk_loaded.emit(chunk_data.coord)
+
+
+## Sets up the splatmap texture from biome weights
+func _setup_splatmap() -> void:
+	if not _material or not chunk_data:
+		return
+	
+	# Check if biome weights are available
+	if chunk_data.biome_weights.is_empty():
+		return
+	
+	# Build splatmap texture from biome weights
+	var splatmap := TerrainMeshBuilder.build_splatmap_texture(
+		chunk_data.biome_weights,
+		chunk_data.width,
+		chunk_data.depth
+	)
+	
+	if splatmap:
+		_material.set_shader_parameter("splatmap", splatmap)
+		_material.set_shader_parameter("use_splatmap", true)
 
 
 ## Configures visibility ranges for LOD transitions

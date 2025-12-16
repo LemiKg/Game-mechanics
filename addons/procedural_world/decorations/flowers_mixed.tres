@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="DecorationDefinition" load_steps=7 format=3 uid="uid://cl01ifk371hjg"]
+
+[ext_resource type="Script" uid="uid://kxng7b8qpiu7" path="res://addons/procedural_world/core/decoration_definition.gd" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://bkub3vmlaqs24" path="res://assets/nature-kit/flower_yellowA.glb" id="2_scene1"]
+[ext_resource type="PackedScene" uid="uid://dhd70hltbq345" path="res://assets/nature-kit/flower_yellowB.glb" id="3_scene2"]
+[ext_resource type="PackedScene" uid="uid://i1wvhlru1py8" path="res://assets/nature-kit/flower_redA.glb" id="4_scene3"]
+[ext_resource type="PackedScene" uid="uid://bns2pk003ja4f" path="res://assets/nature-kit/flower_redB.glb" id="5_scene4"]
+[ext_resource type="PackedScene" uid="uid://dv7qd2eauokj0" path="res://assets/nature-kit/flower_purpleA.glb" id="6_scene5"]
+
+[resource]
+script = ExtResource("1_script")
+decoration_type = 3
+scene_variants = Array[PackedScene]([ExtResource("2_scene1"), ExtResource("3_scene2"), ExtResource("4_scene3"), ExtResource("5_scene4"), ExtResource("6_scene5")])
+density = 0.08
+max_scale = 1.3
+max_slope = 0.25
+align_to_normal = true
+random_rotation = 6.283

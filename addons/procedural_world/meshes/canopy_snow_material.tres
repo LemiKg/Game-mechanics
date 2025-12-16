@@ -1,0 +1,13 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3]
+
+[ext_resource type="Shader" path="res://addons/procedural_world/shaders/decoration_snow.gdshader" id="1"]
+
+[resource]
+shader = ExtResource("1")
+shader_parameter/base_color = Color(0.2, 0.5, 0.15, 1)
+shader_parameter/snow_height = 40.0
+shader_parameter/snow_blend = 15.0
+shader_parameter/snow_color = Color(0.95, 0.97, 1, 1)
+shader_parameter/snow_intensity = 0.85
+shader_parameter/roughness = 0.8
+shader_parameter/metallic = 0.0

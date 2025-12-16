@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="DecorationDefinition" load_steps=3 format=3 uid="uid://xmqlya6cij5p"]
+
+[ext_resource type="Script" uid="uid://kxng7b8qpiu7" path="res://addons/procedural_world/core/decoration_definition.gd" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://b70dl8m4xp3bv" path="res://assets/nature-kit/cactus_tall.glb" id="2_scene"]
+
+[resource]
+script = ExtResource("1_script")
+scene = ExtResource("2_scene")
+density = 0.002
+min_scale = 0.7
+max_scale = 1.1
+max_slope = 0.3
+random_rotation = 6.283
+cluster_strength = 0.3
+cluster_scale = 0.03
+has_collision = true
+collision_shape = 0
+collision_radius = 0.3
+collision_height = 3.0
+collision_distance = 50.0

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="DecorationDefinition" load_steps=4 format=3 uid="uid://do6acptjla6ub"]
+
+[ext_resource type="Script" uid="uid://kxng7b8qpiu7" path="res://addons/procedural_world/core/decoration_definition.gd" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://de6q38cyug7yo" path="res://assets/nature-kit/plant_bushSmall.glb" id="2_scene1"]
+[ext_resource type="PackedScene" uid="uid://cwglhrp3li287" path="res://assets/nature-kit/plant_bushTriangle.glb" id="3_scene2"]
+
+[resource]
+script = ExtResource("1_script")
+decoration_type = 2
+scene_variants = Array[PackedScene]([ExtResource("2_scene1"), ExtResource("3_scene2")])
+density = 0.03
+min_scale = 0.7
+max_slope = 0.35
+random_rotation = 6.283

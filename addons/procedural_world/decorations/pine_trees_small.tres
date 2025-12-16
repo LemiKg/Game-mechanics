@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="DecorationDefinition" load_steps=6 format=3 uid="uid://cdafy3nykhjl0"]
+
+[ext_resource type="Script" uid="uid://kxng7b8qpiu7" path="res://addons/procedural_world/core/decoration_definition.gd" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://d3uhrc2q30gs3" path="res://assets/nature-kit/tree_pineSmallA.glb" id="2_scene1"]
+[ext_resource type="PackedScene" uid="uid://dxy4lj4csv6qo" path="res://assets/nature-kit/tree_pineSmallB.glb" id="3_scene2"]
+[ext_resource type="PackedScene" uid="uid://dgki20x45w8ux" path="res://assets/nature-kit/tree_pineSmallC.glb" id="4_scene3"]
+[ext_resource type="PackedScene" uid="uid://cfv7820yl70dw" path="res://assets/nature-kit/tree_pineSmallD.glb" id="5_scene4"]
+
+[resource]
+script = ExtResource("1_script")
+scene_variants = Array[PackedScene]([ExtResource("2_scene1"), ExtResource("3_scene2"), ExtResource("4_scene3"), ExtResource("5_scene4")])
+density = 0.03
+min_scale = 1.5
+max_scale = 2.0
+max_slope = 0.6
+random_rotation = 6.283
+cluster_strength = 0.4
+cluster_scale = 0.02
+has_collision = true
+collision_shape = 0
+collision_radius = 0.35
+collision_height = 5.0
+collision_distance = 40.0

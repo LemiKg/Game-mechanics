@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="DecorationDefinition" load_steps=3 format=3 uid="uid://dgpe4q633kb8t"]
+
+[ext_resource type="Script" uid="uid://kxng7b8qpiu7" path="res://addons/procedural_world/core/decoration_definition.gd" id="1"]
+[ext_resource type="Material" path="res://addons/procedural_world/meshes/bush_snow_material.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+decoration_type = 2
+material = ExtResource("2")
+density = 0.05
+min_scale = 0.6
+random_rotation = 6.283

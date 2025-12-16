@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="DecorationDefinition" load_steps=3 format=3 uid="uid://dt4vi2cawpr6u"]
+
+[ext_resource type="Script" uid="uid://kxng7b8qpiu7" path="res://addons/procedural_world/core/decoration_definition.gd" id="1"]
+[ext_resource type="Material" path="res://addons/procedural_world/meshes/canopy_snow_material.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+decoration_type = 0
+material = ExtResource("2")
+density = 0.02
+min_scale = 0.7
+max_scale = 1.3
+max_slope = 0.4
+random_rotation = 6.283

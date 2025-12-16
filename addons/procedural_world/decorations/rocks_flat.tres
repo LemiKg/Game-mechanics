@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="DecorationDefinition" load_steps=5 format=3 uid="uid://clmlxh6x54hpg"]
+
+[ext_resource type="Script" uid="uid://kxng7b8qpiu7" path="res://addons/procedural_world/core/decoration_definition.gd" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://bsq38gcbxfyhd" path="res://assets/nature-kit/rock_smallFlatA.glb" id="2_scene1"]
+[ext_resource type="PackedScene" uid="uid://bgx0d0647d5vw" path="res://assets/nature-kit/rock_smallFlatB.glb" id="3_scene2"]
+[ext_resource type="PackedScene" uid="uid://bmdu3p2a6lgh7" path="res://assets/nature-kit/rock_smallFlatC.glb" id="4_scene3"]
+
+[resource]
+script = ExtResource("1_script")
+decoration_type = 1
+scene_variants = Array[PackedScene]([ExtResource("2_scene1"), ExtResource("3_scene2"), ExtResource("4_scene3")])
+density = 0.01
+min_scale = 0.5
+max_scale = 1.5
+max_slope = 0.4
+align_to_normal = true
+random_rotation = 6.283

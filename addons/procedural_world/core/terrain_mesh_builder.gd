@@ -226,3 +226,36 @@ static func create_collision_data(
 		"width": width,
 		"depth": depth
 	}
+
+
+## Builds a splatmap texture from biome weights for shader blending
+## @param biome_weights: PackedFloat32Array with RGBA values per vertex (size = width * depth * 4)
+## @param width: Number of vertices in X direction
+## @param depth: Number of vertices in Z direction
+## @return: ImageTexture suitable for shader splatmap uniform
+static func build_splatmap_texture(
+	biome_weights: PackedFloat32Array,
+	width: int,
+	depth: int
+) -> ImageTexture:
+	if biome_weights.size() != width * depth * 4:
+		push_error("TerrainMeshBuilder: Biome weights size mismatch (expected %d, got %d)" % [width * depth * 4, biome_weights.size()])
+		return null
+	
+	# Create image from biome weights
+	var image := Image.create(width, depth, false, Image.FORMAT_RGBA8)
+	
+	for z in range(depth):
+		for x in range(width):
+			var idx := (z * width + x) * 4
+			var color := Color(
+				biome_weights[idx], # R
+				biome_weights[idx + 1], # G
+				biome_weights[idx + 2], # B
+				biome_weights[idx + 3] # A
+			)
+			image.set_pixel(x, z, color)
+	
+	# Create texture from image
+	var texture := ImageTexture.create_from_image(image)
+	return texture

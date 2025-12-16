@@ -395,23 +395,38 @@ ChunkManager._process()
 
 ---
 
-### Phase 2: Biomes + Splatmap Blending
+### Phase 2: Biomes + Splatmap Blending ✅ COMPLETE
 **Goal:** Multiple biomes with smooth blending
 
 | Task | File | Priority | Status |
 |------|------|----------|--------|
-| Implement BiomeData (abstract) | `core/biome_data.gd` | 1 | |
-| Implement BiomeMap | `core/biome_map.gd` | 2 | |
-| Create PlainsBiome | `core/biomes/plains_biome.gd` | 3 | |
-| Create ForestBiome | `core/biomes/forest_biome.gd` | 4 | |
-| Create MountainBiome | `core/biomes/mountain_biome.gd` | 5 | |
-| Create DesertBiome | `core/biomes/desert_biome.gd` | 6 | |
-| Add biome weight calculation | `core/chunk_manager.gd` | 7 | |
-| Implement splatmap texture generation | `core/terrain_mesh_builder.gd` | 8 | |
-| Enable splatmap blending in shader | `shaders/terrain_triplanar.gdshader` | 9 | (prepared) |
-| Update WorldConfig for biomes | `core/world_config.gd` | 10 | |
+| Implement BiomeData (abstract) | `core/biome_data.gd` | 1 | ✅ |
+| Implement BiomeMap | `core/biome_map.gd` | 2 | ✅ |
+| Create PlainsBiome | `core/biomes/plains_biome.gd` | 3 | ✅ |
+| Create ForestBiome | `core/biomes/forest_biome.gd` | 4 | ✅ |
+| Create MountainBiome | `core/biomes/mountain_biome.gd` | 5 | ✅ |
+| Create DesertBiome | `core/biomes/desert_biome.gd` | 6 | ✅ |
+| Add biome weight calculation | `core/chunk_manager.gd` | 7 | ✅ |
+| Implement splatmap texture generation | `core/terrain_mesh_builder.gd` | 8 | ✅ |
+| Enable splatmap blending in shader | `shaders/terrain_triplanar.gdshader` | 9 | ✅ |
+| Update WorldConfig for biomes | `core/world_config.gd` | 10 | ✅ |
+| Register biome types in plugin | `world_generation_plugin.gd` | 11 | ✅ |
+| Create default biome resources | `world/biomes/*.tres` | 12 | ✅ |
+| Blended height modifications | `core/chunk_manager.gd` | 13 | ✅ |
+| Height-based snow in shader | `shaders/terrain_triplanar.gdshader` | 14 | ✅ |
 
 **Deliverable:** Multiple chunks with different biomes, smooth blending at borders.
+
+**Implementation Notes:**
+- Biomes define elevation/moisture ranges with `matches()` and `get_match_strength()` for blending
+- Height modifications are blended across all matching biomes (prevents cliff discontinuities)
+- Per-chunk material duplication for unique splatmap textures
+- Snow automatically applied at high elevations via shader (configurable `snow_height`)
+- Default biome resources in `world/biomes/` with tuned thresholds:
+  - Plains: elevation 0.0-0.7, moisture 0.2-0.8
+  - Forest: elevation 0.15-0.8, moisture 0.45-1.0
+  - Desert: elevation 0.0-0.7, moisture 0.0-0.4
+  - Mountain: elevation 0.65-1.0, any moisture
 
 ---
 
@@ -435,22 +450,34 @@ ChunkManager._process()
 
 ---
 
-### Phase 4: Async Generation + Vegetation
+### Phase 4: Async Generation + Vegetation ✅ COMPLETE
 **Goal:** Smooth loading without frame drops, basic vegetation
 
 | Task | File | Priority | Status |
 |------|------|----------|--------|
-| Implement AsyncGenerationHandler | `core/async_generation_handler.gd` | 1 | |
-| Add Thread + Mutex pattern | `core/async_generation_handler.gd` | 2 | |
-| Implement thread-safe generation | `height_generator.gd`, `terrain_mesh_builder.gd` | 3 | (already stateless) |
-| Add call_deferred mesh application | `core/chunk_manager.gd` | 4 | |
-| Implement DecorationDefinition | `core/decoration_definition.gd` | 5 | |
-| Implement VegetationSpawner | `core/vegetation_spawner.gd` | 6 | |
-| Add MultiMesh instancing | `core/vegetation_spawner.gd` | 7 | |
-| Implement Poisson disk sampling | `core/vegetation_spawner.gd` | 8 | |
-| Add biome-specific decorations | `core/biomes/*.gd` | 9 | |
+| Implement AsyncGenerationHandler | `core/async_generation_handler.gd` | 1 | ✅ |
+| Add Thread + Mutex pattern | `core/async_generation_handler.gd` | 2 | ✅ |
+| Implement thread-safe generation | `height_generator.gd`, `terrain_mesh_builder.gd` | 3 | ✅ (already stateless) |
+| Add call_deferred mesh application | `core/chunk_manager.gd` | 4 | ✅ |
+| Implement DecorationDefinition | `core/decoration_definition.gd` | 5 | ✅ |
+| Implement DecorationMeshBuilder | `core/decoration_mesh_builder.gd` | 6 | ✅ |
+| Implement VegetationSpawner | `core/vegetation_spawner.gd` | 7 | ✅ |
+| Add MultiMesh instancing | `core/vegetation_spawner.gd` | 8 | ✅ |
+| Implement jittered grid sampling | `core/vegetation_spawner.gd` | 9 | ✅ |
+| Add biome-specific decorations | `world/biomes/*.tres` | 10 | ✅ |
+| Create placeholder meshes/materials | `meshes/*.tres` | 11 | ✅ |
+| Register new types in plugin | `world_generation_plugin.gd` | 12 | ✅ |
 
 **Deliverable:** Lag-free chunk loading, trees/rocks in appropriate biomes.
+
+**Implementation Notes:**
+- Single worker thread with Mutex for queue access
+- `call_deferred()` used for all scene tree modifications
+- Jittered grid placement (simpler than Poisson disk, good visual results)
+- Procedural placeholder meshes via `DecorationMeshBuilder` (tree, rock, bush)
+- Per-chunk MultiMeshInstance3D for efficient instancing
+- Slope filtering and normal alignment support
+- Forest biome: trees + bushes; Mountain biome: rocks
 
 ---
 
@@ -696,3 +723,7 @@ func reset() -> void
 |------|---------|---------|
 | 2025-12-16 | 0.1.0 | Initial plan created |
 | 2025-12-16 | 0.2.0 | Phase 1 implementation complete - Core terrain with editor preview, LOD, triplanar shader |
+| 2025-12-16 | 0.3.0 | Phase 2 implementation complete - Biome system with BiomeData, BiomeMap, 4 biome types, splatmap blending |
+| 2025-12-16 | 0.3.1 | Added blended height modifications to prevent biome boundary cliffs |
+| 2025-12-16 | 0.3.2 | Added height-based snow to shader, tuned biome thresholds for balanced distribution |
+| 2025-12-16 | 0.4.0 | Phase 4 implementation complete - AsyncGenerationHandler with Thread+Mutex, VegetationSpawner with MultiMesh+jittered grid, DecorationDefinition resources, procedural placeholder meshes |

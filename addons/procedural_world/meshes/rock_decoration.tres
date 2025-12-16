@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="DecorationDefinition" load_steps=3 format=3 uid="uid://bvn36feerlsc6"]
+
+[ext_resource type="Script" uid="uid://kxng7b8qpiu7" path="res://addons/procedural_world/core/decoration_definition.gd" id="1"]
+[ext_resource type="Material" path="res://addons/procedural_world/meshes/rock_snow_material.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+decoration_type = 1
+material = ExtResource("2")
+density = 0.01
+min_scale = 0.5
+max_scale = 2.0
+max_slope = 1.0
+align_to_normal = true
+y_offset = -0.1
+random_rotation = 6.283

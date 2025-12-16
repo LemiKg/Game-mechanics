@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="BiomeMap" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://addons/procedural_world/core/biome_map.gd" id="1_biome_map"]
+[ext_resource type="Resource" path="res://world/biomes/plains.tres" id="2_plains"]
+[ext_resource type="Resource" path="res://world/biomes/forest.tres" id="3_forest"]
+[ext_resource type="Resource" path="res://world/biomes/mountain.tres" id="4_mountain"]
+[ext_resource type="Resource" path="res://world/biomes/desert.tres" id="5_desert"]
+
+[resource]
+script = ExtResource("1_biome_map")
+biomes = [ExtResource("2_plains"), ExtResource("3_forest"), ExtResource("4_mountain"), ExtResource("5_desert")]
+fallback_biome = ExtResource("2_plains")

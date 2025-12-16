@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ForestBiome" load_steps=7 format=3 uid="uid://c5t8a7lnxjeym"]
+
+[ext_resource type="Script" uid="uid://kxng7b8qpiu7" path="res://addons/procedural_world/core/decoration_definition.gd" id="1_58apm"]
+[ext_resource type="Script" uid="uid://dxb6tmal8stqx" path="res://addons/procedural_world/core/biomes/forest_biome.gd" id="1_forest"]
+[ext_resource type="Resource" path="res://addons/procedural_world/decorations/pine_trees_tall.tres" id="2_pine_tall"]
+[ext_resource type="Resource" path="res://addons/procedural_world/decorations/pine_trees_round.tres" id="3_pine_round"]
+[ext_resource type="Resource" path="res://addons/procedural_world/decorations/bushes_large.tres" id="4_bushes"]
+[ext_resource type="Resource" path="res://addons/procedural_world/decorations/mushrooms.tres" id="5_mushrooms"]
+
+[resource]
+script = ExtResource("1_forest")
+biome_name = "Forest"
+priority = 20
+terrain_color = Color(0.2, 0.5, 0.2, 1)
+min_elevation = 0.15
+max_elevation = 0.8
+min_moisture = 0.45
+decorations = Array[ExtResource("1_58apm")]([ExtResource("2_pine_tall"), ExtResource("3_pine_round"), ExtResource("4_bushes"), ExtResource("5_mushrooms")])

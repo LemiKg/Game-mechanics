@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="PlainsBiome" load_steps=6 format=3 uid="uid://ivbjffjekp41"]
+
+[ext_resource type="Script" uid="uid://dfvnycsmsn4yb" path="res://addons/procedural_world/core/biomes/plains_biome.gd" id="1_plains"]
+[ext_resource type="Script" uid="uid://kxng7b8qpiu7" path="res://addons/procedural_world/core/decoration_definition.gd" id="2_decdef"]
+[ext_resource type="Resource" path="res://addons/procedural_world/decorations/grass_clumps.tres" id="3_grass"]
+[ext_resource type="Resource" path="res://addons/procedural_world/decorations/flowers_mixed.tres" id="4_flowers"]
+[ext_resource type="Resource" path="res://addons/procedural_world/decorations/bushes_small.tres" id="5_bushes"]
+
+[resource]
+script = ExtResource("1_plains")
+biome_name = "Plains"
+priority = 10
+terrain_color = Color(0.4, 0.7, 0.3, 1)
+max_elevation = 0.7
+min_moisture = 0.2
+max_moisture = 0.8
+decorations = Array[ExtResource("2_decdef")]([ExtResource("3_grass"), ExtResource("4_flowers"), ExtResource("5_bushes")])

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="DecorationDefinition" load_steps=3 format=3 uid="uid://bbsdnmh28kgx0"]
+
+[ext_resource type="Script" uid="uid://kxng7b8qpiu7" path="res://addons/procedural_world/core/decoration_definition.gd" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://dns51t65ee2w2" path="res://assets/nature-kit/cactus_short.glb" id="2_scene"]
+
+[resource]
+script = ExtResource("1_script")
+decoration_type = 2
+scene = ExtResource("2_scene")
+density = 0.005
+min_scale = 0.6
+max_slope = 0.35
+random_rotation = 6.283

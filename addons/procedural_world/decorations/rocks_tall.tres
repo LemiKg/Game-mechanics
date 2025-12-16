@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="DecorationDefinition" load_steps=7 format=3 uid="uid://bcyq6u7oxqi81"]
+
+[ext_resource type="Script" uid="uid://kxng7b8qpiu7" path="res://addons/procedural_world/core/decoration_definition.gd" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://c5cur4rx1sbhk" path="res://assets/nature-kit/rock_tallA.glb" id="2_scene1"]
+[ext_resource type="PackedScene" uid="uid://d03bpbcbkjdni" path="res://assets/nature-kit/rock_tallB.glb" id="3_scene2"]
+[ext_resource type="PackedScene" uid="uid://bfjs5e10ovbnk" path="res://assets/nature-kit/rock_tallC.glb" id="4_scene3"]
+[ext_resource type="PackedScene" uid="uid://b0u5dni0nibwc" path="res://assets/nature-kit/rock_tallD.glb" id="5_scene4"]
+[ext_resource type="PackedScene" uid="uid://bdppwpl3m5txe" path="res://assets/nature-kit/rock_tallE.glb" id="6_scene5"]
+
+[resource]
+script = ExtResource("1_script")
+decoration_type = 1
+scene_variants = Array[PackedScene]([ExtResource("2_scene1"), ExtResource("3_scene2"), ExtResource("4_scene3"), ExtResource("5_scene4"), ExtResource("6_scene5")])
+density = 0.003
+min_scale = 0.6
+max_scale = 1.0
+max_slope = 0.8
+align_to_normal = true
+random_rotation = 6.283
+cluster_strength = 0.35
+cluster_scale = 0.025
+has_collision = true
+collision_shape = 0
+collision_radius = 0.6
+collision_height = 3.0
+collision_distance = 40.0

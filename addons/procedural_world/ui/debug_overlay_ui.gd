@@ -137,6 +137,10 @@ func _update_stats() -> void:
 		lines.append("Chunks: %d active" % chunk_manager.get_active_chunk_count())
 		lines.append("Pool: %d cached" % chunk_manager.get_pool_size())
 		
+		var pending_count := chunk_manager.get_pending_chunk_count()
+		if pending_count > 0:
+			lines.append("Pending: %d generating" % pending_count)
+		
 		var collision_count := chunk_manager.get_collision_chunk_count()
 		if collision_count > 0:
 			lines.append("Collision: %d chunks" % collision_count)

@@ -59,6 +59,12 @@ var _is_regenerating: bool = false
 ## Chunks with collision currently enabled
 var _collision_chunks: Dictionary = {}
 
+## Async generation handler (created at runtime)
+var _async_handler: AsyncGenerationHandler = null
+
+## Chunks currently being generated (coord -> true)
+var _pending_chunks: Dictionary = {}
+
 
 ## Returns number of currently active chunks
 func get_active_chunk_count() -> int:
@@ -75,17 +81,49 @@ func get_collision_chunk_count() -> int:
 	return _collision_chunks.size()
 
 
+## Returns number of chunks currently being generated
+func get_pending_chunk_count() -> int:
+	return _pending_chunks.size()
+
+
 func _ready() -> void:
 	if Engine.is_editor_hint():
 		if preview_enabled:
 			_regenerate_preview.call_deferred()
 	else:
+		# Create async generation handler for runtime
+		_setup_async_handler()
+		
 		# Runtime: try to find player if not assigned
 		if not player:
 			_try_find_player()
 		
 		# Initial chunk generation around player or origin
 		call_deferred("_initial_runtime_generation")
+
+
+## Setup the async generation handler
+func _setup_async_handler() -> void:
+	_async_handler = AsyncGenerationHandler.new()
+	_async_handler.name = "AsyncGenerationHandler"
+	_async_handler.world_config = world_config
+	_async_handler.chunk_generated.connect(_on_async_chunk_generated)
+	add_child(_async_handler)
+
+
+## Called when async handler finishes generating a chunk
+func _on_async_chunk_generated(coord: Vector2i, data: ChunkData) -> void:
+	_pending_chunks.erase(coord)
+	
+	# Check if chunk is still needed (player may have moved away)
+	if not _active_chunks.has(coord) and is_coord_valid(coord):
+		_generate_and_apply_chunk(coord, data)
+		
+		# Update collision if needed
+		if player:
+			var player_coord := world_to_coord(player.global_position)
+			var collision_radius := world_config.collision_radius if world_config else 2
+			_update_chunk_collision(player_coord, collision_radius)
 
 
 func _try_find_player() -> void:
@@ -211,6 +249,9 @@ func _load_chunk(coord: Vector2i) -> void:
 	if _active_chunks.has(coord):
 		return # Already loaded
 	
+	if _pending_chunks.has(coord):
+		return # Already being generated
+	
 	if not is_coord_valid(coord):
 		return # Out of bounds
 	
@@ -221,28 +262,47 @@ func _load_chunk(coord: Vector2i) -> void:
 			push_error("ChunkManager: " + error)
 		return
 	
-	# Generate chunk data
-	var chunk_data := ChunkData.new()
-	chunk_data.initialize(coord, world_config.chunk_resolution)
+	# Use async handler at runtime, sync in editor
+	if _async_handler and not Engine.is_editor_hint():
+		_pending_chunks[coord] = true
+		_async_handler.request_chunk(coord)
+	else:
+		# Synchronous fallback for editor
+		_generate_and_apply_chunk(coord)
+
+
+## Synchronous chunk generation (editor) or async callback handler
+func _generate_and_apply_chunk(coord: Vector2i, chunk_data: ChunkData = null) -> void:
+	if not world_config:
+		return
 	
-	# Generate heights
-	chunk_data.height_data = HeightGenerator.generate_height_data(coord, world_config)
-	chunk_data.moisture_data = HeightGenerator.generate_moisture_data(coord, world_config)
-	
-	# Build meshes
-	var cell_size := world_config.get_cell_size()
-	var lod_count := world_config.lod_distances.size() + 1
-	chunk_data.mesh_lods = TerrainMeshBuilder.build_lod_meshes(
-		chunk_data.height_data,
-		chunk_data.width,
-		chunk_data.depth,
-		cell_size,
-		lod_count
-	)
-	
-	chunk_data.state = ChunkData.GenerationState.READY
+	# Generate synchronously if no data provided
+	if chunk_data == null:
+		chunk_data = ChunkData.new()
+		chunk_data.initialize(coord, world_config.chunk_resolution)
+		
+		# Pass 1: Generate base heights and moisture
+		chunk_data.height_data = HeightGenerator.generate_height_data(coord, world_config)
+		chunk_data.moisture_data = HeightGenerator.generate_moisture_data(coord, world_config)
+		
+		# Pass 2: Calculate biome weights and apply height modifications
+		_apply_biome_data(chunk_data, coord)
+		
+		# Build meshes (after biome height modifications)
+		var cell_size := world_config.get_cell_size()
+		var lod_count := world_config.lod_distances.size() + 1
+		chunk_data.mesh_lods = TerrainMeshBuilder.build_lod_meshes(
+			chunk_data.height_data,
+			chunk_data.width,
+			chunk_data.depth,
+			cell_size,
+			lod_count
+		)
+		
+		chunk_data.state = ChunkData.GenerationState.READY
 	
 	# Get chunk node from pool and initialize
+	var cell_size := world_config.get_cell_size()
 	var chunk := _get_chunk_from_pool()
 	chunk.name = "Chunk_%d_%d" % [coord.x, coord.y]
 	chunk.initialize(chunk_data, world_config.terrain_material, cell_size)
@@ -261,8 +321,74 @@ func _load_chunk(coord: Vector2i) -> void:
 	chunk_ready.emit(coord)
 
 
+## Applies biome weights and height modifications to chunk data
+func _apply_biome_data(chunk_data: ChunkData, coord: Vector2i) -> void:
+	if not world_config or not world_config.biome_map:
+		# No biome map configured - use default grass weights
+		for i in range(chunk_data.width * chunk_data.depth):
+			var idx := i * 4
+			chunk_data.biome_weights[idx] = 1.0 # R = grass
+			chunk_data.biome_weights[idx + 1] = 0.0
+			chunk_data.biome_weights[idx + 2] = 0.0
+			chunk_data.biome_weights[idx + 3] = 0.0
+		return
+	
+	var biome_map := world_config.biome_map
+	var cell_size := world_config.get_cell_size()
+	var resolution := chunk_data.width
+	
+	# World offset for this chunk
+	var world_offset_x := coord.x * world_config.chunk_size
+	var world_offset_z := coord.y * world_config.chunk_size
+	
+	for z in range(resolution):
+		for x in range(resolution):
+			var idx := z * resolution + x
+			
+			# Get height and moisture at this vertex
+			var height := chunk_data.height_data[idx]
+			var moisture := chunk_data.moisture_data[idx]
+			
+			# Calculate normalized elevation
+			var elevation := HeightGenerator.get_normalized_elevation(height, world_config)
+			
+			# Get world position for this vertex
+			var world_x := world_offset_x + x * cell_size
+			var world_z := world_offset_z + z * cell_size
+			
+			# Blend height modifications from ALL matching biomes (smooth transitions)
+			var matching := biome_map.get_matching_biomes(elevation, moisture)
+			if not matching.is_empty():
+				var total_strength := 0.0
+				var blended_height := 0.0
+				
+				for match_data in matching:
+					var biome: BiomeData = match_data["biome"]
+					var strength: float = match_data["strength"]
+					var modified := biome.modify_height(height, world_x, world_z)
+					blended_height += modified * strength
+					total_strength += strength
+				
+				if total_strength > 0.0:
+					chunk_data.height_data[idx] = blended_height / total_strength
+			
+			# Calculate blended biome weights for splatmap
+			var weights := biome_map.get_biome_weights(elevation, moisture)
+			var weight_idx := idx * 4
+			chunk_data.biome_weights[weight_idx] = weights.r
+			chunk_data.biome_weights[weight_idx + 1] = weights.g
+			chunk_data.biome_weights[weight_idx + 2] = weights.b
+			chunk_data.biome_weights[weight_idx + 3] = weights.a
+
+
 ## Unloads a chunk at the specified coordinate
 func _unload_chunk(coord: Vector2i) -> void:
+	# Cancel pending generation if any
+	if _pending_chunks.has(coord):
+		_pending_chunks.erase(coord)
+		if _async_handler:
+			_async_handler.cancel_request(coord)
+	
 	if not _active_chunks.has(coord):
 		return
 	
@@ -275,6 +401,11 @@ func _unload_chunk(coord: Vector2i) -> void:
 
 ## Clears all loaded chunks
 func _clear_all_chunks() -> void:
+	# Cancel all pending generations
+	if _async_handler:
+		_async_handler.cancel_all()
+	_pending_chunks.clear()
+	
 	var coords := _active_chunks.keys().duplicate()
 	for coord in coords:
 		_unload_chunk(coord)

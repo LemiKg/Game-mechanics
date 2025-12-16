@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="MountainBiome" load_steps=6 format=3 uid="uid://b224575qkq8qe"]
+
+[ext_resource type="Script" uid="uid://of0lp0y6u7ub" path="res://addons/procedural_world/core/biomes/mountain_biome.gd" id="1_mountain"]
+[ext_resource type="Script" uid="uid://kxng7b8qpiu7" path="res://addons/procedural_world/core/decoration_definition.gd" id="1_p70lh"]
+[ext_resource type="Resource" path="res://addons/procedural_world/decorations/rocks_tall.tres" id="2_rocks_tall"]
+[ext_resource type="Resource" path="res://addons/procedural_world/decorations/stones_large.tres" id="3_stones"]
+[ext_resource type="Resource" path="res://addons/procedural_world/decorations/pine_trees_small.tres" id="4_pine_small"]
+
+[resource]
+script = ExtResource("1_mountain")
+biome_name = "Mountain"
+priority = 30
+splatmap_channel = 1
+terrain_color = Color(0.5, 0.5, 0.5, 1)
+min_elevation = 0.65
+decorations = Array[ExtResource("1_p70lh")]([ExtResource("2_rocks_tall"), ExtResource("3_stones"), ExtResource("4_pine_small")])

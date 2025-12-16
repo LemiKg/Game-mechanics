@@ -85,6 +85,13 @@ signal config_changed()
 		emit_changed()
 		config_changed.emit()
 
+## Biome lookup table for terrain texturing and height modification
+@export var biome_map: BiomeMap:
+	set(value):
+		biome_map = value
+		emit_changed()
+		config_changed.emit()
+
 
 @export_group("Fog")
 

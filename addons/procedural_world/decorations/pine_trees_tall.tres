@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="DecorationDefinition" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://addons/procedural_world/core/decoration_definition.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://assets/nature-kit/tree_pineTallA.glb" id="2_scene1"]
+[ext_resource type="PackedScene" path="res://assets/nature-kit/tree_pineTallB.glb" id="3_scene2"]
+[ext_resource type="PackedScene" path="res://assets/nature-kit/tree_pineTallC.glb" id="4_scene3"]
+[ext_resource type="PackedScene" path="res://assets/nature-kit/tree_pineTallD.glb" id="5_scene4"]
+
+[resource]
+script = ExtResource("1_script")
+decoration_type = 0
+scene_variants = [ExtResource("2_scene1"), ExtResource("3_scene2"), ExtResource("4_scene3"), ExtResource("5_scene4")]
+density = 0.005
+min_scale = 2.0
+max_scale = 3.0
+min_slope = 0.0
+max_slope = 0.4
+align_to_normal = false
+y_offset = 0.0
+random_rotation = 6.283
+cluster_strength = 0.5
+cluster_scale = 0.015
+has_collision = true
+collision_shape = 0
+collision_radius = 0.6
+collision_height = 10.0
+collision_distance = 60.0
