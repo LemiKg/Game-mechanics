@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="WorldConfig" load_steps=4 format=3 uid="uid://ddikae18i3r6x"]
+
+[ext_resource type="Script" uid="uid://dho4uigly465k" path="res://addons/procedural_world/core/world_config.gd" id="1_jfupg"]
+[ext_resource type="Material" uid="uid://c6qr8m5x2pnw1" path="res://world/terrain_material.tres" id="2_material"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_jfupg"]
+noise_type = 0
+frequency = 0.002
+fractal_octaves = 4
+fractal_gain = 0.4
+
+[resource]
+script = ExtResource("1_jfupg")
+noise = SubResource("FastNoiseLite_jfupg")
+terrain_material = ExtResource("2_material")
+fog_density = 0.024
+fog_sky_affect = 0.432
+metadata/_custom_type_script = "uid://dho4uigly465k"

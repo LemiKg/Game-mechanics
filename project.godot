@@ -11,13 +11,13 @@ config_version=5
 [application]
 
 config/name="Inventory system"
-run/main_scene="res://scenes/dual_perspective_test_scene.tscn"
+run/main_scene="uid://dubasu1ixt185"
 config/features=PackedStringArray("4.5", "Forward Plus")
 config/icon="res://icon.svg"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/inventory_system/plugin.cfg", "res://addons/player_control_core/plugin.cfg", "res://addons/player_control_fps/plugin.cfg")
+enabled=PackedStringArray("res://addons/inventory_system/plugin.cfg", "res://addons/player_control_3rd_person/plugin.cfg", "res://addons/player_control_core/plugin.cfg", "res://addons/player_control_fps/plugin.cfg", "res://addons/procedural_world/plugin.cfg")
 
 [input]
 

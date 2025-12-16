@@ -1,0 +1,255 @@
+[gd_scene load_steps=29 format=3 uid="uid://bv4xp8r0k5qm2"]
+
+[ext_resource type="Script" uid="uid://ddprtht2qo7se" path="res://addons/inventory_system/core/inventory_component.gd" id="1_inv_comp"]
+[ext_resource type="Script" uid="uid://bgudcqpbogui8" path="res://addons/inventory_system/core/equipment_component.gd" id="2_equip_comp"]
+[ext_resource type="Script" uid="uid://cw07au03k3mfg" path="res://addons/inventory_system/core/inventory.gd" id="3_inv"]
+[ext_resource type="Script" uid="uid://dqg7l1xgdnk4k" path="res://addons/inventory_system/core/inventory_slot.gd" id="4_slot"]
+[ext_resource type="Script" uid="uid://0oumke1hqq02" path="res://addons/player_control_core/core/dual_perspective_controller_3d.gd" id="5_controller"]
+[ext_resource type="Script" uid="uid://00fbir5gxwep" path="res://addons/player_control_core/core/player_input_router_3d.gd" id="6_input"]
+[ext_resource type="Script" uid="uid://bjjvdh7ol6wh3" path="res://addons/player_control_core/core/player_motor_3d.gd" id="7_motor"]
+[ext_resource type="Script" uid="uid://0b6846c0kky3" path="res://addons/player_control_fps/core/player_look_controller_3d.gd" id="8_fps_look"]
+[ext_resource type="Script" uid="uid://dxe0iy4kpi1t3" path="res://addons/player_control_3rd_person/core/orbit_camera_controller_3d.gd" id="9_orbit"]
+[ext_resource type="Script" uid="uid://bj0xc8uqm4vsi" path="res://addons/player_control_core/core/state_machine/player_state_machine.gd" id="10_state_machine"]
+[ext_resource type="Script" uid="uid://frs8p3b0mojm" path="res://addons/player_control_core/core/state_machine/grounded_state.gd" id="11_grounded"]
+[ext_resource type="Script" uid="uid://usyyiwva45ou" path="res://addons/player_control_core/core/state_machine/airborne_state.gd" id="12_airborne"]
+[ext_resource type="Script" uid="uid://7dy7k5juccbd" path="res://addons/player_control_core/core/state_machine/ui_state.gd" id="13_ui_state"]
+[ext_resource type="PackedScene" uid="uid://c4ciyr75aow6p" path="res://addons/inventory_system/ui/inventory_ui.tscn" id="14_inv_ui"]
+[ext_resource type="PackedScene" path="res://addons/inventory_system/ui/quick_inventory_ui.tscn" id="15_quick_inv"]
+[ext_resource type="PackedScene" path="res://addons/inventory_system/ui/item_tooltip_ui.tscn" id="16_tooltip"]
+[ext_resource type="Script" uid="uid://b7qhwhcj7pgjr" path="res://addons/inventory_system/ui/tooltip_controller.gd" id="17_tooltip_ctrl"]
+[ext_resource type="Script" uid="uid://bxuwiwu17py1y" path="res://addons/inventory_system/core/inventory_interaction_handler.gd" id="18_handler"]
+[ext_resource type="PackedScene" uid="uid://c0wo2ldbnefie" path="res://assets/characters/quaternius/player.tscn" id="19_character"]
+[ext_resource type="Script" uid="uid://ckhcbx5786s1m" path="res://addons/player_control_core/core/animation_controller.gd" id="20_anim_ctrl"]
+[ext_resource type="Script" path="res://scenes/reusable_player.gd" id="21_player_script"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_player"]
+radius = 0.4
+height = 1.8
+
+[sub_resource type="Resource" id="Slot_1"]
+script = ExtResource("4_slot")
+
+[sub_resource type="Resource" id="Slot_2"]
+script = ExtResource("4_slot")
+
+[sub_resource type="Resource" id="Slot_3"]
+script = ExtResource("4_slot")
+
+[sub_resource type="Resource" id="Slot_4"]
+script = ExtResource("4_slot")
+
+[sub_resource type="Resource" id="Slot_5"]
+script = ExtResource("4_slot")
+
+[sub_resource type="Resource" id="Slot_6"]
+script = ExtResource("4_slot")
+
+[sub_resource type="Resource" id="Slot_7"]
+script = ExtResource("4_slot")
+
+[sub_resource type="Resource" id="Slot_8"]
+script = ExtResource("4_slot")
+
+[sub_resource type="Resource" id="Slot_9"]
+script = ExtResource("4_slot")
+
+[sub_resource type="Resource" id="Slot_10"]
+script = ExtResource("4_slot")
+
+[sub_resource type="Resource" id="Slot_11"]
+script = ExtResource("4_slot")
+
+[sub_resource type="Resource" id="Slot_12"]
+script = ExtResource("4_slot")
+
+[sub_resource type="Resource" id="Slot_13"]
+script = ExtResource("4_slot")
+
+[sub_resource type="Resource" id="Slot_14"]
+script = ExtResource("4_slot")
+
+[sub_resource type="Resource" id="Slot_15"]
+script = ExtResource("4_slot")
+
+[sub_resource type="Resource" id="Slot_16"]
+script = ExtResource("4_slot")
+
+[sub_resource type="Resource" id="Slot_17"]
+script = ExtResource("4_slot")
+
+[sub_resource type="Resource" id="Slot_18"]
+script = ExtResource("4_slot")
+
+[sub_resource type="Resource" id="Slot_19"]
+script = ExtResource("4_slot")
+
+[sub_resource type="Resource" id="Slot_20"]
+script = ExtResource("4_slot")
+
+[sub_resource type="Resource" id="MainInventory"]
+script = ExtResource("3_inv")
+slots = Array[ExtResource("4_slot")]([SubResource("Slot_1"), SubResource("Slot_2"), SubResource("Slot_3"), SubResource("Slot_4"), SubResource("Slot_5"), SubResource("Slot_6"), SubResource("Slot_7"), SubResource("Slot_8"), SubResource("Slot_9"), SubResource("Slot_10"), SubResource("Slot_11"), SubResource("Slot_12"), SubResource("Slot_13"), SubResource("Slot_14"), SubResource("Slot_15"), SubResource("Slot_16"), SubResource("Slot_17"), SubResource("Slot_18"), SubResource("Slot_19"), SubResource("Slot_20")])
+
+[sub_resource type="Resource" id="HotbarSlot_1"]
+script = ExtResource("4_slot")
+
+[sub_resource type="Resource" id="HotbarSlot_2"]
+script = ExtResource("4_slot")
+
+[sub_resource type="Resource" id="HotbarSlot_3"]
+script = ExtResource("4_slot")
+
+[sub_resource type="Resource" id="HotbarSlot_4"]
+script = ExtResource("4_slot")
+
+[sub_resource type="Resource" id="HotbarSlot_5"]
+script = ExtResource("4_slot")
+
+[sub_resource type="Resource" id="HotbarSlot_6"]
+script = ExtResource("4_slot")
+
+[sub_resource type="Resource" id="HotbarInventory"]
+script = ExtResource("3_inv")
+slots = Array[ExtResource("4_slot")]([SubResource("HotbarSlot_1"), SubResource("HotbarSlot_2"), SubResource("HotbarSlot_3"), SubResource("HotbarSlot_4"), SubResource("HotbarSlot_5"), SubResource("HotbarSlot_6")])
+size = 6
+
+[node name="Player" type="CharacterBody3D" groups=["player"]]
+script = ExtResource("21_player_script")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("CapsuleShape3D_player")
+
+[node name="CharacterMesh" parent="." instance=ExtResource("19_character")]
+
+[node name="FPSPitchPivot" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+
+[node name="FPSCamera" type="Camera3D" parent="FPSPitchPivot"]
+
+[node name="CameraTarget" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+
+[node name="PlayerInputRouter3D" type="Node" parent="."]
+script = ExtResource("6_input")
+
+[node name="PlayerMotor3D" type="Node" parent="." node_paths=PackedStringArray("body", "input_router")]
+script = ExtResource("7_motor")
+body = NodePath("..")
+input_router = NodePath("../PlayerInputRouter3D")
+
+[node name="PlayerLookController3D" type="Node" parent="." node_paths=PackedStringArray("yaw_node", "pitch_node", "input_router")]
+script = ExtResource("8_fps_look")
+yaw_node = NodePath("..")
+pitch_node = NodePath("../FPSPitchPivot")
+input_router = NodePath("../PlayerInputRouter3D")
+
+[node name="OrbitCameraController3D" type="Node" parent="." node_paths=PackedStringArray("target", "camera", "input_router")]
+script = ExtResource("9_orbit")
+target = NodePath("../CameraTarget")
+camera = NodePath("ThirdPersonCamera")
+input_router = NodePath("../PlayerInputRouter3D")
+
+[node name="ThirdPersonCamera" type="Camera3D" parent="OrbitCameraController3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 5)
+
+[node name="DualPerspectiveController3D" type="Node" parent="." node_paths=PackedStringArray("fps_look_controller", "fps_pitch_pivot", "fps_camera", "orbit_camera_controller", "third_person_camera", "character_mesh", "body", "input_router", "motor", "state_machine")]
+script = ExtResource("5_controller")
+fps_look_controller = NodePath("../PlayerLookController3D")
+fps_pitch_pivot = NodePath("../FPSPitchPivot")
+fps_camera = NodePath("../FPSPitchPivot/FPSCamera")
+orbit_camera_controller = NodePath("../OrbitCameraController3D")
+third_person_camera = NodePath("../OrbitCameraController3D/ThirdPersonCamera")
+character_mesh = NodePath("../CharacterMesh")
+body = NodePath("..")
+input_router = NodePath("../PlayerInputRouter3D")
+motor = NodePath("../PlayerMotor3D")
+state_machine = NodePath("../PlayerStateMachine")
+
+[node name="PlayerStateMachine" type="Node" parent="." node_paths=PackedStringArray("initial_state", "controller")]
+script = ExtResource("10_state_machine")
+initial_state = NodePath("grounded")
+controller = NodePath("../DualPerspectiveController3D")
+
+[node name="grounded" type="Node" parent="PlayerStateMachine"]
+script = ExtResource("11_grounded")
+
+[node name="airborne" type="Node" parent="PlayerStateMachine"]
+script = ExtResource("12_airborne")
+
+[node name="ui" type="Node" parent="PlayerStateMachine"]
+script = ExtResource("13_ui_state")
+
+[node name="AnimationController" type="Node" parent="." node_paths=PackedStringArray("state_machine", "animation_tree")]
+script = ExtResource("20_anim_ctrl")
+state_machine = NodePath("../PlayerStateMachine")
+animation_tree = NodePath("../CharacterMesh/AnimationTree")
+
+[node name="InventoryComponent" type="Node" parent="."]
+script = ExtResource("1_inv_comp")
+main_inventory = SubResource("MainInventory")
+hotbar_inventory = SubResource("HotbarInventory")
+
+[node name="EquipmentComponent" type="Node" parent="."]
+script = ExtResource("2_equip_comp")
+equipment_slots = {
+"Chest": null,
+"Feet": null,
+"Hands": null,
+"Head": null,
+"Legs": null,
+"MainHand": null,
+"Neck": null,
+"OffHand": null,
+"Ring1": null,
+"Ring2": null,
+"Shoulders": null,
+"Waist": null
+}
+defined_slots = Array[String](["Head", "Neck", "Shoulders", "Chest", "Hands", "MainHand", "Waist", "Legs", "OffHand", "Ring1", "Feet", "Ring2"])
+
+[node name="InventoryInteractionHandler" type="Node" parent="."]
+script = ExtResource("18_handler")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="InventoryUI" parent="CanvasLayer" node_paths=PackedStringArray("tooltip_controller", "equipment_component", "inventory_component", "interaction_handler") instance=ExtResource("14_inv_ui")]
+visible = false
+tooltip_controller = NodePath("../TooltipController")
+equipment_component = NodePath("../../EquipmentComponent")
+inventory_component = NodePath("../../InventoryComponent")
+interaction_handler = NodePath("../../InventoryInteractionHandler")
+
+[node name="QuickInventoryUI" parent="CanvasLayer" node_paths=PackedStringArray("tooltip_controller", "inventory_component", "interaction_handler") instance=ExtResource("15_quick_inv")]
+tooltip_controller = NodePath("../TooltipController")
+inventory_component = NodePath("../../InventoryComponent")
+interaction_handler = NodePath("../../InventoryInteractionHandler")
+
+[node name="ItemTooltipUI" parent="CanvasLayer" instance=ExtResource("16_tooltip")]
+
+[node name="TooltipController" type="Node" parent="CanvasLayer" node_paths=PackedStringArray("tooltip_ui")]
+script = ExtResource("17_tooltip_ctrl")
+tooltip_ui = NodePath("../ItemTooltipUI")
+
+[node name="HUD" type="Label" parent="CanvasLayer"]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -200.0
+offset_top = 10.0
+offset_right = 200.0
+offset_bottom = 50.0
+grow_horizontal = 2
+text = "WASD: Move | Space: Jump | Shift: Sprint | V: Toggle Perspective | I: Inventory"
+horizontal_alignment = 1
+
+[node name="PerspectiveLabel" type="Label" parent="CanvasLayer"]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -200.0
+offset_top = 10.0
+offset_bottom = 30.0
+grow_horizontal = 0
+text = "Perspective: First Person"
+horizontal_alignment = 2

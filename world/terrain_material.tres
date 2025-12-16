@@ -1,0 +1,22 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://c6qr8m5x2pnw1"]
+
+[ext_resource type="Shader" path="res://addons/procedural_world/shaders/terrain_triplanar.gdshader" id="1_shader"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_shader")
+shader_parameter/color_grass = Vector3(0.28, 0.45, 0.18)
+shader_parameter/color_rock = Vector3(0.4, 0.38, 0.35)
+shader_parameter/color_sand = Vector3(0.76, 0.7, 0.5)
+shader_parameter/color_snow = Vector3(0.95, 0.97, 1.0)
+shader_parameter/use_textures = false
+shader_parameter/use_splatmap = false
+shader_parameter/texture_scale = 0.05
+shader_parameter/triplanar_sharpness = 4.0
+shader_parameter/snow_height = 40.0
+shader_parameter/snow_blend_range = 10.0
+shader_parameter/snow_slope_threshold = 0.7
+shader_parameter/rock_slope_start = 0.5
+shader_parameter/rock_slope_end = 0.8
+shader_parameter/roughness_base = 0.85
+shader_parameter/roughness_variation = 0.1

@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://debug_overlay_ui"]
+
+[ext_resource type="Script" path="res://addons/procedural_world/ui/debug_overlay_ui.gd" id="1_debug"]
+
+[node name="DebugOverlayUI" type="CanvasLayer"]
+layer = 100
+script = ExtResource("1_debug")
