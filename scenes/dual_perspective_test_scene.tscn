@@ -1,41 +1,31 @@
-[gd_scene load_steps=62 format=3 uid="uid://ddual_perspective_test"]
+[gd_scene load_steps=65 format=3 uid="uid://bh111q25ruxtp"]
 
-[ext_resource type="Script" path="res://scenes/dual_perspective_test_player.gd" id="1_player"]
-[ext_resource type="Script" path="res://addons/inventory_system/core/inventory_component.gd" id="2_inv_comp"]
-[ext_resource type="Script" path="res://addons/inventory_system/core/equipment_component.gd" id="3_equip_comp"]
-[ext_resource type="Script" path="res://addons/inventory_system/core/inventory.gd" id="4_inv"]
-[ext_resource type="Script" path="res://addons/inventory_system/core/inventory_slot.gd" id="5_slot"]
-[ext_resource type="Script" path="res://addons/player_control_core/core/dual_perspective_controller_3d.gd" id="6_controller"]
-[ext_resource type="Script" path="res://addons/player_control_core/core/player_input_router_3d.gd" id="7_input"]
-[ext_resource type="Script" path="res://addons/player_control_core/core/player_motor_3d.gd" id="8_motor"]
-[ext_resource type="Script" path="res://addons/player_control_fps/core/player_look_controller_3d.gd" id="9_fps_look"]
-[ext_resource type="Script" path="res://addons/player_control_3rd_person/core/orbit_camera_controller_3d.gd" id="10_orbit"]
-[ext_resource type="Script" path="res://addons/player_control_core/core/state_machine/player_state_machine.gd" id="11_state_machine"]
-[ext_resource type="Script" path="res://addons/player_control_core/core/state_machine/grounded_state.gd" id="12_grounded"]
-[ext_resource type="Script" path="res://addons/player_control_core/core/state_machine/airborne_state.gd" id="13_airborne"]
-[ext_resource type="Script" path="res://addons/player_control_core/core/state_machine/ui_state.gd" id="14_ui_state"]
+[ext_resource type="Script" uid="uid://t4kh1o7k4xj6" path="res://scenes/dual_perspective_test_player.gd" id="1_player"]
+[ext_resource type="Script" uid="uid://ddprtht2qo7se" path="res://addons/inventory_system/core/inventory_component.gd" id="2_inv_comp"]
+[ext_resource type="Script" uid="uid://bgudcqpbogui8" path="res://addons/inventory_system/core/equipment_component.gd" id="3_equip_comp"]
+[ext_resource type="Script" uid="uid://cw07au03k3mfg" path="res://addons/inventory_system/core/inventory.gd" id="4_inv"]
+[ext_resource type="Script" uid="uid://dqg7l1xgdnk4k" path="res://addons/inventory_system/core/inventory_slot.gd" id="5_slot"]
+[ext_resource type="Script" uid="uid://0oumke1hqq02" path="res://addons/player_control_core/core/dual_perspective_controller_3d.gd" id="6_controller"]
+[ext_resource type="Script" uid="uid://00fbir5gxwep" path="res://addons/player_control_core/core/player_input_router_3d.gd" id="7_input"]
+[ext_resource type="Script" uid="uid://bjjvdh7ol6wh3" path="res://addons/player_control_core/core/player_motor_3d.gd" id="8_motor"]
+[ext_resource type="Script" uid="uid://0b6846c0kky3" path="res://addons/player_control_fps/core/player_look_controller_3d.gd" id="9_fps_look"]
+[ext_resource type="Script" uid="uid://dxe0iy4kpi1t3" path="res://addons/player_control_3rd_person/core/orbit_camera_controller_3d.gd" id="10_orbit"]
+[ext_resource type="Script" uid="uid://bj0xc8uqm4vsi" path="res://addons/player_control_core/core/state_machine/player_state_machine.gd" id="11_state_machine"]
+[ext_resource type="Script" uid="uid://frs8p3b0mojm" path="res://addons/player_control_core/core/state_machine/grounded_state.gd" id="12_grounded"]
+[ext_resource type="Script" uid="uid://usyyiwva45ou" path="res://addons/player_control_core/core/state_machine/airborne_state.gd" id="13_airborne"]
+[ext_resource type="Script" uid="uid://cbq0osrr5prct" path="res://addons/inventory_system/core/item_category.gd" id="14_rydct"]
+[ext_resource type="Script" uid="uid://7dy7k5juccbd" path="res://addons/player_control_core/core/state_machine/ui_state.gd" id="14_ui_state"]
 [ext_resource type="PackedScene" uid="uid://c4ciyr75aow6p" path="res://addons/inventory_system/ui/inventory_ui.tscn" id="15_inv_ui"]
 [ext_resource type="PackedScene" path="res://addons/inventory_system/ui/quick_inventory_ui.tscn" id="16_quick_inv"]
 [ext_resource type="PackedScene" path="res://addons/inventory_system/ui/item_tooltip_ui.tscn" id="17_tooltip"]
-[ext_resource type="Script" path="res://addons/inventory_system/ui/tooltip_controller.gd" id="18_tooltip_ctrl"]
-[ext_resource type="Script" path="res://addons/inventory_system/core/inventory_interaction_handler.gd" id="19_handler"]
+[ext_resource type="Script" uid="uid://b7qhwhcj7pgjr" path="res://addons/inventory_system/ui/tooltip_controller.gd" id="18_tooltip_ctrl"]
+[ext_resource type="Script" uid="uid://bxuwiwu17py1y" path="res://addons/inventory_system/core/inventory_interaction_handler.gd" id="19_handler"]
+[ext_resource type="PackedScene" uid="uid://c0wo2ldbnefie" path="res://assets/characters/quaternius/player.tscn" id="20_character"]
+[ext_resource type="Script" uid="uid://ckhcbx5786s1m" path="res://addons/player_control_core/core/animation_controller.gd" id="21_anim_ctrl"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_player"]
 radius = 0.4
 height = 1.8
-
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_player"]
-radius = 0.4
-height = 1.8
-
-[sub_resource type="StandardMaterial3D" id="PlayerMaterial"]
-albedo_color = Color(0.2, 0.6, 0.8, 1)
-
-[sub_resource type="BoxMesh" id="BoxMesh_face"]
-size = Vector3(0.3, 0.15, 0.1)
-
-[sub_resource type="StandardMaterial3D" id="FaceMaterial"]
-albedo_color = Color(0.9, 0.7, 0.5, 1)
 
 [sub_resource type="Resource" id="Slot_1"]
 script = ExtResource("5_slot")
@@ -174,15 +164,7 @@ script = ExtResource("1_player")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
 shape = SubResource("CapsuleShape3D_player")
 
-[node name="CharacterMesh" type="MeshInstance3D" parent="Player"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
-mesh = SubResource("CapsuleMesh_player")
-surface_material_override/0 = SubResource("PlayerMaterial")
-
-[node name="FaceIndicator" type="MeshInstance3D" parent="Player/CharacterMesh"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0.35)
-mesh = SubResource("BoxMesh_face")
-surface_material_override/0 = SubResource("FaceMaterial")
+[node name="CharacterMesh" parent="Player" instance=ExtResource("20_character")]
 
 [node name="FPSPitchPivot" type="Node3D" parent="Player"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
@@ -192,21 +174,18 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
 [node name="CameraTarget" type="Node3D" parent="Player"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
 
-[node name="DualPerspectiveController3D" type="Node" parent="Player" node_paths=PackedStringArray("body", "input_router", "motor", "state_machine", "fps_look_controller", "fps_pitch_pivot", "fps_camera", "orbit_camera_controller", "third_person_camera", "character_mesh")]
+[node name="DualPerspectiveController3D" type="Node" parent="Player" node_paths=PackedStringArray("fps_look_controller", "fps_pitch_pivot", "fps_camera", "orbit_camera_controller", "third_person_camera", "character_mesh", "body", "input_router", "motor", "state_machine")]
 script = ExtResource("6_controller")
-body = NodePath("..")
-input_router = NodePath("../PlayerInputRouter3D")
-motor = NodePath("../PlayerMotor3D")
-state_machine = NodePath("../PlayerStateMachine")
-perspective = 0
 fps_look_controller = NodePath("../PlayerLookController3D")
 fps_pitch_pivot = NodePath("../FPSPitchPivot")
 fps_camera = NodePath("../FPSPitchPivot/FPSCamera")
 orbit_camera_controller = NodePath("../OrbitCameraController3D")
 third_person_camera = NodePath("../OrbitCameraController3D/ThirdPersonCamera")
-rotation_mode = 0
-rotation_speed = 10.0
 character_mesh = NodePath("../CharacterMesh")
+body = NodePath("..")
+input_router = NodePath("../PlayerInputRouter3D")
+motor = NodePath("../PlayerMotor3D")
+state_machine = NodePath("../PlayerStateMachine")
 
 [node name="PlayerInputRouter3D" type="Node" parent="Player"]
 script = ExtResource("7_input")
@@ -244,6 +223,11 @@ script = ExtResource("13_airborne")
 
 [node name="ui" type="Node" parent="Player/PlayerStateMachine"]
 script = ExtResource("14_ui_state")
+
+[node name="AnimationController" type="Node" parent="Player" node_paths=PackedStringArray("state_machine", "animation_tree")]
+script = ExtResource("21_anim_ctrl")
+state_machine = NodePath("../PlayerStateMachine")
+animation_tree = NodePath("../CharacterMesh/AnimationTree")
 
 [node name="InventoryComponent" type="Node" parent="Player"]
 script = ExtResource("2_inv_comp")

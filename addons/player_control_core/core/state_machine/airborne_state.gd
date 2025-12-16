@@ -19,11 +19,9 @@ var _jump_buffered: bool = false
 ## Time remaining on jump buffer.
 var _jump_buffer_timer: float = 0.0
 
-## Track if we're falling (for animation).
-var _is_falling: bool = false
-
 
 func enter() -> void:
+	print("[AirborneState] Frame %d: ENTER" % Engine.get_process_frames())
 	# Air control uses walk speed as base
 	if motor:
 		motor.set_walk_speed()
@@ -33,15 +31,10 @@ func enter() -> void:
 	_coyote_used = false
 	_jump_buffered = false
 	_jump_buffer_timer = 0.0
-	_is_falling = false
 	
-	# Request jump or fall animation based on vertical velocity
-	if motor and motor.body:
-		if motor.body.velocity.y > 0:
-			request_animation(&"jump", 0.1)
-		else:
-			request_animation(&"fall", 0.2)
-			_is_falling = true
+	# Always start with jump animation when entering airborne
+	print("[AirborneState] Frame %d: requesting 'jump' animation" % Engine.get_process_frames())
+	request_animation(&"jump", 0.05)
 
 
 func physics_update(delta: float) -> void:
@@ -56,8 +49,7 @@ func physics_update(delta: float) -> void:
 		if _can_coyote_jump():
 			if motor.try_jump():
 				_coyote_used = true
-				request_animation(&"jump", 0.1)
-				_is_falling = false
+				request_animation(&"jump", 0.05)
 		else:
 			# Buffer the jump for landing
 			_jump_buffered = true
@@ -72,13 +64,10 @@ func physics_update(delta: float) -> void:
 	# Apply gravity
 	motor.apply_gravity(delta)
 	
-	# Transition to fall animation when starting to descend
-	if not _is_falling and motor.body and motor.body.velocity.y < 0:
-		_is_falling = true
-		request_animation(&"fall", 0.2)
-	
-	# Check if landed
-	if motor.is_grounded:
+	# Check if landed (ignore first few frames to let physics settle after jump)
+	# At 60 FPS with jump_velocity=4.5, we need at least ~5 frames before we could possibly land
+	var min_airtime := 0.1 # 100ms minimum
+	if motor.is_grounded and _time_since_left_ground > min_airtime:
 		_on_landed()
 		return
 
@@ -91,17 +80,19 @@ func _can_coyote_jump() -> bool:
 
 
 func _on_landed() -> void:
+	print("[AirborneState] Frame %d: _on_landed, _jump_buffered=%s" % [Engine.get_process_frames(), _jump_buffered])
 	# Check if we should execute a buffered jump
 	if _jump_buffered:
 		if motor.try_jump():
-			request_animation(&"jump", 0.1)
+			print("[AirborneState] Frame %d: buffered jump executed" % Engine.get_process_frames())
+			request_animation(&"jump", 0.05)
 			# Stay in airborne state
 			_time_since_left_ground = 0.0
 			_coyote_used = false
 			_jump_buffered = false
-			_is_falling = false
 			return
 	
-	# Normal landing - transition to grounded
-	request_animation(&"land", 0.1)
+	# Normal landing - request land animation and transition to grounded
+	print("[AirborneState] Frame %d: normal landing, requesting 'land' and transitioning to grounded" % Engine.get_process_frames())
+	request_animation(&"land", 0.05)
 	transition_to(&"grounded")

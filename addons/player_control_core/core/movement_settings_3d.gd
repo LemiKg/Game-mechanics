@@ -17,9 +17,9 @@ extends Resource
 
 @export_group("Acceleration")
 ## How quickly the player reaches target speed (units/second²).
-@export_range(0.0, 100.0, 0.5) var acceleration: float = 10.0
+@export_range(0.0, 100.0, 0.5) var acceleration: float = 25.0
 ## How quickly the player stops when no input (units/second²).
-@export_range(0.0, 100.0, 0.5) var deceleration: float = 10.0
+@export_range(0.0, 100.0, 0.5) var deceleration: float = 30.0
 ## Movement control multiplier while airborne (0 = no air control, 1 = full).
 @export_range(0.0, 1.0, 0.05) var air_control: float = 0.3
 

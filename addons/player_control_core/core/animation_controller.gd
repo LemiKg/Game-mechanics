@@ -30,6 +30,22 @@ signal animation_started(animation_name: StringName)
 @export var state_machine_path: String = "parameters/playback"
 
 
+@export_group("Animation Mapping")
+## Map state animation names to actual animation names in your AnimationTree.
+## Keys are the names emitted by states (idle, walk, run, etc.)
+## Values are the actual animation names in your AnimationTree/Player.
+## Leave empty to use state names directly.
+@export var animation_map: Dictionary = {
+	&"idle": &"Idle",
+	&"walk": &"Walk",
+	&"run": &"Sprint",
+	&"jump": &"Jump_Start",
+	&"land": &"Jump_Land",
+	&"crouch_idle": &"Crouch_Idle",
+	&"crouch_walk": &"Crouch_Fwd",
+}
+
+
 ## Currently playing animation name.
 var current_animation: StringName = &""
 
@@ -83,28 +99,62 @@ func _on_state_changed(_old_state: PlayerState, _new_state: PlayerState) -> void
 
 
 ## Play an animation by name. Uses AnimationTree if available, else AnimationPlayer.
+## Automatically remaps animation names using animation_map.
 func play_animation(animation_name: StringName, blend_time: float = -1.0) -> void:
-	if animation_name == current_animation:
+	# Remap animation name if mapping exists
+	var mapped_name: StringName = _get_mapped_animation(animation_name)
+	
+	print("[AnimCtrl] Frame %d: play_animation('%s') -> mapped='%s', current='%s'" % [
+		Engine.get_process_frames(), animation_name, mapped_name, current_animation])
+	
+	if mapped_name == current_animation:
+		print("[AnimCtrl] Frame %d: SKIPPED - same as current" % Engine.get_process_frames())
 		return
 	
 	var actual_blend := blend_time if blend_time >= 0 else default_blend_time
 	
 	if animation_tree and _state_playback:
-		_play_via_tree(animation_name, actual_blend)
+		_play_via_tree(mapped_name, actual_blend)
 	elif animation_player:
-		_play_via_player(animation_name, actual_blend)
+		_play_via_player(mapped_name, actual_blend)
 	else:
 		return
 	
-	current_animation = animation_name
-	animation_started.emit(animation_name)
+	current_animation = mapped_name
+	animation_started.emit(mapped_name)
+
+
+## Get the mapped animation name, or return original if no mapping exists.
+func _get_mapped_animation(animation_name: StringName) -> StringName:
+	if animation_map.has(animation_name):
+		return animation_map[animation_name]
+	return animation_name
 
 
 func _play_via_tree(animation_name: StringName, _blend_time: float) -> void:
-	if _state_playback.has_node(animation_name):
-		_state_playback.travel(animation_name)
-	else:
-		push_warning("AnimationController: Animation '%s' not found in AnimationTree" % animation_name)
+	var current_node := _state_playback.get_current_node()
+	var travel_path := _state_playback.get_travel_path()
+	
+	print("[AnimCtrl] Frame %d: _play_via_tree('%s') - current_node='%s', travel_path=%s" % [
+		Engine.get_process_frames(), animation_name, current_node, travel_path])
+	
+	# Sync our tracking with actual state machine state
+	if current_animation != current_node and travel_path.is_empty():
+		print("[AnimCtrl] Frame %d: SYNC current_animation '%s' -> '%s'" % [
+			Engine.get_process_frames(), current_animation, current_node])
+		current_animation = current_node
+	
+	# Check if already at this state
+	if current_node == animation_name:
+		print("[AnimCtrl] Frame %d: SKIPPED - already at node" % Engine.get_process_frames())
+		return
+	# Also check if we're already traveling to this state
+	if travel_path.size() > 0 and travel_path[-1] == animation_name:
+		print("[AnimCtrl] Frame %d: SKIPPED - already traveling to target" % Engine.get_process_frames())
+		return
+	
+	print("[AnimCtrl] Frame %d: >>> TRAVEL('%s')" % [Engine.get_process_frames(), animation_name])
+	_state_playback.travel(animation_name)
 
 
 func _play_via_player(animation_name: StringName, blend_time: float) -> void:
@@ -119,8 +169,9 @@ func _play_via_player(animation_name: StringName, blend_time: float) -> void:
 
 ## Check if an animation exists.
 func has_animation(animation_name: StringName) -> bool:
-	if animation_tree and _state_playback:
-		return _state_playback.has_node(animation_name)
+	if animation_tree and animation_tree.tree_root is AnimationNodeStateMachine:
+		var state_machine := animation_tree.tree_root as AnimationNodeStateMachine
+		return state_machine.has_node(animation_name)
 	elif animation_player:
 		return animation_player.has_animation(animation_name)
 	return false
