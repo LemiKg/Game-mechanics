@@ -19,9 +19,12 @@ var _jump_buffered: bool = false
 ## Time remaining on jump buffer.
 var _jump_buffer_timer: float = 0.0
 
+## Debug logger for this state.
+var _logger := DebugLogger.new("[AirborneState]")
+
 
 func enter() -> void:
-	print("[AirborneState] Frame %d: ENTER" % Engine.get_process_frames())
+	_logger.debug("ENTER")
 	# Air control uses walk speed as base
 	if motor:
 		motor.set_walk_speed()
@@ -33,7 +36,7 @@ func enter() -> void:
 	_jump_buffer_timer = 0.0
 	
 	# Always start with jump animation when entering airborne
-	print("[AirborneState] Frame %d: requesting 'jump' animation" % Engine.get_process_frames())
+	_logger.debug("requesting 'jump' animation")
 	request_animation(&"jump", 0.05)
 
 
@@ -66,7 +69,7 @@ func physics_update(delta: float) -> void:
 	
 	# Check if landed (ignore first few frames to let physics settle after jump)
 	# At 60 FPS with jump_velocity=4.5, we need at least ~5 frames before we could possibly land
-	var min_airtime := 0.1 # 100ms minimum
+	var min_airtime := movement_settings.min_airtime if movement_settings else 0.1
 	if motor.is_grounded and _time_since_left_ground > min_airtime:
 		_on_landed()
 		return
@@ -80,11 +83,11 @@ func _can_coyote_jump() -> bool:
 
 
 func _on_landed() -> void:
-	print("[AirborneState] Frame %d: _on_landed, _jump_buffered=%s" % [Engine.get_process_frames(), _jump_buffered])
+	_logger.debugf("_on_landed, _jump_buffered=%s", [_jump_buffered])
 	# Check if we should execute a buffered jump
 	if _jump_buffered:
 		if motor.try_jump():
-			print("[AirborneState] Frame %d: buffered jump executed" % Engine.get_process_frames())
+			_logger.debug("buffered jump executed")
 			request_animation(&"jump", 0.05)
 			# Stay in airborne state
 			_time_since_left_ground = 0.0
@@ -93,6 +96,6 @@ func _on_landed() -> void:
 			return
 	
 	# Normal landing - request land animation and transition to grounded
-	print("[AirborneState] Frame %d: normal landing, requesting 'land' and transitioning to grounded" % Engine.get_process_frames())
+	_logger.debug("normal landing, requesting 'land' and transitioning to grounded")
 	request_animation(&"land", 0.05)
 	transition_to(&"grounded")

@@ -40,3 +40,9 @@ extends Resource
 @export_range(0.0, 3.0, 0.1) var crouch_height: float = 1.0
 ## Height of collision shape when standing.
 @export_range(0.0, 3.0, 0.1) var stand_height: float = 1.8
+
+@export_group("State Timing")
+## Grace period after landing before movement animations resume.
+@export_range(0.0, 1.0, 0.05) var landing_grace_time: float = 0.5
+## Minimum time in air before landing can be detected (prevents false positives).
+@export_range(0.0, 0.5, 0.01) var min_airtime: float = 0.1

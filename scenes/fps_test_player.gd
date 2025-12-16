@@ -1,8 +1,8 @@
 extends CharacterBody3D
-## FPS test player script demonstrating PlayerController3D integration with inventory UI.
+## FPS test player script demonstrating FPSPlayerController3D integration with inventory UI.
 
 
-@onready var player_controller: PlayerController3D = $PlayerController3D
+@onready var player_controller: FPSPlayerController3D = $FPSPlayerController3D
 @onready var inventory_component = $InventoryComponent
 @onready var equipment_component = $EquipmentComponent
 @onready var inventory_ui = $CanvasLayer/InventoryUI

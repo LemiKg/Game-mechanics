@@ -52,6 +52,9 @@ var current_animation: StringName = &""
 ## Reference to AnimationTree state machine playback.
 var _state_playback: AnimationNodeStateMachinePlayback
 
+## Debug logger for animation controller.
+var _logger := DebugLogger.new("[AnimCtrl]")
+
 
 func _ready() -> void:
 	_validate_dependencies()
@@ -104,11 +107,11 @@ func play_animation(animation_name: StringName, blend_time: float = -1.0) -> voi
 	# Remap animation name if mapping exists
 	var mapped_name: StringName = _get_mapped_animation(animation_name)
 	
-	print("[AnimCtrl] Frame %d: play_animation('%s') -> mapped='%s', current='%s'" % [
-		Engine.get_process_frames(), animation_name, mapped_name, current_animation])
+	_logger.debugf("play_animation('%s') -> mapped='%s', current='%s'",
+		[animation_name, mapped_name, current_animation])
 	
 	if mapped_name == current_animation:
-		print("[AnimCtrl] Frame %d: SKIPPED - same as current" % Engine.get_process_frames())
+		_logger.debug("SKIPPED - same as current")
 		return
 	
 	var actual_blend := blend_time if blend_time >= 0 else default_blend_time
@@ -135,25 +138,24 @@ func _play_via_tree(animation_name: StringName, _blend_time: float) -> void:
 	var current_node := _state_playback.get_current_node()
 	var travel_path := _state_playback.get_travel_path()
 	
-	print("[AnimCtrl] Frame %d: _play_via_tree('%s') - current_node='%s', travel_path=%s" % [
-		Engine.get_process_frames(), animation_name, current_node, travel_path])
+	_logger.debugf("_play_via_tree('%s') - current_node='%s', travel_path=%s",
+		[animation_name, current_node, travel_path])
 	
 	# Sync our tracking with actual state machine state
 	if current_animation != current_node and travel_path.is_empty():
-		print("[AnimCtrl] Frame %d: SYNC current_animation '%s' -> '%s'" % [
-			Engine.get_process_frames(), current_animation, current_node])
+		_logger.debugf("SYNC current_animation '%s' -> '%s'", [current_animation, current_node])
 		current_animation = current_node
 	
 	# Check if already at this state
 	if current_node == animation_name:
-		print("[AnimCtrl] Frame %d: SKIPPED - already at node" % Engine.get_process_frames())
+		_logger.debug("SKIPPED - already at node")
 		return
 	# Also check if we're already traveling to this state
 	if travel_path.size() > 0 and travel_path[-1] == animation_name:
-		print("[AnimCtrl] Frame %d: SKIPPED - already traveling to target" % Engine.get_process_frames())
+		_logger.debug("SKIPPED - already traveling to target")
 		return
 	
-	print("[AnimCtrl] Frame %d: >>> TRAVEL('%s')" % [Engine.get_process_frames(), animation_name])
+	_logger.debugf(">>> TRAVEL('%s')", [animation_name])
 	_state_playback.travel(animation_name)
 
 
