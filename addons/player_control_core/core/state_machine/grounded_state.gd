@@ -2,7 +2,7 @@ class_name GroundedState
 extends PlayerState
 ## Active when the player is on the floor.
 ##
-## Handles walking, sprinting, crouching, and jumping.
+## Handles walking, sprinting, crouching, jumping, and rotate-in-place.
 ## Transitions to Airborne when jump or falling.
 
 
@@ -22,6 +22,12 @@ var _landing_grace_timer: float = 0.0
 ## Whether we just landed (skip immediate animation update).
 var _just_landed: bool = false
 
+## Whether currently in a rotate-in-place turn.
+var _is_rotating_in_place: bool = false
+
+## Target yaw for rotate-in-place.
+var _rotation_target: float = 0.0
+
 ## Debug logger for this state.
 var _logger := DebugLogger.new("[GroundedState]")
 
@@ -31,6 +37,7 @@ func enter() -> void:
 	is_sprinting = false
 	is_crouching = false
 	_current_animation = &""
+	_is_rotating_in_place = false
 	if motor:
 		motor.set_walk_speed()
 	
@@ -46,6 +53,7 @@ func enter() -> void:
 func exit() -> void:
 	is_sprinting = false
 	is_crouching = false
+	_is_rotating_in_place = false
 
 
 func physics_update(delta: float) -> void:
@@ -77,6 +85,13 @@ func physics_update(delta: float) -> void:
 	
 	# Handle sprint/crouch modifiers
 	_update_movement_modifiers()
+	
+	# Check for rotate-in-place (only when not moving and enabled)
+	if movement_settings and movement_settings.enable_rotate_in_place:
+		if not motor.is_moving:
+			_check_rotate_in_place(delta)
+		else:
+			_is_rotating_in_place = false
 	
 	# Handle jump (consume the buffered input)
 	if input_router.consume_jump():
@@ -130,3 +145,50 @@ func _update_animation() -> void:
 		_logger.debugf("animation changed '%s' -> '%s'", [_current_animation, new_animation])
 		_current_animation = new_animation
 		request_animation(new_animation)
+
+
+func _check_rotate_in_place(delta: float) -> void:
+	var body := controller.body
+	if not body:
+		return
+	
+	var camera_yaw := _get_camera_yaw()
+	var body_yaw := body.rotation.y
+	
+	var angle_diff := rad_to_deg(angle_difference(body_yaw, camera_yaw))
+	var threshold := movement_settings.rotation_threshold_degrees
+	
+	# Check if we should start rotating
+	if abs(angle_diff) > threshold and not _is_rotating_in_place:
+		_is_rotating_in_place = true
+		_rotation_target = camera_yaw
+		
+		# Request turn animation
+		var anim_name: StringName
+		if angle_diff < 0:
+			anim_name = movement_settings.turn_left_animation
+		else:
+			anim_name = movement_settings.turn_right_animation
+		
+		_logger.debugf("starting rotate-in-place, angle_diff=%.1f, anim=%s", [angle_diff, anim_name])
+		request_animation(anim_name, 0.1)
+		_current_animation = anim_name
+	
+	# Perform rotation if in rotate-in-place mode
+	if _is_rotating_in_place:
+		var rotation_speed := deg_to_rad(movement_settings.rotation_in_place_speed)
+		body.rotation.y = rotate_toward(body.rotation.y, _rotation_target, rotation_speed * delta)
+		
+		# Check if rotation is complete
+		if abs(angle_difference(body.rotation.y, _rotation_target)) < deg_to_rad(5.0):
+			_is_rotating_in_place = false
+			_logger.debug("rotate-in-place complete")
+			request_animation(&"idle", 0.2)
+			_current_animation = &"idle"
+
+
+func _get_camera_yaw() -> float:
+	# Get camera yaw from controller if available
+	if controller.has_method("get_camera_yaw"):
+		return controller.get_camera_yaw()
+	return 0.0

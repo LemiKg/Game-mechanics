@@ -4,7 +4,12 @@ extends PlayerState
 ##
 ## Applies gravity and limited air control.
 ## Transitions to Grounded when landing.
-## Supports coyote time (late jump) and jump buffering.
+## Supports coyote time (late jump), jump buffering, and mantling.
+
+
+@export_group("Mantling")
+## Optional mantle detector for ledge climbing.
+@export var mantle_detector: MantleDetector
 
 
 ## Time since leaving the ground (for coyote time).
@@ -64,6 +69,15 @@ func physics_update(delta: float) -> void:
 		if _jump_buffer_timer <= 0:
 			_jump_buffered = false
 	
+	# Check for mantle opportunity (when moving forward and detector is available)
+	if _should_check_mantle():
+		var ledge_data := mantle_detector.check_for_ledge()
+		if not ledge_data.is_empty():
+			_logger.debugf("ledge detected at height %.2f, initiating mantle", [ledge_data.height])
+			state_machine.set_meta("mantle_ledge_data", ledge_data)
+			transition_to(&"mantle")
+			return
+	
 	# Apply gravity
 	motor.apply_gravity(delta)
 	
@@ -73,6 +87,15 @@ func physics_update(delta: float) -> void:
 	if motor.is_grounded and _time_since_left_ground > min_airtime:
 		_on_landed()
 		return
+
+
+func _should_check_mantle() -> bool:
+	if not mantle_detector or not mantle_detector.is_configured():
+		return false
+	if not input_router:
+		return false
+	# Only check when moving forward
+	return input_router.movement_intent.y > 0.5
 
 
 func _can_coyote_jump() -> bool:

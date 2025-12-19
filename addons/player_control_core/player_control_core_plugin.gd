@@ -35,6 +35,12 @@ func _enter_tree() -> void:
 		preload("res://addons/player_control_core/core/state_machine/ui_state.gd"),
 		preload("res://addons/player_control_core/icons/state.svg")
 	)
+	add_custom_type(
+		"MantleState",
+		"Node",
+		preload("res://addons/player_control_core/core/state_machine/mantle_state.gd"),
+		preload("res://addons/player_control_core/icons/state.svg")
+	)
 	
 	# Core components
 	add_custom_type(
@@ -67,6 +73,12 @@ func _enter_tree() -> void:
 		preload("res://addons/player_control_core/core/animation_controller.gd"),
 		preload("res://addons/player_control_core/icons/controller.svg")
 	)
+	add_custom_type(
+		"MantleDetector",
+		"Node",
+		preload("res://addons/player_control_core/core/mantle_detector.gd"),
+		preload("res://addons/player_control_core/icons/controller.svg")
+	)
 	
 	# Resources
 	add_custom_type(
@@ -81,6 +93,12 @@ func _enter_tree() -> void:
 		preload("res://addons/player_control_core/core/input_actions_3d.gd"),
 		preload("res://addons/player_control_core/icons/input.svg")
 	)
+	add_custom_type(
+		"MantleSettings3D",
+		"Resource",
+		preload("res://addons/player_control_core/core/mantle_settings_3d.gd"),
+		preload("res://addons/player_control_core/icons/settings.svg")
+	)
 
 
 func _exit_tree() -> void:
@@ -90,6 +108,7 @@ func _exit_tree() -> void:
 	remove_custom_type("GroundedState")
 	remove_custom_type("AirborneState")
 	remove_custom_type("UIState")
+	remove_custom_type("MantleState")
 	
 	# Core components
 	remove_custom_type("BasePlayerController3D")
@@ -97,7 +116,9 @@ func _exit_tree() -> void:
 	remove_custom_type("PlayerMotor3D")
 	remove_custom_type("PlayerInputRouter3D")
 	remove_custom_type("AnimationController")
+	remove_custom_type("MantleDetector")
 	
 	# Resources
 	remove_custom_type("MovementSettings3D")
 	remove_custom_type("InputActions3D")
+	remove_custom_type("MantleSettings3D")

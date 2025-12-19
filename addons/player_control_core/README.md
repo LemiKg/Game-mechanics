@@ -4,13 +4,32 @@ Core player control framework providing shared abstractions for FPS and third-pe
 
 ## Features
 
-- **State Machine** — Formal player states (Grounded, Airborne, UI) with clean transitions
-- **Jump Feel** — Coyote time and jump buffering for responsive controls (100ms default)
-- **Animation System** — Signal-based animation requests for easy 3D model integration
-- **Pushdown Stack** — State stack for temporary interrupts (attacks, stagger, cutscenes)
+### Movement System
 - **Player Motor** — Physics-based movement with configurable speed, acceleration, and gravity
+- **Dual Body Support** — Works with both `CharacterBody3D` and `RigidBody3D` via duck typing
+- **Actual Velocity Tracking** — Real displacement-based velocity for accurate animation blending
+- **Camera-Relative Movement** — Movement direction based on camera orientation
+
+### State Machine
+- **Formal States** — Grounded, Airborne, UI, and Mantle states with clean transitions
+- **Jump Feel** — Coyote time and jump buffering for responsive controls (100ms default)
+- **Pushdown Stack** — State stack for temporary interrupts (attacks, stagger, cutscenes)
+- **Rotate-in-Place** — Optional idle rotation when input direction differs from facing
+
+### Mantling System
+- **Ledge Detection** — Multi-raycast system for detecting climbable surfaces
+- **Programmatic Movement** — Smooth curve-based interpolation to ledge position
+- **Configurable Heights** — Min/max reach, surface depth, and detection distances
+
+### Animation & Input
+- **Animation System** — Signal-based animation requests for easy 3D model integration
 - **Input Router** — Converts raw input to movement intent, decoupled from motor
-- **Base Controller** — Abstract orchestrator for camera-specific implementations to extend
+
+### Controllers
+- **Base Controller** — Abstract orchestrator for camera-specific implementations
+- **Dual Perspective Controller** — Unified FPS/third-person with runtime toggle
+- **Rotation Modes** — Face Movement, Strafe, Free, Aiming, and Lock-On modes
+- **Body Tilt** — Optional lateral tilt when strafing for visual polish
 
 ## Dependencies
 
@@ -29,26 +48,29 @@ None. This is the base addon that FPS and third-person addons depend on.
 |-------|---------|
 | `PlayerStateMachine` | Manages state transitions, pushdown stack for interrupts |
 | `PlayerState` | Abstract base for all states; emits animation signals |
-| `GroundedState` | Active when on floor; handles sprint/crouch modifiers |
-| `AirborneState` | Active when airborne; coyote time + jump buffering |
+| `GroundedState` | Active when on floor; handles sprint/crouch, rotate-in-place |
+| `AirborneState` | Active when airborne; coyote time, jump buffering, mantle detection |
 | `UIState` | Active when gameplay disabled; blocks input |
+| `MantleState` | Active during mantling; programmatic ledge climb |
 
 ### Core Components
 
 | Class | Purpose |
 |-------|---------|
 | `BasePlayerController3D` | Abstract orchestrator; extend for FPS or third-person |
-| `DualPerspectiveController3D` | Unified controller supporting both FPS and third-person with runtime toggle |
-| `PlayerMotor3D` | Applies velocity to CharacterBody3D based on input intent |
+| `DualPerspectiveController3D` | Unified controller supporting FPS/third-person with runtime toggle |
+| `PlayerMotor3D` | Applies velocity to CharacterBody3D or RigidBody3D based on input |
 | `PlayerInputRouter3D` | Converts input actions to movement/look intent vectors |
 | `AnimationController` | Bridges state signals to AnimationTree or AnimationPlayer |
+| `MantleDetector` | Multi-raycast ledge detection for mantling system |
 
 ### Resources
 
 | Class | Purpose |
 |-------|---------|
-| `MovementSettings3D` | Walk/sprint/crouch speed, acceleration, jump, gravity, jump feel |
+| `MovementSettings3D` | Walk/sprint/crouch speed, acceleration, jump, gravity, RigidBody settings |
 | `InputActions3D` | Configurable input action names |
+| `MantleSettings3D` | Ledge detection distances, movement curve, animation names |
 
 ## Usage
 
@@ -179,11 +201,88 @@ if player_controller.is_first_person():
 - Shares the same state machine for both perspectives
 - Smooth camera angle sync when switching
 - Automatic character mesh show/hide (hidden in FPS)
-- Three rotation modes for third-person: `FACE_MOVEMENT`, `STRAFE`, `FREE`
+- Five rotation modes: `FACE_MOVEMENT`, `STRAFE`, `FREE`, `AIMING`, `LOCK_ON`
+- Body tilt when strafing for visual polish
+- Lock-on targeting with auto-break distance
 
 **Required components:**
 - Both `PlayerLookController3D` (from FPS addon) and `OrbitCameraController3D` (from third-person addon)
 - Input action `toggle_perspective` (optional)
+
+---
+
+## RigidBody3D Support
+
+The `PlayerMotor3D` supports both `CharacterBody3D` and `RigidBody3D` using duck typing:
+
+```gdscript
+# Assign any physics body - motor auto-detects type
+@export var body: Node3D  # CharacterBody3D or RigidBody3D
+
+# Motor uses appropriate physics:
+# - CharacterBody3D: move_and_slide()
+# - RigidBody3D: apply_central_force()
+```
+
+**RigidBody Settings** in `MovementSettings3D`:
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `rigid_body_force_multiplier` | 50.0 | Force multiplier for movement |
+| `rigid_body_ground_raycast_distance` | 0.2 | Ground detection ray length |
+
+---
+
+## Mantling System
+
+Automatic ledge climbing when jumping near climbable surfaces:
+
+```gdscript
+# Add MantleDetector as child of player
+# Configure in MantleSettings3D resource:
+@export var min_height: float = 0.5      # Minimum ledge height
+@export var max_height: float = 2.0      # Maximum reach
+@export var max_distance: float = 0.8    # Forward detection range
+@export var surface_depth: float = 0.3   # Required surface depth
+```
+
+**Components:**
+| Class | Purpose |
+|-------|---------|
+| `MantleDetector` | Casts rays to find valid ledges |
+| `MantleState` | Handles the climb animation/movement |
+| `MantleSettings3D` | Configuration resource |
+
+**Detection Flow:**
+1. AirborneState checks for ledges when ascending and near surfaces
+2. MantleDetector casts horizontal ray to find wall
+3. Casts downward ray to find ledge surface
+4. Validates height and surface depth
+5. Transitions to MantleState for climb
+
+---
+
+## Rotation Modes
+
+Third-person and dual-perspective controllers support multiple rotation modes:
+
+| Mode | Description |
+|------|-------------|
+| `FACE_MOVEMENT` | Character faces movement direction |
+| `STRAFE` | Character faces camera direction, can strafe |
+| `FREE` | No automatic rotation |
+| `AIMING` | Like strafe but with zoom FOV and faster rotation |
+| `LOCK_ON` | Character faces a target node |
+
+```gdscript
+# Set rotation mode
+controller.rotation_mode = ThirdPersonController3D.RotationMode.AIMING
+
+# Lock-on to a target
+controller.set_lock_on_target(enemy_node)
+
+# Clear lock-on
+controller.clear_lock_on()
+```
 
 ## State Machine Architecture
 
@@ -243,6 +342,7 @@ func _on_ui_state_exited() -> void:
 |--------|-------------|
 | `grounded_changed(is_grounded: bool)` | Emitted when grounded state changes |
 | `jumped()` | Emitted when player jumps |
+| `velocity_changed(velocity: Vector3, speed: float)` | Emitted when actual velocity changes (for pose warping) |
 
 ### PlayerStateMachine
 
@@ -267,6 +367,14 @@ func _on_ui_state_exited() -> void:
 | Signal | Description |
 |--------|-------------|
 | `perspective_changed(is_first_person: bool)` | Emitted when perspective toggles |
+| `lock_on_started(target: Node3D)` | Emitted when lock-on begins |
+| `lock_on_ended()` | Emitted when lock-on ends |
+
+### MantleDetector
+
+| Signal | Description |
+|--------|-------------|
+| `ledge_detected(ledge_info: Dictionary)` | Emitted when a valid ledge is found |
 
 ## License
 
