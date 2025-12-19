@@ -29,7 +29,7 @@ var _queue: Array[Vector2i] = []
 var _queue_mutex: Mutex = Mutex.new()
 
 ## Pending results waiting to be delivered
-var _results: Array[Dictionary] = []  # [{coord, data}]
+var _results: Array[Dictionary] = [] # [{coord, data}]
 var _results_mutex: Mutex = Mutex.new()
 
 ## Worker thread

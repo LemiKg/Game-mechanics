@@ -11,7 +11,7 @@ class_name DecorationDefinition
 ## - Normal alignment behavior
 
 ## Type of decoration (used for auto-generating placeholder mesh if none provided)
-enum DecorationType { TREE, ROCK, BUSH, CUSTOM }
+enum DecorationType {TREE, ROCK, BUSH, CUSTOM}
 
 ## Decoration type for automatic mesh generation
 @export var decoration_type: DecorationType = DecorationType.TREE
@@ -61,6 +61,23 @@ var _cached_scene_mesh: Mesh = null
 @export_range(0.0, 6.283, 0.01) var random_rotation: float = TAU
 
 ## ============================================
+## ADVANCED TRANSFORM
+## ============================================
+@export_group("Advanced Transform")
+
+## Non-uniform scale variance per axis (0 = uniform, 0.2 = ±20% per axis)
+@export var scale_variance: Vector3 = Vector3.ZERO
+
+## Random tilt range on X/Z axes in radians (for natural settling)
+@export_range(0.0, 0.5, 0.01) var random_tilt: float = 0.0
+
+## Maximum normal alignment angle in radians (0 = ignore terrain, 1.57 = full alignment)
+@export_range(0.0, 1.571, 0.01) var max_align_angle: float = 1.571
+
+## Random Y offset variance for burial effect (negative values = buried)
+@export_range(0.0, 1.0, 0.01) var y_offset_variance: float = 0.0
+
+## ============================================
 ## CLUSTERING
 ## ============================================
 @export_group("Clustering")
@@ -71,6 +88,23 @@ var _cached_scene_mesh: Mesh = null
 ## Scale of cluster noise (smaller = larger clusters)
 @export_range(0.001, 0.1, 0.001) var cluster_scale: float = 0.02
 
+## Cluster group ID - decorations with same ID share cluster pattern
+@export var cluster_group_id: int = 0
+
+## Seed offset for cluster noise (variation within same group)
+@export var cluster_seed_offset: int = 0
+
+## Scale falloff at cluster edges (0 = none, 1 = min_scale at edges)
+@export_range(0.0, 1.0, 0.05) var cluster_edge_scale_falloff: float = 0.0
+
+## ============================================
+## SAMPLING
+## ============================================
+@export_group("Sampling")
+
+## Use Poisson disk sampling for better spacing (recommended for trees/large rocks)
+@export var use_poisson_sampling: bool = false
+
 ## ============================================
 ## COLLISION
 ## ============================================
@@ -80,7 +114,7 @@ var _cached_scene_mesh: Mesh = null
 @export var has_collision: bool = false
 
 ## Collision shape type
-enum CollisionShapeType { CYLINDER, BOX, CAPSULE }
+enum CollisionShapeType {CYLINDER, BOX, CAPSULE}
 @export var collision_shape: CollisionShapeType = CollisionShapeType.CYLINDER
 
 ## Collision radius (for cylinder/capsule)

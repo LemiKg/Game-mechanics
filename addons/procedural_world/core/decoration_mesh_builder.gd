@@ -35,7 +35,7 @@ static func build_tree_mesh(
 	# Create cone canopy (pine tree shape)
 	var canopy := CylinderMesh.new()
 	canopy.height = canopy_height
-	canopy.top_radius = 0.0  # Pointed top
+	canopy.top_radius = 0.0 # Pointed top
 	canopy.bottom_radius = canopy_radius
 	canopy.radial_segments = 8
 	canopy.rings = 1
@@ -116,7 +116,7 @@ static func build_bush_mesh(
 ## Create a simple brown material for tree trunks
 static func create_trunk_material() -> StandardMaterial3D:
 	var mat := StandardMaterial3D.new()
-	mat.albedo_color = Color(0.4, 0.25, 0.1)  # Brown
+	mat.albedo_color = Color(0.4, 0.25, 0.1) # Brown
 	mat.roughness = 0.9
 	return mat
 
@@ -124,7 +124,7 @@ static func create_trunk_material() -> StandardMaterial3D:
 ## Create a simple green material for tree canopies/bushes
 static func create_canopy_material() -> StandardMaterial3D:
 	var mat := StandardMaterial3D.new()
-	mat.albedo_color = Color(0.2, 0.5, 0.15)  # Forest green
+	mat.albedo_color = Color(0.2, 0.5, 0.15) # Forest green
 	mat.roughness = 0.8
 	return mat
 
@@ -132,7 +132,7 @@ static func create_canopy_material() -> StandardMaterial3D:
 ## Create a simple gray material for rocks
 static func create_rock_material() -> StandardMaterial3D:
 	var mat := StandardMaterial3D.new()
-	mat.albedo_color = Color(0.5, 0.5, 0.5)  # Gray
+	mat.albedo_color = Color(0.5, 0.5, 0.5) # Gray
 	mat.roughness = 0.95
 	return mat
 

@@ -44,6 +44,7 @@ metadata/_custom_type_script = "uid://vudhcqvuvjus"
 
 [node name="DebugOverlayUI" type="CanvasLayer" parent="." node_paths=PackedStringArray("chunk_manager")]
 layer = 100
+visible = false
 script = ExtResource("4_debug")
 chunk_manager = NodePath("../ChunkManager")
 
@@ -51,6 +52,8 @@ chunk_manager = NodePath("../ChunkManager")
 script = ExtResource("5_veg")
 chunk_manager = NodePath("../ChunkManager")
 world_config = ExtResource("2_pyv2p")
+max_per_chunk = 1000
+spawn_radius = 1
 
 [node name="Player" parent="." instance=ExtResource("3_pyv2p")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 48.11914, 80.35122, 85.69061)

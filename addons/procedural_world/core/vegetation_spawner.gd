@@ -43,6 +43,10 @@ var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
 ## Noise generator for clustering
 var _cluster_noise: FastNoiseLite
 
+## Poisson disk sampling constants
+const POISSON_MAX_ATTEMPTS := 30
+const POISSON_MARGIN_FACTOR := 0.2
+
 
 func _ready() -> void:
 	if Engine.is_editor_hint():
@@ -216,75 +220,124 @@ func _generate_instances(
 ) -> Array[Transform3D]:
 	var instances: Array[Transform3D] = []
 	
-	# Calculate grid cell size based on density
-	# density = instances per unit area, so cell_size = 1 / sqrt(density)
-	var grid_cell := 1.0 / sqrt(decoration.density) if decoration.density > 0 else 10.0
-	var grid_count := int(ceil(chunk_size / grid_cell))
+	# Calculate min distance based on density
+	var min_distance := 1.0 / sqrt(decoration.density) if decoration.density > 0 else 10.0
 	
 	# Configure cluster noise for this decoration
 	var use_clustering := decoration.cluster_strength > 0.0 and _cluster_noise
 	if use_clustering:
 		_cluster_noise.frequency = decoration.cluster_scale
+		# Use cluster_group_id for base pattern, cluster_seed_offset for variation
+		_cluster_noise.seed = seed + decoration.cluster_group_id * 1000 + decoration.cluster_seed_offset
+	
+	# Get sample points - either Poisson disk or jittered grid
+	var sample_points: Array[Vector2] = []
+	if decoration.use_poisson_sampling:
+		var decoration_seed := decoration.cluster_group_id * 1000 + decoration.cluster_seed_offset
+		sample_points = _generate_poisson_points_with_margin(chunk_data.coord, chunk_size, min_distance, decoration_seed)
+	else:
+		sample_points = _generate_jittered_grid_points(chunk_size, min_distance)
+	
+	for point in sample_points:
+		if instances.size() >= max_per_chunk:
+			break
+		
+		var local_x := point.x
+		var local_z := point.y
+		
+		# Skip if outside chunk bounds
+		if local_x >= chunk_size or local_z >= chunk_size:
+			continue
+		
+		# Apply clustering - use noise to determine spawn probability
+		var cluster_edge_factor := 1.0 # 1.0 = cluster center, 0.0 = cluster edge
+		if use_clustering:
+			var world_x := world_offset.x + local_x
+			var world_z := world_offset.z + local_z
+			var noise_val := (_cluster_noise.get_noise_2d(world_x, world_z) + 1.0) * 0.5 # 0-1
+			var threshold := decoration.cluster_strength * 0.7 # Higher strength = higher threshold
+			if noise_val < threshold:
+				continue # Skip this position (creates gaps = clusters)
+			
+			# Calculate edge factor for scale falloff
+			if decoration.cluster_edge_scale_falloff > 0.0:
+				cluster_edge_factor = clampf((noise_val - threshold) / (1.0 - threshold + 0.001), 0.0, 1.0)
+		
+		# Sample height from chunk data
+		var height := _sample_height_at(local_x, local_z, chunk_data, cell_size, resolution)
+		
+		# Calculate slope at this position
+		var slope := _calculate_slope_at(local_x, local_z, chunk_data, cell_size, resolution)
+		
+		# Check slope constraints
+		if not decoration.is_slope_valid(slope):
+			continue
+		
+		# Calculate Y offset with variance (negative = buried)
+		var y_off := decoration.y_offset
+		if decoration.y_offset_variance > 0.0:
+			y_off -= _rng.randf() * decoration.y_offset_variance
+		
+		# Create transform
+		var pos := world_offset + Vector3(local_x, height + y_off, local_z)
+		var rotation := decoration.get_random_rotation(_rng)
+		
+		# Get base scale with cluster edge falloff
+		var base_scale := decoration.get_random_scale(_rng)
+		if decoration.cluster_edge_scale_falloff > 0.0:
+			var min_edge_scale := lerpf(decoration.min_scale, base_scale, 1.0 - decoration.cluster_edge_scale_falloff)
+			base_scale = lerpf(min_edge_scale, base_scale, cluster_edge_factor)
+		
+		var transform := Transform3D.IDENTITY
+		
+		# Apply normal alignment if enabled (with angle limit)
+		if decoration.align_to_normal:
+			var normal := _sample_normal_at(local_x, local_z, chunk_data, cell_size, resolution)
+			transform = _align_to_normal_limited(normal, decoration.max_align_angle)
+		
+		# Apply random tilt on X/Z axes for natural settling
+		if decoration.random_tilt > 0.0:
+			var tilt_x := _rng.randf_range(-decoration.random_tilt, decoration.random_tilt)
+			var tilt_z := _rng.randf_range(-decoration.random_tilt, decoration.random_tilt)
+			transform = transform.rotated(transform.basis.x.normalized(), tilt_x)
+			transform = transform.rotated(transform.basis.z.normalized(), tilt_z)
+		
+		# Apply rotation around Y axis
+		transform = transform.rotated(Vector3.UP, rotation)
+		
+		# Apply scale (non-uniform if variance is set)
+		var scale_vec := Vector3.ONE * base_scale
+		if decoration.scale_variance != Vector3.ZERO:
+			scale_vec.x *= 1.0 + _rng.randf_range(-decoration.scale_variance.x, decoration.scale_variance.x)
+			scale_vec.y *= 1.0 + _rng.randf_range(-decoration.scale_variance.y, decoration.scale_variance.y)
+			scale_vec.z *= 1.0 + _rng.randf_range(-decoration.scale_variance.z, decoration.scale_variance.z)
+		transform = transform.scaled(scale_vec)
+		
+		# Apply position
+		transform.origin = pos
+		
+		instances.append(transform)
+	
+	return instances
+
+
+## Generate jittered grid sample points (fallback when not using Poisson)
+func _generate_jittered_grid_points(chunk_size: float, grid_cell: float) -> Array[Vector2]:
+	var points: Array[Vector2] = []
+	var grid_count := int(ceil(chunk_size / grid_cell))
 	
 	for gz in range(grid_count):
 		for gx in range(grid_count):
-			if instances.size() >= max_per_chunk:
-				break
-			
-			# Jittered position within grid cell
 			var jitter_x := _rng.randf() * grid_cell
 			var jitter_z := _rng.randf() * grid_cell
 			
 			var local_x := gx * grid_cell + jitter_x
 			var local_z := gz * grid_cell + jitter_z
 			
-			# Skip if outside chunk bounds
-			if local_x >= chunk_size or local_z >= chunk_size:
-				continue
-			
-			# Apply clustering - use noise to determine spawn probability
-			if use_clustering:
-				var world_x := world_offset.x + local_x
-				var world_z := world_offset.z + local_z
-				var noise_val := (_cluster_noise.get_noise_2d(world_x, world_z) + 1.0) * 0.5 # 0-1
-				var threshold := decoration.cluster_strength * 0.7 # Higher strength = higher threshold
-				if noise_val < threshold:
-					continue # Skip this position (creates gaps = clusters)
-			
-			# Sample height from chunk data
-			var height := _sample_height_at(local_x, local_z, chunk_data, cell_size, resolution)
-			
-			# Calculate slope at this position
-			var slope := _calculate_slope_at(local_x, local_z, chunk_data, cell_size, resolution)
-			
-			# Check slope constraints
-			if not decoration.is_slope_valid(slope):
-				continue
-			
-			# Create transform
-			var pos := world_offset + Vector3(local_x, height + decoration.y_offset, local_z)
-			var scale_factor := decoration.get_random_scale(_rng)
-			var rotation := decoration.get_random_rotation(_rng)
-			
-			var transform := Transform3D.IDENTITY
-			
-			# Apply normal alignment if enabled
-			if decoration.align_to_normal:
-				var normal := _sample_normal_at(local_x, local_z, chunk_data, cell_size, resolution)
-				transform = _align_to_normal(normal)
-			
-			# Apply rotation around Y axis
-			transform = transform.rotated(Vector3.UP, rotation)
-			
-			# Apply scale
-			transform = transform.scaled(Vector3.ONE * scale_factor)
-			
-			# Apply position
-			transform.origin = pos
-			
-			instances.append(transform)
+			if local_x < chunk_size and local_z < chunk_size:
+				points.append(Vector2(local_x, local_z))
 	
-	return instances
+	return points
 
 
 ## Generate instance transforms grouped by mesh variant
@@ -304,80 +357,243 @@ func _generate_instances_with_variants(
 	for i in range(variant_count):
 		variant_instances[i] = [] as Array[Transform3D]
 	
-	# Calculate grid cell size based on density
-	var grid_cell := 1.0 / sqrt(decoration.density) if decoration.density > 0 else 10.0
-	var grid_count := int(ceil(chunk_size / grid_cell))
+	# Calculate min distance based on density
+	var min_distance := 1.0 / sqrt(decoration.density) if decoration.density > 0 else 10.0
 	var total_count := 0
 	
 	# Configure cluster noise for this decoration
 	var use_clustering := decoration.cluster_strength > 0.0 and _cluster_noise
 	if use_clustering:
 		_cluster_noise.frequency = decoration.cluster_scale
+		# Use cluster_group_id for base pattern, cluster_seed_offset for variation
+		_cluster_noise.seed = seed + decoration.cluster_group_id * 1000 + decoration.cluster_seed_offset
 	
-	for gz in range(grid_count):
-		for gx in range(grid_count):
-			if total_count >= max_per_chunk:
-				break
+	# Get sample points - either Poisson disk or jittered grid
+	var sample_points: Array[Vector2] = []
+	if decoration.use_poisson_sampling:
+		var decoration_seed := decoration.cluster_group_id * 1000 + decoration.cluster_seed_offset
+		sample_points = _generate_poisson_points_with_margin(chunk_data.coord, chunk_size, min_distance, decoration_seed)
+	else:
+		sample_points = _generate_jittered_grid_points(chunk_size, min_distance)
+	
+	for point in sample_points:
+		if total_count >= max_per_chunk:
+			break
+		
+		var local_x := point.x
+		var local_z := point.y
+		
+		# Skip if outside chunk bounds
+		if local_x >= chunk_size or local_z >= chunk_size:
+			continue
+		
+		# Apply clustering - use noise to determine spawn probability
+		var cluster_edge_factor := 1.0 # 1.0 = cluster center, 0.0 = cluster edge
+		if use_clustering:
+			var world_x := world_offset.x + local_x
+			var world_z := world_offset.z + local_z
+			var noise_val := (_cluster_noise.get_noise_2d(world_x, world_z) + 1.0) * 0.5 # 0-1
+			var threshold := decoration.cluster_strength * 0.7 # Higher strength = higher threshold
+			if noise_val < threshold:
+				continue # Skip this position (creates gaps = clusters)
 			
-			# Jittered position within grid cell
-			var jitter_x := _rng.randf() * grid_cell
-			var jitter_z := _rng.randf() * grid_cell
-			
-			var local_x := gx * grid_cell + jitter_x
-			var local_z := gz * grid_cell + jitter_z
-			
-			# Skip if outside chunk bounds
-			if local_x >= chunk_size or local_z >= chunk_size:
-				continue
-			
-			# Apply clustering - use noise to determine spawn probability
-			if use_clustering:
-				var world_x := world_offset.x + local_x
-				var world_z := world_offset.z + local_z
-				var noise_val := (_cluster_noise.get_noise_2d(world_x, world_z) + 1.0) * 0.5 # 0-1
-				var threshold := decoration.cluster_strength * 0.7 # Higher strength = higher threshold
-				if noise_val < threshold:
-					continue # Skip this position (creates gaps = clusters)
-			
-			# Sample height from chunk data
-			var height := _sample_height_at(local_x, local_z, chunk_data, cell_size, resolution)
-			
-			# Calculate slope at this position
-			var slope := _calculate_slope_at(local_x, local_z, chunk_data, cell_size, resolution)
-			
-			# Check slope constraints
-			if not decoration.is_slope_valid(slope):
-				continue
-			
-			# Pick a random variant
-			var variant_idx := _rng.randi() % variant_count
-			
-			# Create transform
-			var pos := world_offset + Vector3(local_x, height + decoration.y_offset, local_z)
-			var scale_factor := decoration.get_random_scale(_rng)
-			var rotation := decoration.get_random_rotation(_rng)
-			
-			var transform := Transform3D.IDENTITY
-			
-			# Apply normal alignment if enabled
-			if decoration.align_to_normal:
-				var normal := _sample_normal_at(local_x, local_z, chunk_data, cell_size, resolution)
-				transform = _align_to_normal(normal)
-			
-			# Apply rotation around Y axis
-			transform = transform.rotated(Vector3.UP, rotation)
-			
-			# Apply scale
-			transform = transform.scaled(Vector3.ONE * scale_factor)
-			
-			# Apply position
-			transform.origin = pos
-			
-			variant_instances[variant_idx].append(transform)
-			total_count += 1
+			# Calculate edge factor for scale falloff
+			if decoration.cluster_edge_scale_falloff > 0.0:
+				cluster_edge_factor = clampf((noise_val - threshold) / (1.0 - threshold + 0.001), 0.0, 1.0)
+		
+		# Sample height from chunk data
+		var height := _sample_height_at(local_x, local_z, chunk_data, cell_size, resolution)
+		
+		# Calculate slope at this position
+		var slope := _calculate_slope_at(local_x, local_z, chunk_data, cell_size, resolution)
+		
+		# Check slope constraints
+		if not decoration.is_slope_valid(slope):
+			continue
+		
+		# Pick a random variant
+		var variant_idx := _rng.randi() % variant_count
+		
+		# Calculate Y offset with variance (negative = buried)
+		var y_off := decoration.y_offset
+		if decoration.y_offset_variance > 0.0:
+			y_off -= _rng.randf() * decoration.y_offset_variance
+		
+		# Create transform
+		var pos := world_offset + Vector3(local_x, height + y_off, local_z)
+		var rotation := decoration.get_random_rotation(_rng)
+		
+		# Get base scale with cluster edge falloff
+		var base_scale := decoration.get_random_scale(_rng)
+		if decoration.cluster_edge_scale_falloff > 0.0:
+			var min_edge_scale := lerpf(decoration.min_scale, base_scale, 1.0 - decoration.cluster_edge_scale_falloff)
+			base_scale = lerpf(min_edge_scale, base_scale, cluster_edge_factor)
+		
+		var transform := Transform3D.IDENTITY
+		
+		# Apply normal alignment if enabled (with angle limit)
+		if decoration.align_to_normal:
+			var normal := _sample_normal_at(local_x, local_z, chunk_data, cell_size, resolution)
+			transform = _align_to_normal_limited(normal, decoration.max_align_angle)
+		
+		# Apply random tilt on X/Z axes for natural settling
+		if decoration.random_tilt > 0.0:
+			var tilt_x := _rng.randf_range(-decoration.random_tilt, decoration.random_tilt)
+			var tilt_z := _rng.randf_range(-decoration.random_tilt, decoration.random_tilt)
+			transform = transform.rotated(transform.basis.x.normalized(), tilt_x)
+			transform = transform.rotated(transform.basis.z.normalized(), tilt_z)
+		
+		# Apply rotation around Y axis
+		transform = transform.rotated(Vector3.UP, rotation)
+		
+		# Apply scale (non-uniform if variance is set)
+		var scale_vec := Vector3.ONE * base_scale
+		if decoration.scale_variance != Vector3.ZERO:
+			scale_vec.x *= 1.0 + _rng.randf_range(-decoration.scale_variance.x, decoration.scale_variance.x)
+			scale_vec.y *= 1.0 + _rng.randf_range(-decoration.scale_variance.y, decoration.scale_variance.y)
+			scale_vec.z *= 1.0 + _rng.randf_range(-decoration.scale_variance.z, decoration.scale_variance.z)
+		transform = transform.scaled(scale_vec)
+		
+		# Apply position
+		transform.origin = pos
+		
+		variant_instances[variant_idx].append(transform)
+		total_count += 1
 	
 	return variant_instances
 
+
+## ============================================
+## POISSON DISK SAMPLING
+## ============================================
+
+## Generate Poisson disk distributed points using Bridson's algorithm
+## Returns Array[Vector2] of local positions (0 to chunk_size)
+func _generate_poisson_points(
+	area_size: float,
+	min_distance: float,
+	coord: Vector2i,
+	decoration_seed: int = 0
+) -> Array[Vector2]:
+	var cell_size := min_distance / sqrt(2.0)
+	var grid_width := int(ceil(area_size / cell_size))
+	
+	# Spatial grid for fast neighbor lookup (-1 = empty)
+	var grid: Array[int] = []
+	grid.resize(grid_width * grid_width)
+	grid.fill(-1)
+	
+	var points: Array[Vector2] = []
+	var active_list: Array[int] = []
+	
+	# Seed RNG for reproducibility
+	var local_rng := RandomNumberGenerator.new()
+	local_rng.seed = seed + coord.x * 73856093 + coord.y * 19349663 + decoration_seed
+	
+	# Start with random initial point
+	var initial := Vector2(local_rng.randf() * area_size, local_rng.randf() * area_size)
+	points.append(initial)
+	active_list.append(0)
+	_poisson_grid_insert(grid, grid_width, cell_size, initial, 0)
+	
+	while not active_list.is_empty():
+		var active_idx := local_rng.randi() % active_list.size()
+		var point_idx := active_list[active_idx]
+		var point := points[point_idx]
+		
+		var found := false
+		for _attempt in range(POISSON_MAX_ATTEMPTS):
+			var angle := local_rng.randf() * TAU
+			var radius := min_distance + local_rng.randf() * min_distance
+			var candidate := point + Vector2(cos(angle), sin(angle)) * radius
+			
+			# Check bounds
+			if candidate.x < 0 or candidate.x >= area_size:
+				continue
+			if candidate.y < 0 or candidate.y >= area_size:
+				continue
+			
+			# Check distance to nearby points
+			if _is_valid_poisson_point(candidate, grid, grid_width, cell_size, points, min_distance):
+				points.append(candidate)
+				active_list.append(points.size() - 1)
+				_poisson_grid_insert(grid, grid_width, cell_size, candidate, points.size() - 1)
+				found = true
+				break
+		
+		if not found:
+			active_list.remove_at(active_idx)
+	
+	return points
+
+
+## Generate Poisson points with margin for seamless chunk edges
+func _generate_poisson_points_with_margin(
+	coord: Vector2i,
+	chunk_size: float,
+	min_distance: float,
+	decoration_seed: int = 0
+) -> Array[Vector2]:
+	var margin := min_distance * POISSON_MARGIN_FACTOR
+	var extended_size := chunk_size + margin * 2.0
+	
+	# Generate in extended region
+	var all_points := _generate_poisson_points(extended_size, min_distance, coord, decoration_seed)
+	
+	# Filter to actual chunk bounds
+	var valid_points: Array[Vector2] = []
+	for p in all_points:
+		var adjusted := p - Vector2(margin, margin)
+		if adjusted.x >= 0 and adjusted.x < chunk_size and adjusted.y >= 0 and adjusted.y < chunk_size:
+			valid_points.append(adjusted)
+	
+	return valid_points
+
+
+## Insert point into Poisson grid
+func _poisson_grid_insert(grid: Array[int], grid_width: int, cell_size: float, point: Vector2, point_idx: int) -> void:
+	var gx := int(point.x / cell_size)
+	var gy := int(point.y / cell_size)
+	if gx >= 0 and gx < grid_width and gy >= 0 and gy < grid_width:
+		grid[gy * grid_width + gx] = point_idx
+
+
+## Check if a candidate point is valid (far enough from all neighbors)
+func _is_valid_poisson_point(
+	candidate: Vector2,
+	grid: Array[int],
+	grid_width: int,
+	cell_size: float,
+	points: Array[Vector2],
+	min_distance: float
+) -> bool:
+	var gx := int(candidate.x / cell_size)
+	var gy := int(candidate.y / cell_size)
+	
+	var min_dist_sq := min_distance * min_distance
+	
+	# Check 5x5 neighborhood
+	for dy in range(-2, 3):
+		for dx in range(-2, 3):
+			var nx := gx + dx
+			var ny := gy + dy
+			if nx < 0 or nx >= grid_width or ny < 0 or ny >= grid_width:
+				continue
+			
+			var point_idx := grid[ny * grid_width + nx]
+			if point_idx < 0:
+				continue
+			
+			var neighbor := points[point_idx]
+			if candidate.distance_squared_to(neighbor) < min_dist_sq:
+				return false
+	
+	return true
+
+
+## ============================================
+## TERRAIN SAMPLING
+## ============================================
 
 ## Sample height from chunk data at local position
 func _sample_height_at(local_x: float, local_z: float, chunk_data: ChunkData, cell_size: float, resolution: int) -> float:
@@ -453,6 +669,37 @@ func _align_to_normal(normal: Vector3) -> Transform3D:
 	var forward := up.cross(right).normalized()
 	
 	return Transform3D(Basis(right, up, forward), Vector3.ZERO)
+
+
+## Create a transform that aligns Y-up to the given normal with angle limit
+## @param normal The terrain normal to align to
+## @param max_angle Maximum tilt angle from vertical in radians (1.57 = full alignment)
+func _align_to_normal_limited(normal: Vector3, max_angle: float) -> Transform3D:
+	# If max_angle is essentially full (90 degrees), use standard alignment
+	if max_angle >= 1.57:
+		return _align_to_normal(normal)
+	
+	# If max_angle is zero, return identity (upright)
+	if max_angle <= 0.001:
+		return Transform3D.IDENTITY
+	
+	# Calculate angle between normal and UP
+	var up := Vector3.UP
+	var angle := acos(clampf(normal.dot(up), -1.0, 1.0))
+	
+	# If terrain is flatter than max_angle, use full alignment
+	if angle <= max_angle:
+		return _align_to_normal(normal)
+	
+	# Limit the alignment angle
+	var axis := up.cross(normal)
+	if axis.length_squared() < 0.001:
+		return Transform3D.IDENTITY
+	
+	axis = axis.normalized()
+	var limited_normal := up.rotated(axis, max_angle)
+	
+	return _align_to_normal(limited_normal)
 
 
 ## Create a MultiMeshInstance3D for a set of instances

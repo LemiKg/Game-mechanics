@@ -12,6 +12,7 @@ fractal_gain = 0.4
 
 [resource]
 script = ExtResource("1_jfupg")
+view_distance = 20
 noise = SubResource("FastNoiseLite_jfupg")
 terrain_material = ExtResource("2_material")
 biome_map = ExtResource("1_yf4mo")
