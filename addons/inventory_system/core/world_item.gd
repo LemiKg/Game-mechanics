@@ -23,6 +23,8 @@ signal picked_up(item: InventoryItem, amount: int)
 @export var interact_action: StringName = &"interact"
 ## Destroy after pickup.
 @export var destroy_on_pickup: bool = true
+## Optional: Explicit reference to the InventoryComponent. If not set, auto-discovers from player.
+@export var inventory_component: InventoryComponent
 
 @export_group("Visual")
 ## Rotation speed (degrees/second) for idle spin.
@@ -130,29 +132,23 @@ func _try_pickup() -> void:
 	if not item or not _player:
 		return
 
-	# Find InventoryComponent on player
-	var inv_comp: InventoryComponent = null
-	for child in _player.get_children():
-		if child is InventoryComponent:
-			inv_comp = child
-			break
-
+	# Use explicit reference if set, otherwise find on player
+	var inv_comp: InventoryComponent = inventory_component
 	if not inv_comp:
-		push_warning("WorldItem: Player has no InventoryComponent")
+		inv_comp = _player.get_node_or_null("InventoryComponent") as InventoryComponent
+	if not inv_comp:
+		push_warning("WorldItem: No InventoryComponent found on player (set export or add child named 'InventoryComponent')")
 		return
 
 	var remaining := inv_comp.add_item(item, amount)
 	if remaining < amount:
-		# At least some items were picked up
 		var picked := amount - remaining
 		picked_up.emit(item, picked)
 
 		if remaining == 0 and destroy_on_pickup:
 			_play_pickup_effect()
-			queue_free()
 		else:
 			amount = remaining
-	# else: inventory full, item stays
 
 
 func _play_pickup_effect() -> void:
