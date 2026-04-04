@@ -508,6 +508,8 @@ func _regenerate_preview() -> void:
 
 ## Called when world_config changes
 func _on_config_changed() -> void:
+	if not is_inside_tree():
+		return
 	if Engine.is_editor_hint() and preview_enabled:
 		_regenerate_preview.call_deferred()
 
