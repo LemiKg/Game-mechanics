@@ -67,7 +67,14 @@ static func build_mesh(
 	
 	# Calculate normals
 	normals = _calculate_normals(vertices, indices)
-	
+
+	# Add edge skirts to hide LOD seam cracks
+	var skirt_result := _add_skirts(vertices, normals, uvs, indices, width, depth)
+	vertices = skirt_result["vertices"]
+	normals = skirt_result["normals"]
+	uvs = skirt_result["uvs"]
+	indices = skirt_result["indices"]
+
 	# Build ArrayMesh
 	var arrays := []
 	arrays.resize(Mesh.ARRAY_MAX)
@@ -167,6 +174,99 @@ static func _calculate_normals(
 			normals[i] = Vector3.UP
 	
 	return normals
+
+
+## Add downward skirts along chunk edges to hide LOD seam cracks.
+static func _add_skirts(
+	vertices: PackedVector3Array,
+	normals: PackedVector3Array,
+	uvs: PackedVector2Array,
+	indices: PackedInt32Array,
+	width: int,
+	depth: int,
+	skirt_depth: float = 5.0
+) -> Dictionary:
+	var edge_indices: Array[int] = []
+
+	# Top edge (z=0)
+	for x in range(width):
+		edge_indices.append(x)
+	# Bottom edge (z=depth-1)
+	for x in range(width):
+		edge_indices.append((depth - 1) * width + x)
+	# Left edge (x=0), skip corners already added
+	for z in range(1, depth - 1):
+		edge_indices.append(z * width)
+	# Right edge (x=width-1), skip corners
+	for z in range(1, depth - 1):
+		edge_indices.append(z * width + (width - 1))
+
+	var new_vertices := vertices.duplicate()
+	var new_normals := normals.duplicate()
+	var new_uvs := uvs.duplicate()
+	var new_indices := indices.duplicate()
+
+	# For each edge vertex, create a dropped vertex
+	var edge_map: Dictionary = {}
+	for orig_idx in edge_indices:
+		var dropped_pos := vertices[orig_idx]
+		dropped_pos.y -= skirt_depth
+		var new_idx := new_vertices.size()
+		new_vertices.append(dropped_pos)
+		new_normals.append(normals[orig_idx])
+		new_uvs.append(uvs[orig_idx])
+		edge_map[orig_idx] = new_idx
+
+	# Top edge skirt (z=0, faces -Z)
+	for x in range(width - 1):
+		var a := x
+		var b := x + 1
+		new_indices.append(a)
+		new_indices.append(edge_map[a])
+		new_indices.append(b)
+		new_indices.append(b)
+		new_indices.append(edge_map[a])
+		new_indices.append(edge_map[b])
+
+	# Bottom edge skirt (z=depth-1, faces +Z)
+	for x in range(width - 1):
+		var a := (depth - 1) * width + x
+		var b := (depth - 1) * width + x + 1
+		new_indices.append(a)
+		new_indices.append(b)
+		new_indices.append(edge_map[a])
+		new_indices.append(b)
+		new_indices.append(edge_map[b])
+		new_indices.append(edge_map[a])
+
+	# Left edge skirt (x=0, faces -X)
+	for z in range(depth - 1):
+		var a := z * width
+		var b := (z + 1) * width
+		new_indices.append(a)
+		new_indices.append(b)
+		new_indices.append(edge_map[a])
+		new_indices.append(b)
+		new_indices.append(edge_map[b])
+		new_indices.append(edge_map[a])
+
+	# Right edge skirt (x=width-1, faces +X)
+	for z in range(depth - 1):
+		var a := z * width + (width - 1)
+		var b := (z + 1) * width + (width - 1)
+		new_indices.append(a)
+		new_indices.append(edge_map[a])
+		new_indices.append(b)
+		new_indices.append(b)
+		new_indices.append(edge_map[a])
+		new_indices.append(edge_map[b])
+
+	return {
+		"vertices": new_vertices,
+		"normals": new_normals,
+		"uvs": new_uvs,
+		"indices": new_indices
+	}
 
 
 ## Downsamples height data by factor of 2 using bilinear interpolation
