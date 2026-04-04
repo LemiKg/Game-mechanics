@@ -24,6 +24,7 @@ func _ready():
 	if equipment_component:
 		set_equipment(equipment_component)
 	_setup_interaction_handler()
+	_create_sort_buttons()
 
 func _setup_interaction_handler():
 	if not interaction_handler:
@@ -153,6 +154,42 @@ func on_slot_updated(inventory: Inventory, index: int) -> void:
 	var slot_ui: SlotUI = container.get_child(index) as SlotUI
 	if slot_ui:
 		slot_ui.set_slot(inventory, index, inventory.slots[index])
+
+func _create_sort_buttons() -> void:
+	if not grid_container:
+		return
+	# Insert sort bar above the ScrollContainer that holds the grid
+	var scroll := grid_container.get_parent()
+	var vbox := scroll.get_parent()
+
+	var sort_bar := HBoxContainer.new()
+	sort_bar.name = "SortBar"
+	sort_bar.alignment = BoxContainer.ALIGNMENT_CENTER
+
+	var label := Label.new()
+	label.text = "Sort:"
+	label.add_theme_font_size_override("font_size", 12)
+	sort_bar.add_child(label)
+
+	var buttons := {
+		"Name": inventory_component.main_inventory.sort_by_name,
+		"Rarity": inventory_component.main_inventory.sort_by_rarity,
+		"Value": inventory_component.main_inventory.sort_by_value,
+		"Weight": inventory_component.main_inventory.sort_by_weight,
+	}
+
+	for btn_text in buttons:
+		var btn := Button.new()
+		btn.text = btn_text
+		btn.flat = true
+		btn.add_theme_font_size_override("font_size", 12)
+		btn.pressed.connect(buttons[btn_text])
+		sort_bar.add_child(btn)
+
+	# Insert before the ScrollContainer
+	var scroll_index := scroll.get_index()
+	vbox.add_child(sort_bar)
+	vbox.move_child(sort_bar, scroll_index)
 
 func refresh_equipment_slot(slot_name: String, item: InventoryItem) -> void:
 	# Use cached slot for O(1) lookup
