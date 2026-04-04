@@ -729,7 +729,13 @@ func _create_multimesh_instance(decoration: DecorationDefinition, instances: Arr
 	# Apply material override if specified
 	if decoration.material:
 		mmi.material_override = decoration.material
-	
+
+	# Distance-based culling with fade
+	var max_distance := spawn_radius * world_config.chunk_size if world_config else 500.0
+	mmi.visibility_range_end = max_distance
+	mmi.visibility_range_end_margin = max_distance * 0.1
+	mmi.visibility_range_fade_mode = GeometryInstance3D.VISIBILITY_RANGE_FADE_SELF
+
 	return mmi
 
 
@@ -755,8 +761,16 @@ func _create_multimesh_from_mesh(mesh: Mesh, instances: Array[Transform3D], mate
 	# Apply material override if specified
 	if material_override:
 		mmi.material_override = material_override
-	
+
+	# Distance-based culling with fade
+	var max_distance := spawn_radius * world_config.chunk_size if world_config else 500.0
+	mmi.visibility_range_end = max_distance
+	mmi.visibility_range_end_margin = max_distance * 0.1
+	mmi.visibility_range_fade_mode = GeometryInstance3D.VISIBILITY_RANGE_FADE_SELF
+
 	return mmi
+
+
 func _get_decoration_mesh(decoration: DecorationDefinition) -> Mesh:
 	# Use provided mesh if available
 	if decoration.mesh:
