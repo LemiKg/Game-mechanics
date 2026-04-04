@@ -147,11 +147,11 @@ func _finish_dodge() -> void:
 	# Blend times match the AnimationTree xfade_time on roll exit transitions.
 	if input_router and input_router.movement_intent.length() > 0.1:
 		if input_router.sprint_held:
-			request_animation(&"run", 0.2)
+			request_animation(&"run", 0.35)
 		else:
-			request_animation(&"walk", 0.2)
+			request_animation(&"walk", 0.4)
 	else:
-		request_animation(&"idle", 0.25)
+		request_animation(&"idle", 0.45)
 
 	# Determine next state based on ground check
 	if motor and motor.is_grounded:

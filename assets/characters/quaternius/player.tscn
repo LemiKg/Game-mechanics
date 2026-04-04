@@ -110,16 +110,16 @@ xfade_time = 0.05
 switch_mode = 1
 
 [sub_resource type="AnimationNodeStateMachineTransition" id="trans_roll_idle"]
-xfade_time = 0.25
-xfade_curve = 1.0
+xfade_time = 0.45
+xfade_curve = 0.6
 
 [sub_resource type="AnimationNodeStateMachineTransition" id="trans_roll_walk"]
-xfade_time = 0.2
-xfade_curve = 1.0
+xfade_time = 0.4
+xfade_curve = 0.6
 
 [sub_resource type="AnimationNodeStateMachineTransition" id="trans_roll_sprint"]
-xfade_time = 0.2
-xfade_curve = 1.0
+xfade_time = 0.35
+xfade_curve = 0.6
 
 [sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_main"]
 states/Crouch_Fwd/node = SubResource("AnimationNodeAnimation_crouch_fwd")
