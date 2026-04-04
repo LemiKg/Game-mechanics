@@ -62,6 +62,13 @@ uniform float texture_scale : hint_range(0.001, 1.0) = 0.05;
 uniform float triplanar_sharpness : hint_range(1.0, 16.0) = 4.0;
 
 // ============================================
+// HEIGHT-BASED MICRO-BLENDING
+// ============================================
+group_uniforms height_blending;
+uniform float height_blend_sharpness : hint_range(0.01, 1.0) = 0.15;
+uniform float height_blend_scale : hint_range(0.001, 0.5) = 0.05;
+
+// ============================================
 // HEIGHT-BASED SNOW
 // ============================================
 group_uniforms snow_settings;
@@ -145,7 +152,20 @@ void fragment() {
 	
 	float total = splat.r + splat.g + splat.b + splat.a;
 	if (total > 0.001) { splat /= total; } else { splat = vec4(1.0, 0.0, 0.0, 0.0); }
-	
+
+	// Height-based micro-blending: use world height detail to create irregular biome edges
+	{
+		float h = fract(world_position.y * height_blend_scale + world_position.x * 0.017 + world_position.z * 0.013);
+		vec4 biased = vec4(
+			splat.r + h * height_blend_sharpness,
+			splat.g + fract(h + 0.37) * height_blend_sharpness,
+			splat.b + fract(h + 0.71) * height_blend_sharpness,
+			splat.a + fract(h + 0.53) * height_blend_sharpness
+		);
+		float bt = biased.r + biased.g + biased.b + biased.a;
+		if (bt > 0.001) { splat = biased / bt; }
+	}
+
 	// ALBEDO
 	vec3 final_color = vec3(0.0);
 	if (splat.r > 0.001) {
