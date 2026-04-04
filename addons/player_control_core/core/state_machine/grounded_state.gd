@@ -105,7 +105,6 @@ func physics_update(delta: float) -> void:
 	var jump_consumed := input_router.consume_jump() or motor.consume_direct_jump()
 	if jump_consumed:
 		if motor.try_jump():
-			request_animation(&"jump", 0.1)
 			transition_to(&"airborne")
 			return
 
