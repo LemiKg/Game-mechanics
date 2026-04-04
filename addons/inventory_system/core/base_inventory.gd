@@ -6,6 +6,8 @@ class_name BaseInventory
 
 signal inventory_updated
 
+signal weight_changed(current: float, maximum: float)
+
 ## Array of InventorySlot resources
 @export var slots: Array[InventorySlot] = []
 @export var size: int = 20:
@@ -17,6 +19,9 @@ signal inventory_updated
 
 ## Array of ItemCategory resources for filtering
 @export var allowed_categories: Array[ItemCategory] = []
+
+## Maximum weight capacity. 0 = unlimited (backwards compatible).
+@export_range(0.0, 10000.0, 1.0) var max_weight: float = 0.0
 
 func _init():
 	resize(size)
@@ -74,6 +79,34 @@ func remove_item_at_index(index: int, amount: int) -> InventoryItem:
 ## @param amount: The stack amount
 func set_item(index: int, item: InventoryItem, amount: int) -> void:
 	push_error("BaseInventory.set_item() is abstract - override in subclass")
+
+## Get the total weight of all items in the inventory.
+func get_current_weight() -> float:
+	var total := 0.0
+	for slot in slots:
+		if not slot.is_empty():
+			total += slot.item.weight * slot.amount
+	return total
+
+
+## Check if adding this item would fit within weight limit (if set).
+func can_add_weight(item: InventoryItem, amount: int = 1) -> bool:
+	if max_weight <= 0.0:
+		return true
+	return get_current_weight() + (item.weight * amount) <= max_weight
+
+
+## Get weight as a ratio (0.0 to 1.0+). Returns 0 if no weight limit.
+func get_weight_ratio() -> float:
+	if max_weight <= 0.0:
+		return 0.0
+	return get_current_weight() / max_weight
+
+
+## Emit weight change. Call after any inventory modification.
+func _emit_weight_changed() -> void:
+	weight_changed.emit(get_current_weight(), max_weight)
+
 
 ## Helper to check if a slot index is valid
 func is_valid_index(index: int) -> bool:
