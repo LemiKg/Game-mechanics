@@ -37,3 +37,18 @@ extends Resource
 @export_flags_3d_physics var collision_mask: int = 1
 ## Distance to push camera away from collision point.
 @export_range(0.0, 1.0, 0.05) var collision_margin: float = 0.2
+
+
+@export_group("Shoulder")
+## Horizontal offset magnitude for shoulder view (positive = right).
+@export_range(0.0, 2.0, 0.05) var shoulder_offset: float = 0.5
+## How fast the camera transitions between shoulder positions.
+@export_range(1.0, 30.0, 1.0) var shoulder_switch_speed: float = 8.0
+
+@export_group("FOV")
+## Base field of view.
+@export_range(50.0, 120.0, 1.0) var base_fov: float = 75.0
+## FOV when sprinting (for speed effect).
+@export_range(50.0, 120.0, 1.0) var sprint_fov: float = 85.0
+## How fast FOV transitions.
+@export_range(1.0, 30.0, 1.0) var fov_transition_speed: float = 5.0

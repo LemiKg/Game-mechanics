@@ -42,6 +42,18 @@ var _max_pitch: float = 1.4
 var _follow_smoothing: float = 10.0
 var _collision_mask: int = 1
 var _collision_margin: float = 0.2
+var _shoulder_offset: float = 0.5
+var _shoulder_switch_speed: float = 8.0
+var _base_fov: float = 75.0
+var _sprint_fov: float = 85.0
+var _fov_transition_speed: float = 5.0
+
+## Current shoulder position: 1.0 = right, -1.0 = left, 0.0 = center
+var _current_shoulder: float = 1.0
+## Target shoulder position (for smooth transition)
+var _target_shoulder: float = 1.0
+## Current shoulder side index for cycling (0=right, 1=left, 2=center)
+var _shoulder_index: int = 0
 
 
 func _ready() -> void:
@@ -71,6 +83,11 @@ func _cache_settings() -> void:
 		_follow_smoothing = camera_settings.follow_smoothing
 		_collision_mask = camera_settings.collision_mask
 		_collision_margin = camera_settings.collision_margin
+		_shoulder_offset = camera_settings.shoulder_offset
+		_shoulder_switch_speed = camera_settings.shoulder_switch_speed
+		_base_fov = camera_settings.base_fov
+		_sprint_fov = camera_settings.sprint_fov
+		_fov_transition_speed = camera_settings.fov_transition_speed
 
 
 func _physics_process(delta: float) -> void:
@@ -91,16 +108,23 @@ func _physics_process(delta: float) -> void:
 	offset.z = current_distance
 	offset = offset.rotated(Vector3.RIGHT, pitch)
 	offset = offset.rotated(Vector3.UP, yaw)
-	
+
 	var target_pos := target.global_position + Vector3(0, _height_offset, 0)
+
+	# Apply shoulder offset (horizontal offset perpendicular to camera direction)
+	_current_shoulder = lerpf(_current_shoulder, _target_shoulder, _shoulder_switch_speed * delta)
+	var right_dir := offset.cross(Vector3.UP).normalized()
+	var shoulder_shift := right_dir * _shoulder_offset * _current_shoulder
+	target_pos += shoulder_shift
+
 	var desired_pos := target_pos + offset
-	
+
 	# Check for camera collision
 	desired_pos = _check_collision(target_pos, desired_pos)
-	
+
 	# Smooth follow
 	camera.global_position = camera.global_position.lerp(desired_pos, _follow_smoothing * delta)
-	
+
 	# Look at target
 	camera.look_at(target_pos)
 
@@ -145,3 +169,20 @@ func reset_orbit() -> void:
 ## Call when camera_settings resource changes.
 func refresh_settings() -> void:
 	_cache_settings()
+
+
+## Cycle shoulder position: right -> left -> center -> right
+func cycle_shoulder() -> void:
+	_shoulder_index = (_shoulder_index + 1) % 3
+	match _shoulder_index:
+		0: _target_shoulder = 1.0   # Right
+		1: _target_shoulder = -1.0  # Left
+		2: _target_shoulder = 0.0   # Center
+
+
+## Update FOV based on speed. Call from controller with current speed ratio.
+func update_speed_fov(speed_ratio: float, delta: float) -> void:
+	if not camera:
+		return
+	var target_fov := lerpf(_base_fov, _sprint_fov, clampf(speed_ratio, 0.0, 1.0))
+	camera.fov = lerpf(camera.fov, target_fov, _fov_transition_speed * delta)
