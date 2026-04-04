@@ -24,6 +24,9 @@ var _rotation_target: float = 0.0
 ## Whether the player wants to stand but can't (ceiling above).
 var _wants_to_stand: bool = false
 
+## Whether the player was moving last frame (for stop detection).
+var _was_moving: bool = false
+
 ## Debug logger for this state.
 var _logger := DebugLogger.new("[GroundedState]")
 
@@ -40,6 +43,7 @@ func enter() -> void:
 	_logger.debug("ENTER")
 	_current_animation = &""
 	_is_rotating_in_place = false
+	_was_moving = false
 	if motor:
 		motor.gait = PlayerMotor3D.Gait.RUN
 		motor.stance = PlayerMotor3D.Stance.STANDING
@@ -160,7 +164,20 @@ func _update_animation() -> void:
 	elif has_movement:
 		new_animation = &"walk"
 	else:
-		new_animation = &"idle"
+		# Stop prediction: if we were moving and now stopped, play stop anim
+		if _was_moving and motor.is_moving:
+			# Still decelerating — predict time to stop
+			var gait_data := motor.get_current_gait_data()
+			var speed := Vector2(motor.actual_velocity.x, motor.actual_velocity.z).length()
+			var time_to_stop := speed / maxf(gait_data.deceleration, 1.0)
+			if time_to_stop < 0.3:
+				new_animation = &"stop"
+			else:
+				new_animation = &"idle"
+		else:
+			new_animation = &"idle"
+
+	_was_moving = has_movement
 
 	if new_animation != _current_animation:
 		_current_animation = new_animation
