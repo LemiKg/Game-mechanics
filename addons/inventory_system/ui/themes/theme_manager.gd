@@ -100,10 +100,15 @@ func _show_toast() -> void:
 func _create_toast_label() -> void:
 	_toast_label = Label.new()
 	_toast_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_toast_label.anchors_preset = Control.PRESET_CENTER_TOP
-	_toast_label.offset_top = 40.0
+	_toast_label.anchor_left = 0.5
+	_toast_label.anchor_right = 0.5
+	_toast_label.anchor_top = 0.0
+	_toast_label.anchor_bottom = 0.0
 	_toast_label.offset_left = -150.0
 	_toast_label.offset_right = 150.0
+	_toast_label.offset_top = 40.0
+	_toast_label.offset_bottom = 70.0
+	_toast_label.grow_horizontal = Control.GROW_DIRECTION_BOTH
 	_toast_label.visible = false
 	get_parent().call_deferred("add_child", _toast_label)
 
