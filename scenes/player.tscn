@@ -1,4 +1,4 @@
-[gd_scene load_steps=61 format=3 uid="uid://bv4xp8r0k5qm2"]
+[gd_scene load_steps=62 format=3 uid="uid://bv4xp8r0k5qm2"]
 
 [ext_resource type="Script" uid="uid://ddprtht2qo7se" path="res://addons/inventory_system/core/inventory_component.gd" id="1_inv_comp"]
 [ext_resource type="Script" uid="uid://bgudcqpbogui8" path="res://addons/inventory_system/core/equipment_component.gd" id="2_equip_comp"]
@@ -30,6 +30,7 @@
 [ext_resource type="Script" path="res://addons/player_control_core/core/state_machine/dodge_state.gd" id="29_dodge"]
 [ext_resource type="Script" path="res://addons/player_control_core/core/state_machine/ragdoll_state.gd" id="30_ragdoll"]
 [ext_resource type="Script" path="res://addons/player_control_core/core/stamina_component.gd" id="31_stamina"]
+[ext_resource type="Script" path="res://addons/player_control_core/ui/stamina_bar_ui.gd" id="32_stamina_bar"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_player"]
 radius = 0.2
@@ -283,8 +284,23 @@ offset_top = 10.0
 offset_right = 200.0
 offset_bottom = 50.0
 grow_horizontal = 2
-text = "WASD: Move | Space: Jump | Shift: Sprint | V: Toggle Perspective | I: Inventory"
+text = "WASD: Move | Space: Jump | Shift: Sprint | Ctrl: Crouch | Alt: Dodge | V: Perspective | F2: Shoulder | I: Inventory"
 horizontal_alignment = 1
+
+[node name="StaminaBarUI" type="Control" parent="CanvasLayer" node_paths=PackedStringArray("stamina_component")]
+script = ExtResource("32_stamina_bar")
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -150.0
+offset_top = -50.0
+offset_right = 150.0
+offset_bottom = -38.0
+grow_horizontal = 2
+grow_vertical = 0
+stamina_component = NodePath("../../StaminaComponent")
 
 [node name="PerspectiveLabel" type="Label" parent="CanvasLayer"]
 anchors_preset = 1
