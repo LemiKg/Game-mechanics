@@ -1,6 +1,27 @@
 @tool
 extends Resource
 class_name InventoryItem
+
+## Item rarity tier, affects tooltip color and slot border.
+enum Rarity { COMMON, UNCOMMON, RARE, EPIC, LEGENDARY }
+
+## Rarity color mapping for UI display.
+const RARITY_COLORS := {
+	Rarity.COMMON: Color.WHITE,
+	Rarity.UNCOMMON: Color(0.3, 0.8, 0.3),
+	Rarity.RARE: Color(0.4, 0.6, 1.0),
+	Rarity.EPIC: Color(0.7, 0.4, 0.9),
+	Rarity.LEGENDARY: Color(1.0, 0.6, 0.2),
+}
+
+const RARITY_NAMES := {
+	Rarity.COMMON: "Common",
+	Rarity.UNCOMMON: "Uncommon",
+	Rarity.RARE: "Rare",
+	Rarity.EPIC: "Epic",
+	Rarity.LEGENDARY: "Legendary",
+}
+
 ## Base class for all inventory items.
 ## Extend this to create specialized item types like ConsumableItem, EquipmentItem, etc.
 
@@ -15,6 +36,9 @@ class_name InventoryItem
 
 # Unique ID for save/load systems (set manually or via code)
 @export var id: String = ""
+
+## Item rarity tier.
+@export var rarity: Rarity = Rarity.COMMON
 
 #region Virtual Methods
 
@@ -41,7 +65,11 @@ func get_categories() -> Array[ItemCategory]:
 ## @virtual Returns formatted tooltip text (BBCode) for UI display.
 ## Override in subclasses to add type-specific information.
 func get_tooltip_text() -> String:
-	var text = "[b]%s[/b]" % name
+	var rarity_color := RARITY_COLORS.get(rarity, Color.WHITE)
+	var color_hex := rarity_color.to_html(false)
+	var text = "[b][color=#%s]%s[/color][/b]" % [color_hex, name]
+	if rarity != Rarity.COMMON:
+		text += "\n[color=#%s]%s[/color]" % [color_hex, RARITY_NAMES.get(rarity, "")]
 	if description:
 		text += "\n%s" % description
 	if value > 0:
