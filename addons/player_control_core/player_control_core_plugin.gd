@@ -99,6 +99,12 @@ func _enter_tree() -> void:
 		preload("res://addons/player_control_core/core/mantle_settings_3d.gd"),
 		preload("res://addons/player_control_core/icons/settings.svg")
 	)
+	add_custom_type(
+		"GaitData",
+		"Resource",
+		preload("res://addons/player_control_core/core/gait_data.gd"),
+		preload("res://addons/player_control_core/icons/settings.svg")
+	)
 
 
 func _exit_tree() -> void:
@@ -122,3 +128,4 @@ func _exit_tree() -> void:
 	remove_custom_type("MovementSettings3D")
 	remove_custom_type("InputActions3D")
 	remove_custom_type("MantleSettings3D")
+	remove_custom_type("GaitData")
