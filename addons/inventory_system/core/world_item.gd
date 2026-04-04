@@ -34,6 +34,11 @@ signal picked_up(item: InventoryItem, amount: int)
 ## Rarity glow color (auto-set from item rarity if not overridden).
 @export var glow_color: Color = Color.TRANSPARENT
 
+## Static: the closest in-range WorldItem this frame (only one shows prompt).
+static var _focused_item: WorldItem = null
+static var _focused_distance: float = INF
+static var _focus_frame: int = -1
+
 ## The mesh/visual child to animate.
 var _visual: Node3D
 ## The prompt label.
@@ -77,14 +82,29 @@ func _process(delta: float) -> void:
 		_visual.rotation.y += deg_to_rad(spin_speed) * delta
 		_visual.position.y = sin(_time * bob_speed) * bob_amplitude
 
-	# Show/hide prompt
-	if _prompt_label:
-		_prompt_label.visible = _player_in_range and not auto_pickup
+	# Focus system: only the closest in-range item shows prompt and is interactable
+	var frame := Engine.get_process_frames()
+	if frame != _focus_frame:
+		# New frame — reset focus
+		_focus_frame = frame
+		_focused_item = null
+		_focused_distance = INF
 
-	# Check for interact input (Area3D doesn't receive _unhandled_input)
-	if _player_in_range and not auto_pickup:
-		if Input.is_action_just_pressed(interact_action):
-			_try_pickup()
+	var is_focused := false
+	if _player_in_range and not auto_pickup and _player:
+		var dist := global_position.distance_to(_player.global_position)
+		if dist < _focused_distance:
+			_focused_distance = dist
+			_focused_item = self
+		is_focused = (_focused_item == self)
+
+	# Show prompt only on focused item
+	if _prompt_label:
+		_prompt_label.visible = is_focused
+
+	# Only focused item responds to interact
+	if is_focused and Input.is_action_just_pressed(interact_action):
+		_try_pickup()
 
 
 func _on_body_entered(body: Node3D) -> void:
