@@ -72,8 +72,11 @@ func enter() -> void:
 	_dodge_direction = dodge_dir.normalized()
 	_dodge_direction.y = 0.0
 
-	# Rotate body to face dodge direction
-	controller.body.rotation.y = atan2(_dodge_direction.x, _dodge_direction.z)
+	# Rotate body to face dodge direction (third-person only).
+	# In first-person the body IS the camera yaw node — rotating it
+	# would jerk the view away from where the player is looking.
+	if controller is DualPerspectiveController3D and controller.is_third_person():
+		controller.body.rotation.y = atan2(_dodge_direction.x, _dodge_direction.z)
 
 	# Disable motor — we control movement directly
 	motor.enabled = false
@@ -141,13 +144,14 @@ func _update_iframes(progress: float) -> void:
 func _finish_dodge() -> void:
 	# Request the next movement animation immediately to prevent T-pose flash.
 	# Determine what animation should play based on input state.
+	# Blend times match the AnimationTree xfade_time on roll exit transitions.
 	if input_router and input_router.movement_intent.length() > 0.1:
 		if input_router.sprint_held:
-			request_animation(&"run", 0.15)
+			request_animation(&"run", 0.2)
 		else:
-			request_animation(&"walk", 0.15)
+			request_animation(&"walk", 0.2)
 	else:
-		request_animation(&"idle", 0.15)
+		request_animation(&"idle", 0.25)
 
 	# Determine next state based on ground check
 	if motor and motor.is_grounded:
