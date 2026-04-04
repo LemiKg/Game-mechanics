@@ -438,8 +438,8 @@ func _update_chunks_around_player() -> void:
 	# Unload chunks that are too far (use hysteresis to prevent thrashing)
 	var unload_distance := view_distance + 2
 	var chunks_to_unload: Array[Vector2i] = []
-	for coord in _active_chunks.keys():
-		var dist := (coord - player_coord).length()
+	for coord: Vector2i in _active_chunks.keys():
+		var dist: float = Vector2(coord - player_coord).length()
 		if dist > unload_distance:
 			chunks_to_unload.append(coord)
 	
