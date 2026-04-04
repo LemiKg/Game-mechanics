@@ -69,9 +69,12 @@ func get_match_strength(elevation: float, moisture: float) -> float:
 	var moist_range := (max_moisture - min_moisture) / 2.0
 	var moist_dist := absf(moisture - moist_center) / moist_range if moist_range > 0.0 else 0.0
 	
-	# Convert distance to strength (1 at center, 0 at edge)
-	var strength := 1.0 - maxf(elev_dist, moist_dist)
-	return clampf(strength, 0.0, 1.0)
+	# Convert distance to strength using smoothstep for natural S-curve transitions
+	var distance := maxf(elev_dist, moist_dist)
+	var strength := 1.0 - clampf(distance, 0.0, 1.0)
+	# Apply smoothstep for smoother biome transitions (S-curve instead of linear)
+	strength = strength * strength * (3.0 - 2.0 * strength)
+	return strength
 
 
 ## Modify the base terrain height for biome-specific features.
