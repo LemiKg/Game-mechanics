@@ -19,6 +19,10 @@ run/main_scene="uid://dubasu1ixt185"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
 
+[autoload]
+
+ItemDatabase="*res://addons/inventory_system/core/item_database.gd"
+
 [editor_plugins]
 
 enabled=PackedStringArray("res://addons/inventory_system/plugin.cfg", "res://addons/player_control_3rd_person/plugin.cfg", "res://addons/player_control_core/plugin.cfg", "res://addons/player_control_fps/plugin.cfg", "res://addons/pose_warping/plugin.cfg", "res://addons/procedural_world/plugin.cfg")

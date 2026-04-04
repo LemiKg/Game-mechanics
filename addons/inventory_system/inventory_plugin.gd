@@ -16,7 +16,9 @@ func _enter_tree():
 	# Item Effects
 	add_custom_type("HealEffect", "Resource", preload("core/heal_effect.gd"), preload("icons/item.svg"))
 	add_custom_type("ManaEffect", "Resource", preload("core/mana_effect.gd"), preload("icons/item.svg"))
-	
+	add_custom_type("ItemInstance", "RefCounted", preload("core/item_instance.gd"), preload("icons/item.svg"))
+	add_custom_type("ItemDatabase", "Node", preload("core/item_database.gd"), preload("icons/inventory.svg"))
+
 	# Core Nodes
 	add_custom_type("InventoryComponent", "Node", preload("core/inventory_component.gd"), preload("icons/inventory.svg"))
 	add_custom_type("EquipmentComponent", "Node", preload("core/equipment_component.gd"), preload("icons/inventory.svg"))
@@ -42,7 +44,9 @@ func _exit_tree():
 	# Item Effects
 	remove_custom_type("HealEffect")
 	remove_custom_type("ManaEffect")
-	
+	remove_custom_type("ItemInstance")
+	remove_custom_type("ItemDatabase")
+
 	# Core Nodes
 	remove_custom_type("InventoryComponent")
 	remove_custom_type("EquipmentComponent")

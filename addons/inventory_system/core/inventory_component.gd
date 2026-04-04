@@ -61,15 +61,18 @@ func swap_items(from_inventory: Inventory, from_index: int, to_inventory: Invent
 		if not from_inventory.accepts_item(to_slot.item):
 			return false
 	
-	# Perform swap
+	# Perform swap (preserve instance data)
 	var temp_item = from_slot.item
 	var temp_amount = from_slot.amount
-	
+	var temp_instance = from_slot.instance
+
 	from_slot.item = to_slot.item
 	from_slot.amount = to_slot.amount
-	
+	from_slot.instance = to_slot.instance
+
 	to_slot.item = temp_item
 	to_slot.amount = temp_amount
+	to_slot.instance = temp_instance
 	
 	from_inventory.emit_signal("inventory_updated")
 	if from_inventory != to_inventory:
