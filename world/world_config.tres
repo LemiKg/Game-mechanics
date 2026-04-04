@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="WorldConfig" load_steps=5 format=3 uid="uid://ddikae18i3r6x"]
+[gd_resource type="Resource" script_class="WorldConfig" load_steps=6 format=3 uid="uid://ddikae18i3r6x"]
 
 [ext_resource type="Script" uid="uid://dho4uigly465k" path="res://addons/procedural_world/core/world_config.gd" id="1_jfupg"]
 [ext_resource type="Resource" path="res://world/biomes/default_biome_map.tres" id="1_yf4mo"]
@@ -9,6 +9,21 @@ noise_type = 0
 frequency = 0.0062
 fractal_octaves = 4
 fractal_gain = 0.4
+domain_warp_enabled = true
+domain_warp_type = 0
+domain_warp_amplitude = 30.0
+domain_warp_frequency = 0.006
+domain_warp_fractal_type = 1
+domain_warp_fractal_octaves = 3
+domain_warp_fractal_lacunarity = 2.0
+domain_warp_fractal_gain = 0.5
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_moisture"]
+noise_type = 0
+seed = 42
+frequency = 0.003
+fractal_octaves = 3
+fractal_gain = 0.5
 
 [resource]
 script = ExtResource("1_jfupg")
@@ -16,6 +31,7 @@ view_distance = 20
 noise = SubResource("FastNoiseLite_jfupg")
 terrain_material = ExtResource("2_material")
 biome_map = ExtResource("1_yf4mo")
+moisture_noise = SubResource("FastNoiseLite_moisture")
 fog_density = 0.024
 fog_sky_affect = 0.432
 metadata/_custom_type_script = "uid://dho4uigly465k"
