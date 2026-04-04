@@ -174,37 +174,54 @@ func _process_modification() -> void:
 	if absf(_current_scale - 1.0) < 0.001 and absf(_current_pelvis_pulldown) < 0.001:
 		return
 
-	var hips_pose := skeleton.get_bone_pose(_hips_bone_idx)
+	var hips_global := skeleton.get_bone_global_pose(_hips_bone_idx)
 	var max_pulldown := 0.0
 
-	# Scale each foot's position relative to hips
+	# Scale each foot's position relative to hips in skeleton-global space
 	for i in _foot_bone_indices.size():
 		var foot_idx: int = _foot_bone_indices[i]
-		var foot_pose := skeleton.get_bone_pose(foot_idx)
 
-		# Get the foot's position in hips-local space.
-		# Since foot is a descendant of hips, we need the global pose offset.
-		# However, SkeletonModifier3D works in bone-local space.
-		# The foot's pose.origin is relative to its parent (shin).
-		# We scale the foot's local Z (forward) component to adjust stride reach.
-		var scaled_origin := foot_pose.origin
-		scaled_origin.z *= _current_scale
-		foot_pose.origin = scaled_origin
+		# Get current foot global pose (skeleton-local space, includes all parent transforms)
+		var foot_global := skeleton.get_bone_global_pose(foot_idx)
+		var old_foot_global_origin := foot_global.origin
+
+		# Compute foot offset from hips in skeleton-global space
+		var foot_offset := foot_global.origin - hips_global.origin
+
+		# Scale the Z (forward) component to adjust stride reach
+		foot_offset.z *= _current_scale
+
+		# Compute the new desired foot global origin
+		var new_foot_global_origin := hips_global.origin + foot_offset
+
+		# Compute the delta in skeleton-global space
+		var delta_global := new_foot_global_origin - old_foot_global_origin
+
+		# Convert the delta into the foot's local (parent bone) space.
+		# The foot's parent is the shin bone.
+		var foot_parent_idx := skeleton.get_bone_parent(foot_idx)
+		var delta_local: Vector3
+		if foot_parent_idx >= 0:
+			var foot_parent_global := skeleton.get_bone_global_pose(foot_parent_idx)
+			delta_local = foot_parent_global.basis.inverse() * delta_global
+		else:
+			# No parent — skeleton-global space equals local space
+			delta_local = delta_global
+
+		# Apply as an additive offset to the foot's local pose
+		var foot_pose := skeleton.get_bone_pose(foot_idx)
+		foot_pose.origin += delta_local
 		skeleton.set_bone_pose(foot_idx, foot_pose)
 
 		# Check if this leg would hyper-extend after scaling.
-		# Compute approximate leg extension from the scaled foot position.
-		if i < _max_leg_lengths.size() and i < _shin_bone_indices.size():
-			var shin_idx: int = _shin_bone_indices[i]
-			if shin_idx >= 0:
-				var shin_pose := skeleton.get_bone_pose(shin_idx)
-				# Approximate current leg extension: shin origin length + foot origin length
-				var current_extension := shin_pose.origin.length() + foot_pose.origin.length()
-				var max_length: float = _max_leg_lengths[i]
-				if current_extension > max_length * 0.98:
-					# Leg is near hyper-extension, compute needed pulldown
-					var overshoot := current_extension - max_length * 0.98
-					max_pulldown = maxf(max_pulldown, overshoot)
+		# Use the distance from hips to new foot position in skeleton-global space.
+		if i < _max_leg_lengths.size():
+			var current_extension := (new_foot_global_origin - hips_global.origin).length()
+			var max_length: float = _max_leg_lengths[i]
+			if current_extension > max_length * 0.98:
+				# Leg is near hyper-extension, compute needed pulldown
+				var overshoot := current_extension - max_length * 0.98
+				max_pulldown = maxf(max_pulldown, overshoot)
 
 	# Apply pelvis pull-down if any leg would hyper-extend
 	_target_pelvis_pulldown = clampf(
@@ -214,6 +231,7 @@ func _process_modification() -> void:
 	)
 
 	if absf(_current_pelvis_pulldown) > 0.001:
+		var hips_pose := skeleton.get_bone_pose(_hips_bone_idx)
 		hips_pose.origin.y -= _current_pelvis_pulldown
 		skeleton.set_bone_pose(_hips_bone_idx, hips_pose)
 
