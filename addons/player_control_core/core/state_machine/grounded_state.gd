@@ -21,8 +21,15 @@ var _is_rotating_in_place: bool = false
 ## Target yaw for rotate-in-place.
 var _rotation_target: float = 0.0
 
+## Whether the player wants to stand but can't (ceiling above).
+var _wants_to_stand: bool = false
+
 ## Debug logger for this state.
 var _logger := DebugLogger.new("[GroundedState]")
+
+@export_group("Crouch")
+## The capsule collision shape to resize when crouching.
+@export var collision_shape: CollisionShape3D
 
 
 func enter() -> void:
@@ -80,6 +87,14 @@ func physics_update(delta: float) -> void:
 			transition_to(&"airborne")
 			return
 
+	# Update crouch collision shape
+	_update_crouch_collision(delta)
+
+	# Recheck standing if blocked by ceiling
+	if _wants_to_stand and _check_can_stand():
+		motor.stance = PlayerMotor3D.Stance.STANDING
+		_wants_to_stand = false
+
 	# Update animation
 	if not _just_landed:
 		_update_animation()
@@ -89,11 +104,17 @@ func _update_movement_modifiers() -> void:
 	if not input_router or not motor:
 		return
 
-	# Stance: crouch input
+	# Stance: crouch input with head-bonk detection
 	if input_router.crouch_held:
 		motor.stance = PlayerMotor3D.Stance.CROUCHING
-	else:
-		motor.stance = PlayerMotor3D.Stance.STANDING
+		_wants_to_stand = false
+	elif motor.stance == PlayerMotor3D.Stance.CROUCHING:
+		# Want to stand — check for ceiling
+		if _check_can_stand():
+			motor.stance = PlayerMotor3D.Stance.STANDING
+			_wants_to_stand = false
+		else:
+			_wants_to_stand = true
 
 	# Gait: sprint takes priority, cannot sprint while crouching
 	if input_router.sprint_held and motor.stance != PlayerMotor3D.Stance.CROUCHING:
@@ -157,3 +178,46 @@ func _get_camera_yaw() -> float:
 	if controller.has_method("get_camera_yaw"):
 		return controller.get_camera_yaw()
 	return 0.0
+
+
+func _update_crouch_collision(delta: float) -> void:
+	if not collision_shape or not collision_shape.shape is CapsuleShape3D:
+		return
+	if not movement_settings:
+		return
+
+	var capsule: CapsuleShape3D = collision_shape.shape
+	var target_height: float
+	var speed := movement_settings.crouch_transition_speed if "crouch_transition_speed" in movement_settings else 10.0
+
+	if motor.stance == PlayerMotor3D.Stance.CROUCHING:
+		target_height = movement_settings.crouch_height
+	else:
+		target_height = movement_settings.stand_height
+
+	# Lerp capsule height
+	capsule.height = lerpf(capsule.height, target_height, speed * delta)
+
+	# Adjust capsule center position so feet stay planted
+	collision_shape.position.y = capsule.height * 0.5
+
+
+func _check_can_stand() -> bool:
+	if not controller or not controller.body:
+		return true
+	if not movement_settings:
+		return true
+
+	# Raycast upward from current position to check for ceiling
+	var space_state := controller.body.get_world_3d().direct_space_state
+	var origin := controller.body.global_position + Vector3.UP * movement_settings.crouch_height
+	var margin := movement_settings.crouch_clearance_margin if "crouch_clearance_margin" in movement_settings else 0.1
+	var check_distance := movement_settings.stand_height - movement_settings.crouch_height + margin
+
+	var query := PhysicsRayQueryParameters3D.create(
+		origin, origin + Vector3.UP * check_distance
+	)
+	query.exclude = [controller.body.get_rid()]
+	var result := space_state.intersect_ray(query)
+
+	return result.is_empty()  # Can stand if nothing above

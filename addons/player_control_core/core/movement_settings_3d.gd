@@ -86,6 +86,10 @@ extends Resource
 @export_range(0.0, 3.0, 0.1) var crouch_height: float = 1.0
 ## Height of collision shape when standing.
 @export_range(0.0, 3.0, 0.1) var stand_height: float = 1.8
+## How fast the capsule resizes when crouching/standing (lerp speed).
+@export_range(1.0, 30.0, 1.0) var crouch_transition_speed: float = 10.0
+## Extra clearance margin needed above head to stand up.
+@export_range(0.0, 0.5, 0.01) var crouch_clearance_margin: float = 0.1
 
 
 # =============================================================================
