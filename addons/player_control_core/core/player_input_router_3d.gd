@@ -25,6 +25,8 @@ var enabled: bool = true:
 			_jump_buffered = false
 			sprint_held = false
 			crouch_held = false
+			dodge_requested = false
+			_dodge_buffered = false
 			look_delta = Vector2.ZERO
 
 ## Current movement intent as a normalized 2D vector (x = strafe, y = forward/back).
@@ -42,6 +44,12 @@ var sprint_held: bool = false
 ## True if crouch is currently held.
 var crouch_held: bool = false
 
+## True if dodge was requested (buffered for physics frame).
+var dodge_requested: bool = false
+
+## Internal buffer for dodge input.
+var _dodge_buffered: bool = false
+
 ## Mouse look delta accumulated this frame.
 var look_delta: Vector2 = Vector2.ZERO
 
@@ -53,6 +61,7 @@ var _move_right: StringName = &"move_right"
 var _jump: StringName = &"jump"
 var _sprint: StringName = &"sprint"
 var _crouch: StringName = &"crouch"
+var _dodge: StringName = &"dodge"
 
 
 func _ready() -> void:
@@ -68,6 +77,8 @@ func _cache_action_names() -> void:
 		_jump = input_actions.jump
 		_sprint = input_actions.sprint
 		_crouch = input_actions.crouch
+		if "dodge" in input_actions:
+			_dodge = input_actions.dodge
 
 
 func _process(_delta: float) -> void:
@@ -84,6 +95,8 @@ func _process(_delta: float) -> void:
 	# Read sprint/crouch (held)
 	sprint_held = Input.is_action_pressed(_sprint)
 	crouch_held = Input.is_action_pressed(_crouch)
+	if Input.is_action_just_pressed(_dodge):
+		_dodge_buffered = true
 
 
 func _physics_process(_delta: float) -> void:
@@ -93,12 +106,21 @@ func _physics_process(_delta: float) -> void:
 	# Transfer buffered jump to physics-safe property
 	jump_requested = _jump_buffered
 	_jump_buffered = false
+	dodge_requested = _dodge_buffered
+	_dodge_buffered = false
 
 
 ## Consume and clear the jump request. Returns true if jump was requested.
 func consume_jump() -> bool:
 	var was_requested := jump_requested
 	jump_requested = false
+	return was_requested
+
+
+## Consume and clear the dodge request. Returns true if dodge was requested.
+func consume_dodge() -> bool:
+	var was_requested := dodge_requested
+	dodge_requested = false
 	return was_requested
 
 
