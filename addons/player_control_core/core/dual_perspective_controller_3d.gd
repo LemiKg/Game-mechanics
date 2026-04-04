@@ -373,7 +373,7 @@ func _update_body_tilt(delta: float) -> void:
 		velocity.y = 0
 		
 		if velocity.length() > 0.5:
-			var sprint_speed := movement_settings.sprint_speed if movement_settings else 8.0
+			var sprint_speed := movement_settings.get_gait_data(2).speed if movement_settings else 8.0
 			var speed_factor := clamp(velocity.length() / sprint_speed, 0.0, 1.0)
 			
 			# Calculate tilt based on velocity relative to body facing
