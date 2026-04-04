@@ -65,8 +65,8 @@ static func build_mesh(
 			
 			index_offset += 6
 	
-	# Calculate normals
-	normals = _calculate_normals(vertices, indices)
+	# Calculate normals from height gradients (consistent at chunk edges)
+	normals = _calculate_normals_from_heights(heights, width, depth, cell_size)
 
 	# Add edge skirts to hide LOD seam cracks
 	var skirt_result := _add_skirts(vertices, normals, uvs, indices, width, depth)
@@ -135,44 +135,43 @@ static func build_lod_meshes(
 
 
 ## Calculates smooth normals for vertices based on triangle faces
-static func _calculate_normals(
-	vertices: PackedVector3Array,
-	indices: PackedInt32Array
+## Calculate normals from height gradients using central differences.
+## Unlike face-accumulated normals, this produces consistent results at chunk
+## edges because each vertex's normal depends only on its immediate neighbors
+## in the height grid, not on which triangles happen to exist on each side.
+static func _calculate_normals_from_heights(
+	heights: PackedFloat32Array,
+	width: int,
+	depth: int,
+	cell_size: float
 ) -> PackedVector3Array:
 	var normals := PackedVector3Array()
-	normals.resize(vertices.size())
-	
-	# Initialize normals to zero
-	for i in range(normals.size()):
-		normals[i] = Vector3.ZERO
-	
-	# Accumulate face normals for each vertex
-	for i in range(0, indices.size(), 3):
-		var i0 := indices[i]
-		var i1 := indices[i + 1]
-		var i2 := indices[i + 2]
-		
-		var v0 := vertices[i0]
-		var v1 := vertices[i1]
-		var v2 := vertices[i2]
-		
-		# Calculate face normal (counter-clockwise winding)
-		var edge1 := v1 - v0
-		var edge2 := v2 - v0
-		var face_normal := edge1.cross(edge2)
-		
-		# Accumulate (weighted by face area via non-normalized cross product)
-		normals[i0] += face_normal
-		normals[i1] += face_normal
-		normals[i2] += face_normal
-	
-	# Normalize all normals
-	for i in range(normals.size()):
-		normals[i] = normals[i].normalized()
-		# Handle degenerate case
-		if normals[i].is_zero_approx():
-			normals[i] = Vector3.UP
-	
+	normals.resize(width * depth)
+
+	for z in range(depth):
+		for x in range(width):
+			var idx := z * width + x
+
+			# Central differences, clamped at edges
+			var xl := maxi(x - 1, 0)
+			var xr := mini(x + 1, width - 1)
+			var zu := maxi(z - 1, 0)
+			var zd := mini(z + 1, depth - 1)
+
+			var h_left := heights[z * width + xl]
+			var h_right := heights[z * width + xr]
+			var h_up := heights[zu * width + x]
+			var h_down := heights[zd * width + x]
+
+			# Height gradient scaled by actual sample distance
+			var dx_dist := float(xr - xl) * cell_size
+			var dz_dist := float(zd - zu) * cell_size
+
+			var nx := (h_left - h_right) / maxf(dx_dist, 0.001)
+			var nz := (h_up - h_down) / maxf(dz_dist, 0.001)
+
+			normals[idx] = Vector3(nx, 1.0, nz).normalized()
+
 	return normals
 
 
@@ -184,7 +183,7 @@ static func _add_skirts(
 	indices: PackedInt32Array,
 	width: int,
 	depth: int,
-	skirt_depth: float = 5.0
+	skirt_depth: float = 0.5
 ) -> Dictionary:
 	var edge_indices: Array[int] = []
 
