@@ -43,6 +43,8 @@ signal animation_started(animation_name: StringName)
 	&"land": &"Jump_Land",
 	&"crouch_idle": &"Crouch_Idle",
 	&"crouch_walk": &"Crouch_Fwd",
+	&"dodge": &"Roll",
+	&"stop": &"Idle",
 }
 
 
@@ -155,6 +157,13 @@ func _play_via_tree(animation_name: StringName, _blend_time: float) -> void:
 		_logger.debug("SKIPPED - already traveling to target")
 		return
 	
+	# Check if the animation node exists in the state machine before traveling
+	if animation_tree.tree_root is AnimationNodeStateMachine:
+		var sm := animation_tree.tree_root as AnimationNodeStateMachine
+		if not sm.has_node(animation_name):
+			_logger.debugf("SKIPPED - node '%s' not found in AnimationTree", [animation_name])
+			return
+
 	_logger.debugf(">>> TRAVEL('%s')", [animation_name])
 	_state_playback.travel(animation_name)
 
