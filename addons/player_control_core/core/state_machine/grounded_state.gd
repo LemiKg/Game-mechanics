@@ -93,13 +93,17 @@ func physics_update(delta: float) -> void:
 		else:
 			_is_rotating_in_place = false
 
-	# Handle dodge input
-	if input_router.consume_dodge():
+	# Handle dodge input — check stamina before consuming so the input
+	# is preserved if the player can't afford the dodge.
+	if input_router.dodge_requested:
 		if _can_dodge():
+			input_router.consume_dodge()
 			if stamina_component and stamina_component.has_method("try_consume"):
 				stamina_component.try_consume(stamina_component.dodge_cost)
 			transition_to(&"dodge")
 			return
+		else:
+			input_router.consume_dodge()
 
 	# Handle jump
 	var jump_consumed := input_router.consume_jump() or motor.consume_direct_jump()
@@ -163,9 +167,8 @@ func _update_animation() -> void:
 	elif has_movement:
 		new_animation = &"walk"
 	else:
-		# Stop prediction: if we were moving and now stopped, play stop anim
-		if _was_moving and motor.is_moving:
-			# Still decelerating — predict time to stop
+		# Stop prediction: if we were moving and motor is still decelerating, play stop anim
+		if _was_moving and not motor.is_moving:
 			var gait_data := motor.get_current_gait_data()
 			var speed := Vector2(motor.actual_velocity.x, motor.actual_velocity.z).length()
 			var time_to_stop := speed / maxf(gait_data.deceleration, 1.0)

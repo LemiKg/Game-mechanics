@@ -56,6 +56,12 @@ xfade_time = 0.1
 [sub_resource type="AnimationNodeStateMachineTransition" id="trans_crouch_fwd_crouch_idle"]
 xfade_time = 0.1
 
+[sub_resource type="AnimationNodeStateMachineTransition" id="trans_crouch_idle_jump_start"]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="trans_crouch_fwd_jump_start"]
+xfade_time = 0.1
+
 [sub_resource type="AnimationNodeStateMachineTransition" id="trans_walk_jump"]
 xfade_time = 0.05
 
@@ -141,7 +147,7 @@ states/Roll/position = Vector2(400, -57)
 states/Start/position = Vector2(-50, 100)
 states/Walk/node = SubResource("AnimationNodeAnimation_walk")
 states/Walk/position = Vector2(250, 100)
-transitions = ["Start", "Idle", SubResource("trans_start_idle"), "Idle", "Walk", SubResource("trans_idle_walk"), "Walk", "Idle", SubResource("trans_walk_idle"), "Walk", "Sprint", SubResource("trans_walk_sprint"), "Sprint", "Walk", SubResource("trans_sprint_walk"), "Sprint", "Idle", SubResource("trans_sprint_idle"), "Idle", "Crouch_Idle", SubResource("trans_idle_crouch_idle"), "Crouch_Idle", "Idle", SubResource("trans_crouch_idle_idle"), "Crouch_Idle", "Crouch_Fwd", SubResource("trans_crouch_idle_crouch_fwd"), "Crouch_Fwd", "Crouch_Idle", SubResource("trans_crouch_fwd_crouch_idle"), "Walk", "Jump", SubResource("trans_walk_jump"), "Sprint", "Jump", SubResource("trans_sprint_jump"), "Jump", "Jump_Land", SubResource("trans_jump_jump_land"), "Jump_Land", "Idle", SubResource("trans_jump_land_idle"), "Jump_Land", "Walk", SubResource("trans_jump_land_walk"), "Jump_Land", "Sprint", SubResource("trans_jump_land_sprint"), "Idle", "Jump_Start", SubResource("AnimationNodeStateMachineTransition_tugtx"), "Walk", "Jump_Start", SubResource("trans_walk_jump_start"), "Sprint", "Jump_Start", SubResource("trans_sprint_jump_start"), "Jump_Start", "Idle", SubResource("AnimationNodeStateMachineTransition_wqoky"), "Jump_Start", "Jump", SubResource("AnimationNodeStateMachineTransition_ubrfs"), "Jump_Start", "Jump_Land", SubResource("trans_jump_start_jump_land"), "Idle", "Roll", SubResource("trans_idle_roll"), "Walk", "Roll", SubResource("trans_walk_roll"), "Sprint", "Roll", SubResource("trans_sprint_roll"), "Roll", "Idle", SubResource("trans_roll_idle"), "Roll", "Walk", SubResource("trans_roll_walk"), "Roll", "Sprint", SubResource("trans_roll_sprint")]
+transitions = ["Start", "Idle", SubResource("trans_start_idle"), "Idle", "Walk", SubResource("trans_idle_walk"), "Walk", "Idle", SubResource("trans_walk_idle"), "Walk", "Sprint", SubResource("trans_walk_sprint"), "Sprint", "Walk", SubResource("trans_sprint_walk"), "Sprint", "Idle", SubResource("trans_sprint_idle"), "Idle", "Crouch_Idle", SubResource("trans_idle_crouch_idle"), "Crouch_Idle", "Idle", SubResource("trans_crouch_idle_idle"), "Crouch_Idle", "Crouch_Fwd", SubResource("trans_crouch_idle_crouch_fwd"), "Crouch_Fwd", "Crouch_Idle", SubResource("trans_crouch_fwd_crouch_idle"), "Walk", "Jump", SubResource("trans_walk_jump"), "Sprint", "Jump", SubResource("trans_sprint_jump"), "Jump", "Jump_Land", SubResource("trans_jump_jump_land"), "Jump_Land", "Idle", SubResource("trans_jump_land_idle"), "Jump_Land", "Walk", SubResource("trans_jump_land_walk"), "Jump_Land", "Sprint", SubResource("trans_jump_land_sprint"), "Idle", "Jump_Start", SubResource("AnimationNodeStateMachineTransition_tugtx"), "Walk", "Jump_Start", SubResource("trans_walk_jump_start"), "Sprint", "Jump_Start", SubResource("trans_sprint_jump_start"), "Jump_Start", "Idle", SubResource("AnimationNodeStateMachineTransition_wqoky"), "Jump_Start", "Jump", SubResource("AnimationNodeStateMachineTransition_ubrfs"), "Jump_Start", "Jump_Land", SubResource("trans_jump_start_jump_land"), "Idle", "Roll", SubResource("trans_idle_roll"), "Walk", "Roll", SubResource("trans_walk_roll"), "Sprint", "Roll", SubResource("trans_sprint_roll"), "Roll", "Idle", SubResource("trans_roll_idle"), "Roll", "Walk", SubResource("trans_roll_walk"), "Roll", "Sprint", SubResource("trans_roll_sprint"), "Crouch_Idle", "Jump_Start", SubResource("trans_crouch_idle_jump_start"), "Crouch_Fwd", "Jump_Start", SubResource("trans_crouch_fwd_jump_start")]
 graph_offset = Vector2(-465, -210)
 
 [node name="CharacterModel" instance=ExtResource("1_model")]

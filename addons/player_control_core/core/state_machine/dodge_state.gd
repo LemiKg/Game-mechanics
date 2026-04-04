@@ -51,6 +51,10 @@ func enter() -> void:
 	_dodge_timer = 0.0
 	_in_iframes = false
 
+	# Clear any buffered jump so it doesn't fire after dodge ends
+	if input_router:
+		input_router.consume_jump()
+
 	if not motor or not controller or not controller.body:
 		transition_to(&"grounded")
 		return
@@ -81,7 +85,7 @@ func enter() -> void:
 	# Disable motor — we control movement directly
 	motor.enabled = false
 
-	# Zero vertical velocity to prevent floating dodges
+	# Set initial dodge velocity (horizontal only — _dodge_direction.y is 0)
 	if controller.body.has_method("move_and_slide"):
 		controller.body.velocity = _dodge_direction * dodge_speed
 

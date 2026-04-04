@@ -1,4 +1,4 @@
-[gd_scene load_steps=63 format=3 uid="uid://bv4xp8r0k5qm2"]
+[gd_scene load_steps=67 format=3 uid="uid://bv4xp8r0k5qm2"]
 
 [ext_resource type="Script" uid="uid://ddprtht2qo7se" path="res://addons/inventory_system/core/inventory_component.gd" id="1_inv_comp"]
 [ext_resource type="Script" uid="uid://bgudcqpbogui8" path="res://addons/inventory_system/core/equipment_component.gd" id="2_equip_comp"]
@@ -30,8 +30,14 @@
 [ext_resource type="Script" path="res://addons/player_control_core/core/state_machine/dodge_state.gd" id="29_dodge"]
 [ext_resource type="Script" path="res://addons/player_control_core/core/state_machine/ragdoll_state.gd" id="30_ragdoll"]
 [ext_resource type="Script" path="res://addons/player_control_core/core/stamina_component.gd" id="31_stamina"]
+[ext_resource type="Script" path="res://addons/player_control_core/core/state_machine/mantle_state.gd" id="34_mantle"]
+[ext_resource type="Script" path="res://addons/player_control_core/core/mantle_detector.gd" id="35_mantle_det"]
+[ext_resource type="Script" path="res://addons/player_control_core/core/mantle_settings_3d.gd" id="36_mantle_set"]
 [ext_resource type="Script" path="res://addons/player_control_core/ui/stamina_bar_ui.gd" id="32_stamina_bar"]
 [ext_resource type="Script" path="res://addons/inventory_system/ui/themes/theme_manager.gd" id="33_theme_mgr"]
+
+[sub_resource type="Resource" id="MantleSettings"]
+script = ExtResource("36_mantle_set")
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_player"]
 radius = 0.2
@@ -198,8 +204,9 @@ script = ExtResource("11_grounded")
 collision_shape = NodePath("../../CollisionShape3D")
 stamina_component = NodePath("../../StaminaComponent")
 
-[node name="airborne" type="Node" parent="PlayerStateMachine"]
+[node name="airborne" type="Node" parent="PlayerStateMachine" node_paths=PackedStringArray("mantle_detector")]
 script = ExtResource("12_airborne")
+mantle_detector = NodePath("../../MantleDetector")
 
 [node name="ui" type="Node" parent="PlayerStateMachine"]
 script = ExtResource("13_ui_state")
@@ -207,6 +214,10 @@ script = ExtResource("13_ui_state")
 [node name="dodge" type="Node" parent="PlayerStateMachine" node_paths=PackedStringArray("stamina_component")]
 script = ExtResource("29_dodge")
 stamina_component = NodePath("../../StaminaComponent")
+
+[node name="mantle" type="Node" parent="PlayerStateMachine" node_paths=PackedStringArray("mantle_settings")]
+script = ExtResource("34_mantle")
+mantle_settings = SubResource("MantleSettings")
 
 [node name="ragdoll" type="Node" parent="PlayerStateMachine" node_paths=PackedStringArray("skeleton", "collision_shape")]
 script = ExtResource("30_ragdoll")
@@ -226,6 +237,11 @@ stride_modifier = NodePath("../CharacterMesh/Rig/Skeleton3D/StrideWarpingModifie
 orientation_modifier = NodePath("../CharacterMesh/Rig/Skeleton3D/OrientationWarpingModifier")
 slope_modifier = NodePath("../CharacterMesh/Rig/Skeleton3D/SlopeWarpingModifier")
 settings = ExtResource("25_pose_settings")
+
+[node name="MantleDetector" type="Node" parent="." node_paths=PackedStringArray("body")]
+script = ExtResource("35_mantle_det")
+body = NodePath("..")
+settings = SubResource("MantleSettings")
 
 [node name="StaminaComponent" type="Node" parent="."]
 script = ExtResource("31_stamina")
