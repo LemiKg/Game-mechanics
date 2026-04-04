@@ -5,6 +5,7 @@ class_name BaseInventory
 ## Extend this to create specialized inventory types like WeightBasedInventory, FilteredInventory, etc.
 
 signal inventory_updated
+signal slot_updated(index: int)
 
 signal weight_changed(current: float, maximum: float)
 

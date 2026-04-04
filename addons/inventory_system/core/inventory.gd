@@ -5,8 +5,17 @@ class_name Inventory
 ## Auto-creates ItemInstance for non-stackable items (equipment).
 
 
+## Emit both granular slot_updated and bulk inventory_updated signals.
+func _emit_changes(changed_indices: Array[int]) -> void:
+	for i in changed_indices:
+		slot_updated.emit(i)
+	inventory_updated.emit()
+	_emit_weight_changed()
+
+
 func add_item(item: InventoryItem, amount: int = 1, start_index: int = 0) -> int:
 	var remaining = amount
+	var changed_indices: Array[int] = []
 
 	# First try to stack with existing items (only for stackable items)
 	if item.max_stack > 1:
@@ -17,9 +26,9 @@ func add_item(item: InventoryItem, amount: int = 1, start_index: int = 0) -> int
 				var to_add = min(remaining, space)
 				slot.amount += to_add
 				remaining -= to_add
+				changed_indices.append(i)
 				if remaining == 0:
-					inventory_updated.emit()
-					_emit_weight_changed()
+					_emit_changes(changed_indices)
 					return 0
 
 	# Then try to find empty slots
@@ -35,13 +44,12 @@ func add_item(item: InventoryItem, amount: int = 1, start_index: int = 0) -> int
 			if item.max_stack == 1:
 				slot.instance = ItemInstance.new(item)
 
+			changed_indices.append(i)
 			if remaining == 0:
-				inventory_updated.emit()
-				_emit_weight_changed()
+				_emit_changes(changed_indices)
 				return 0
 
-	inventory_updated.emit()
-	_emit_weight_changed()
+	_emit_changes(changed_indices)
 	return remaining
 
 
@@ -59,8 +67,7 @@ func remove_item_at_index(index: int, amount: int) -> InventoryItem:
 	if slot.amount <= 0:
 		slot.clear()
 
-	inventory_updated.emit()
-	_emit_weight_changed()
+	_emit_changes([index])
 	return item_removed
 
 
@@ -71,8 +78,7 @@ func set_item(index: int, item: InventoryItem, amount: int) -> void:
 	slots[index].amount = amount
 	if item == null:
 		slots[index].instance = null
-	inventory_updated.emit()
-	_emit_weight_changed()
+	_emit_changes([index])
 
 
 ## Serialize the entire inventory to a Dictionary.
