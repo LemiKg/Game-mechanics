@@ -128,3 +128,44 @@ func deserialize(data: Dictionary) -> void:
 
 	inventory_updated.emit()
 	_emit_weight_changed()
+
+
+## Sort inventory slots. Empty slots are moved to the end.
+func sort_by_name() -> void:
+	_sort_slots(func(a: InventorySlot, b: InventorySlot) -> bool:
+		if a.is_empty(): return false
+		if b.is_empty(): return true
+		return a.item.name.naturalnocasecmp_to(b.item.name) < 0
+	)
+
+func sort_by_rarity() -> void:
+	_sort_slots(func(a: InventorySlot, b: InventorySlot) -> bool:
+		if a.is_empty(): return false
+		if b.is_empty(): return true
+		if a.item.rarity != b.item.rarity:
+			return a.item.rarity > b.item.rarity  # Higher rarity first
+		return a.item.name.naturalnocasecmp_to(b.item.name) < 0
+	)
+
+func sort_by_value() -> void:
+	_sort_slots(func(a: InventorySlot, b: InventorySlot) -> bool:
+		if a.is_empty(): return false
+		if b.is_empty(): return true
+		if a.item.value != b.item.value:
+			return a.item.value > b.item.value  # Higher value first
+		return a.item.name.naturalnocasecmp_to(b.item.name) < 0
+	)
+
+func sort_by_weight() -> void:
+	_sort_slots(func(a: InventorySlot, b: InventorySlot) -> bool:
+		if a.is_empty(): return false
+		if b.is_empty(): return true
+		if a.item.weight != b.item.weight:
+			return a.item.weight > b.item.weight  # Heavier first
+		return a.item.name.naturalnocasecmp_to(b.item.name) < 0
+	)
+
+func _sort_slots(comparator: Callable) -> void:
+	slots.sort_custom(comparator)
+	inventory_updated.emit()
+	_emit_weight_changed()
