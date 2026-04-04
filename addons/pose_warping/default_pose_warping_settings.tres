@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="PoseWarpingSettings" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://addons/pose_warping/core/pose_warping_settings.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+enable_stride_warping = true
+base_walk_speed = 2.0
+base_sprint_speed = 5.0
+max_speed_scale = 1.2
+min_speed_scale = 0.8
+min_speed_for_stride = 0.5
+stride_blend_speed = 10.0
+foot_bone_names = Array[String](["DEF-foot.L", "DEF-foot.R"])
+hips_bone_name = "DEF-hips"
+thigh_bone_names = Array[String](["DEF-thigh.L", "DEF-thigh.R"])
+shin_bone_names = Array[String](["DEF-shin.L", "DEF-shin.R"])
+max_stride_pelvis_pulldown = 0.3
+enable_orientation_warping = true
+max_orientation_angle = 90.0
+orientation_blend_speed = 10.0
+spine_bone_names = Array[String](["DEF-spine.001", "DEF-spine.002", "DEF-spine.003"])
+spine_weight_distribution = Array[float]([0.25, 0.35, 0.4])
+enable_slope_warping = false
+slope_raycast_length = 1.5
+slope_adaptation_speed = 10.0
+slope_collision_mask = 1
+max_pelvis_offset = 0.3
+foot_rotation_blend = 0.8
+foot_height_offset = 0.05
+raycast_origin_height = 0.5
+idle_speed_threshold = 0.1
