@@ -67,8 +67,26 @@ func _apply_current_theme() -> void:
 		for child in parent.get_children():
 			if child is Control:
 				child.theme = _themes[_current_index]
+				# Clear inline style overrides so theme takes effect
+				_clear_style_overrides_recursive(child)
 	elif parent is Control:
 		parent.theme = _themes[_current_index]
+		_clear_style_overrides_recursive(parent)
+
+
+## Recursively clear theme_override_styles on all PanelContainer descendants
+## so the theme's styles take effect instead of hardcoded inline styles.
+func _clear_style_overrides_recursive(node: Node) -> void:
+	if node is PanelContainer:
+		if node.has_theme_stylebox_override("panel"):
+			node.remove_theme_stylebox_override("panel")
+	if node is ProgressBar:
+		if node.has_theme_stylebox_override("fill"):
+			node.remove_theme_stylebox_override("fill")
+		if node.has_theme_stylebox_override("background"):
+			node.remove_theme_stylebox_override("background")
+	for child in node.get_children():
+		_clear_style_overrides_recursive(child)
 
 
 func _show_toast() -> void:
