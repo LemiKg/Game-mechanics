@@ -76,9 +76,11 @@ func swap_items(from_inventory: Inventory, from_index: int, to_inventory: Invent
 	
 	from_inventory.slot_updated.emit(from_index)
 	from_inventory.inventory_updated.emit()
+	from_inventory._emit_weight_changed()
 	if from_inventory != to_inventory:
 		to_inventory.slot_updated.emit(to_index)
 		to_inventory.inventory_updated.emit()
+		to_inventory._emit_weight_changed()
 	else:
 		from_inventory.slot_updated.emit(to_index)
 

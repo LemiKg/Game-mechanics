@@ -68,8 +68,8 @@ func refresh():
 			var slot_ui = slot_scene.instantiate()
 			hotbar_container.add_child(slot_ui)
 			slot_ui.set_slot(inventory_component.hotbar_inventory, i, slots[i])
-			_connect_slot_signals(slot_ui)
-			
+			_connect_slot_ui_signals(slot_ui)
+
 	# Refresh Main Inventory
 	if grid_container and inventory_component.main_inventory:
 		var slots = inventory_component.main_inventory.slots
@@ -77,9 +77,9 @@ func refresh():
 			var slot_ui = slot_scene.instantiate()
 			grid_container.add_child(slot_ui)
 			slot_ui.set_slot(inventory_component.main_inventory, i, slots[i])
-			_connect_slot_signals(slot_ui)
+			_connect_slot_ui_signals(slot_ui)
 
-func _connect_slot_signals(slot_ui: SlotUI):
+func _connect_slot_ui_signals(slot_ui: SlotUI):
 	if interaction_handler:
 		slot_ui.item_drop_requested.connect(interaction_handler.handle_inventory_drop)
 		slot_ui.item_activated.connect(interaction_handler.handle_item_activation)

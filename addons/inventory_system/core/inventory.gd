@@ -167,5 +167,7 @@ func sort_by_weight() -> void:
 
 func _sort_slots(comparator: Callable) -> void:
 	slots.sort_custom(comparator)
+	for i in range(slots.size()):
+		slot_updated.emit(i)
 	inventory_updated.emit()
 	_emit_weight_changed()

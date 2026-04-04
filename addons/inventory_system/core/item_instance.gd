@@ -3,7 +3,7 @@ extends RefCounted
 ## Per-item mutable state for non-stackable items (equipment).
 ##
 ## Wraps an InventoryItem definition with instance-specific data like
-## durability, upgrade level, and (future) random affixes.
+## durability and upgrade level.
 ## Only created for items with max_stack == 1.
 
 
