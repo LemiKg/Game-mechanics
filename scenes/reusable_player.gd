@@ -14,8 +14,8 @@ signal inventory_toggled(is_open: bool)
 @onready var equipment_component: EquipmentComponent = $EquipmentComponent
 @onready var inventory_ui = $CanvasLayer/InventoryUI
 @onready var quick_inventory_ui = $CanvasLayer/QuickInventoryUI
-@onready var perspective_label: Label = $CanvasLayer/PerspectiveLabel
-@onready var hud_label: Label = $CanvasLayer/HUD
+@onready var perspective_label: PanelContainer = $CanvasLayer/PerspectiveLabel
+@onready var hud_label: PanelContainer = $CanvasLayer/HUD
 
 ## Whether to add test items on ready (for debugging)
 @export var add_test_items: bool = false
@@ -141,4 +141,4 @@ func _on_perspective_changed(is_first_person: bool) -> void:
 func _update_perspective_label() -> void:
 	if perspective_label:
 		var mode := "First Person" if dual_controller.is_first_person() else "Third Person"
-		perspective_label.text = "Perspective: %s" % mode
+		perspective_label.get_node("Label").text = "Perspective: %s" % mode

@@ -1,4 +1,4 @@
-[gd_scene load_steps=62 format=3 uid="uid://bv4xp8r0k5qm2"]
+[gd_scene load_steps=63 format=3 uid="uid://bv4xp8r0k5qm2"]
 
 [ext_resource type="Script" uid="uid://ddprtht2qo7se" path="res://addons/inventory_system/core/inventory_component.gd" id="1_inv_comp"]
 [ext_resource type="Script" uid="uid://bgudcqpbogui8" path="res://addons/inventory_system/core/equipment_component.gd" id="2_equip_comp"]
@@ -31,6 +31,7 @@
 [ext_resource type="Script" path="res://addons/player_control_core/core/state_machine/ragdoll_state.gd" id="30_ragdoll"]
 [ext_resource type="Script" path="res://addons/player_control_core/core/stamina_component.gd" id="31_stamina"]
 [ext_resource type="Script" path="res://addons/player_control_core/ui/stamina_bar_ui.gd" id="32_stamina_bar"]
+[ext_resource type="Script" path="res://addons/inventory_system/ui/themes/theme_manager.gd" id="33_theme_mgr"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_player"]
 radius = 0.2
@@ -257,6 +258,9 @@ script = ExtResource("18_handler")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
+[node name="ThemeManager" type="Node" parent="CanvasLayer"]
+script = ExtResource("33_theme_mgr")
+
 [node name="InventoryUI" parent="CanvasLayer" node_paths=PackedStringArray("tooltip_controller", "equipment_component", "inventory_component", "interaction_handler") instance=ExtResource("14_inv_ui")]
 visible = false
 tooltip_controller = NodePath("../TooltipController")
@@ -275,16 +279,18 @@ interaction_handler = NodePath("../../InventoryInteractionHandler")
 script = ExtResource("17_tooltip_ctrl")
 tooltip_ui = NodePath("../ItemTooltipUI")
 
-[node name="HUD" type="Label" parent="CanvasLayer"]
+[node name="HUD" type="PanelContainer" parent="CanvasLayer"]
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -200.0
+offset_left = -350.0
 offset_top = 10.0
-offset_right = 200.0
-offset_bottom = 50.0
+offset_right = 350.0
 grow_horizontal = 2
-text = "WASD: Move | Space: Jump | Shift: Sprint | Ctrl: Crouch | Alt: Dodge | V: Perspective | F2: Shoulder | I: Inventory"
+
+[node name="Label" type="Label" parent="CanvasLayer/HUD"]
+layout_mode = 2
+text = "WASD: Move | Space: Jump | Shift: Sprint | Ctrl: Crouch | Alt: Dodge | V: Perspective | F2: Shoulder | F4: Theme | I: Inventory"
 horizontal_alignment = 1
 
 [node name="StaminaBarUI" type="Control" parent="CanvasLayer" node_paths=PackedStringArray("stamina_component")]
@@ -299,13 +305,15 @@ offset_bottom = -38.0
 grow_vertical = 0
 stamina_component = NodePath("../../StaminaComponent")
 
-[node name="PerspectiveLabel" type="Label" parent="CanvasLayer"]
+[node name="PerspectiveLabel" type="PanelContainer" parent="CanvasLayer"]
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -200.0
+offset_left = -220.0
 offset_top = 10.0
-offset_bottom = 30.0
 grow_horizontal = 0
+
+[node name="Label" type="Label" parent="CanvasLayer/PerspectiveLabel"]
+layout_mode = 2
 text = "Perspective: First Person"
 horizontal_alignment = 2

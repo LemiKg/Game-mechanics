@@ -96,4 +96,4 @@ func _on_perspective_changed(is_first_person: bool) -> void:
 func _update_perspective_label() -> void:
 	if perspective_label:
 		var mode := "First Person" if player_controller.is_first_person() else "Third Person"
-		perspective_label.text = "Perspective: %s (V to toggle)" % mode
+		perspective_label.get_node("Label").text = "Perspective: %s (V to toggle)" % mode

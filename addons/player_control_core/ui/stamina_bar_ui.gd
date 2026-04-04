@@ -24,7 +24,6 @@ extends Control
 
 ## Internal state
 var _bar: ProgressBar
-var _bg: ColorRect
 var _hide_timer: float = 0.0
 var _target_alpha: float = 0.0
 var _showing: bool = false
@@ -45,33 +44,13 @@ func _ready() -> void:
 
 
 func _build_ui() -> void:
-	# Background
-	_bg = ColorRect.new()
-	_bg.color = color_background
-	_bg.set_anchors_preset(Control.PRESET_FULL_RECT)
-	add_child(_bg)
-
-	# Progress bar
+	# Progress bar — inherits fill/background styles from theme
 	_bar = ProgressBar.new()
 	_bar.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_bar.min_value = 0.0
 	_bar.max_value = 100.0
 	_bar.value = 100.0
 	_bar.show_percentage = false
-
-	# Style the bar
-	var fill_style := StyleBoxFlat.new()
-	fill_style.bg_color = color_full
-	fill_style.corner_radius_top_left = 3
-	fill_style.corner_radius_top_right = 3
-	fill_style.corner_radius_bottom_left = 3
-	fill_style.corner_radius_bottom_right = 3
-	_bar.add_theme_stylebox_override("fill", fill_style)
-
-	var bg_style := StyleBoxFlat.new()
-	bg_style.bg_color = Color.TRANSPARENT
-	_bar.add_theme_stylebox_override("background", bg_style)
-
 	add_child(_bar)
 
 
@@ -95,13 +74,15 @@ func _on_stamina_changed(current: float, maximum: float) -> void:
 	_bar.max_value = maximum
 	_bar.value = current
 
-	# Update color based on ratio
 	var ratio := current / maxf(maximum, 1.0)
-	var fill_style: StyleBoxFlat = _bar.get_theme_stylebox("fill") as StyleBoxFlat
-	if fill_style:
-		fill_style.bg_color = color_low.lerp(color_full, ratio)
 
-	# Show/hide logic
+	# Override fill color based on stamina ratio
+	var fill_style := _bar.get_theme_stylebox("fill")
+	if fill_style and fill_style is StyleBoxFlat:
+		var override := fill_style.duplicate() as StyleBoxFlat
+		override.bg_color = color_low.lerp(color_full, ratio)
+		_bar.add_theme_stylebox_override("fill", override)
+
 	if ratio < 1.0:
 		_showing = true
 		_hide_timer = hide_delay
@@ -110,10 +91,11 @@ func _on_stamina_changed(current: float, maximum: float) -> void:
 
 
 func _on_stamina_depleted() -> void:
-	# Flash effect when depleted
 	_showing = true
 	_hide_timer = hide_delay
 	if _bar:
-		var fill_style: StyleBoxFlat = _bar.get_theme_stylebox("fill") as StyleBoxFlat
-		if fill_style:
-			fill_style.bg_color = Color(1.0, 0.0, 0.0, 1.0)
+		var fill_style := _bar.get_theme_stylebox("fill")
+		if fill_style and fill_style is StyleBoxFlat:
+			var override := fill_style.duplicate() as StyleBoxFlat
+			override.bg_color = Color(1.0, 0.0, 0.0, 1.0)
+			_bar.add_theme_stylebox_override("fill", override)
