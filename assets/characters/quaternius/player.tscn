@@ -1,4 +1,4 @@
-[gd_scene load_steps=40 format=3 uid="uid://c0wo2ldbnefie"]
+[gd_scene load_steps=121 format=3 uid="uid://c0wo2ldbnefie"]
 
 [ext_resource type="PackedScene" uid="uid://d3rpqr655oidf" path="res://assets/characters/quaternius/AnimationLibrary_Godot_Standard.glb" id="1_model"]
 
@@ -103,6 +103,99 @@ xfade_time = 0.05
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_roll"]
 animation = &"Roll"
 
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_interact"]
+animation = &"Interact"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_jog_fwd"]
+animation = &"Jog_Fwd"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_hit_chest"]
+animation = &"Hit_Chest"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_hit_head"]
+animation = &"Hit_Head"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_death01"]
+animation = &"Death01"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_punch_enter"]
+animation = &"Punch_Enter"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_punch_jab"]
+animation = &"Punch_Jab"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_punch_cross"]
+animation = &"Punch_Cross"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_sword_idle"]
+animation = &"Sword_Idle"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_sword_attack"]
+animation = &"Sword_Attack"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_pistol_idle"]
+animation = &"Pistol_Idle"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_pistol_aim_neutral"]
+animation = &"Pistol_Aim_Neutral"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_pistol_shoot"]
+animation = &"Pistol_Shoot"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_pistol_reload"]
+animation = &"Pistol_Reload"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_spell_simple_enter"]
+animation = &"Spell_Simple_Enter"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_spell_simple_idle"]
+animation = &"Spell_Simple_Idle"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_spell_simple_shoot"]
+animation = &"Spell_Simple_Shoot"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_spell_simple_exit"]
+animation = &"Spell_Simple_Exit"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_dance"]
+animation = &"Dance"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_push"]
+animation = &"Push"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_swim_idle"]
+animation = &"Swim_Idle"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_swim_fwd"]
+animation = &"Swim_Fwd"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_pickup_table"]
+animation = &"PickUp_Table"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_fixing_kneeling"]
+animation = &"Fixing_Kneeling"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_sitting_enter"]
+animation = &"Sitting_Enter"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_sitting_idle"]
+animation = &"Sitting_Idle"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_sitting_exit"]
+animation = &"Sitting_Exit"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_idle_talking"]
+animation = &"Idle_Talking"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_walk_formal"]
+animation = &"Walk_Formal"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_driving"]
+animation = &"Driving"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_idle_torch"]
+animation = &"Idle_Torch"
+
 [sub_resource type="AnimationNodeStateMachineTransition" id="trans_idle_roll"]
 xfade_time = 0.05
 switch_mode = 1
@@ -127,6 +220,153 @@ xfade_curve = 0.6
 xfade_time = 0.35
 xfade_curve = 0.6
 
+[sub_resource type="AnimationNodeStateMachineTransition" id="trans_idle_interact"]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="trans_interact_idle"]
+xfade_time = 0.2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="trans_idle_hit_chest"]
+xfade_time = 0.05
+switch_mode = 1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="trans_idle_hit_head"]
+xfade_time = 0.05
+switch_mode = 1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="trans_hit_chest_idle"]
+xfade_time = 0.2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="trans_hit_head_idle"]
+xfade_time = 0.2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="trans_idle_death01"]
+xfade_time = 0.1
+switch_mode = 1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="trans_idle_punch_enter"]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="trans_punch_enter_idle"]
+xfade_time = 0.2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="trans_punch_enter_punch_jab"]
+xfade_time = 0.05
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="trans_punch_jab_idle"]
+xfade_time = 0.2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="trans_punch_jab_punch_cross"]
+xfade_time = 0.05
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="trans_punch_cross_idle"]
+xfade_time = 0.2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="trans_idle_sword_idle"]
+xfade_time = 0.15
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="trans_sword_idle_idle"]
+xfade_time = 0.15
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="trans_sword_idle_sword_attack"]
+xfade_time = 0.05
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="trans_sword_attack_sword_idle"]
+xfade_time = 0.15
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="trans_idle_pistol_idle"]
+xfade_time = 0.15
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="trans_pistol_idle_idle"]
+xfade_time = 0.15
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="trans_pistol_idle_pistol_aim_neutral"]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="trans_pistol_aim_neutral_pistol_idle"]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="trans_pistol_aim_neutral_pistol_shoot"]
+xfade_time = 0.05
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="trans_pistol_shoot_pistol_aim_neutral"]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="trans_pistol_idle_pistol_reload"]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="trans_pistol_reload_pistol_idle"]
+xfade_time = 0.15
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="trans_idle_spell_simple_enter"]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="trans_spell_simple_enter_spell_simple_idle"]
+xfade_time = 0.1
+advance_mode = 2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="trans_spell_simple_idle_spell_simple_shoot"]
+xfade_time = 0.05
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="trans_spell_simple_shoot_spell_simple_idle"]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="trans_spell_simple_idle_spell_simple_exit"]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="trans_spell_simple_exit_idle"]
+xfade_time = 0.2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="trans_idle_dance"]
+xfade_time = 0.2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="trans_dance_idle"]
+xfade_time = 0.2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="trans_idle_sitting_enter"]
+xfade_time = 0.15
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="trans_sitting_enter_sitting_idle"]
+xfade_time = 0.1
+advance_mode = 2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="trans_sitting_idle_sitting_exit"]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="trans_sitting_exit_idle"]
+xfade_time = 0.2
+advance_mode = 2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="trans_idle_pickup_table"]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="trans_pickup_table_idle"]
+xfade_time = 0.2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="trans_idle_fixing_kneeling"]
+xfade_time = 0.15
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="trans_fixing_kneeling_idle"]
+xfade_time = 0.2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="trans_idle_push"]
+xfade_time = 0.15
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="trans_push_idle"]
+xfade_time = 0.15
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="trans_idle_swim_idle"]
+xfade_time = 0.2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="trans_swim_idle_swim_fwd"]
+xfade_time = 0.15
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="trans_swim_fwd_swim_idle"]
+xfade_time = 0.15
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="trans_swim_idle_idle"]
+xfade_time = 0.2
+
 [sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_main"]
 states/Crouch_Fwd/node = SubResource("AnimationNodeAnimation_crouch_fwd")
 states/Crouch_Fwd/position = Vector2(277, -57)
@@ -144,10 +384,72 @@ states/Sprint/node = SubResource("AnimationNodeAnimation_sprint")
 states/Sprint/position = Vector2(583, 48)
 states/Roll/node = SubResource("AnimationNodeAnimation_roll")
 states/Roll/position = Vector2(400, -57)
+states/Interact/node = SubResource("AnimationNodeAnimation_interact")
+states/Interact/position = Vector2(600, 260)
+states/Jog_Fwd/node = SubResource("AnimationNodeAnimation_jog_fwd")
+states/Jog_Fwd/position = Vector2(400, 100)
+states/Hit_Chest/node = SubResource("AnimationNodeAnimation_hit_chest")
+states/Hit_Chest/position = Vector2(-200, 260)
+states/Hit_Head/node = SubResource("AnimationNodeAnimation_hit_head")
+states/Hit_Head/position = Vector2(-200, 340)
+states/Death01/node = SubResource("AnimationNodeAnimation_death01")
+states/Death01/position = Vector2(-200, 420)
+states/Punch_Enter/node = SubResource("AnimationNodeAnimation_punch_enter")
+states/Punch_Enter/position = Vector2(-400, 100)
+states/Punch_Jab/node = SubResource("AnimationNodeAnimation_punch_jab")
+states/Punch_Jab/position = Vector2(-400, 180)
+states/Punch_Cross/node = SubResource("AnimationNodeAnimation_punch_cross")
+states/Punch_Cross/position = Vector2(-400, 260)
+states/Sword_Idle/node = SubResource("AnimationNodeAnimation_sword_idle")
+states/Sword_Idle/position = Vector2(-400, -57)
+states/Sword_Attack/node = SubResource("AnimationNodeAnimation_sword_attack")
+states/Sword_Attack/position = Vector2(-400, -137)
+states/Pistol_Idle/node = SubResource("AnimationNodeAnimation_pistol_idle")
+states/Pistol_Idle/position = Vector2(700, -57)
+states/Pistol_Aim_Neutral/node = SubResource("AnimationNodeAnimation_pistol_aim_neutral")
+states/Pistol_Aim_Neutral/position = Vector2(700, -137)
+states/Pistol_Shoot/node = SubResource("AnimationNodeAnimation_pistol_shoot")
+states/Pistol_Shoot/position = Vector2(700, -217)
+states/Pistol_Reload/node = SubResource("AnimationNodeAnimation_pistol_reload")
+states/Pistol_Reload/position = Vector2(850, -137)
+states/Spell_Simple_Enter/node = SubResource("AnimationNodeAnimation_spell_simple_enter")
+states/Spell_Simple_Enter/position = Vector2(700, 100)
+states/Spell_Simple_Idle/node = SubResource("AnimationNodeAnimation_spell_simple_idle")
+states/Spell_Simple_Idle/position = Vector2(700, 180)
+states/Spell_Simple_Shoot/node = SubResource("AnimationNodeAnimation_spell_simple_shoot")
+states/Spell_Simple_Shoot/position = Vector2(700, 260)
+states/Spell_Simple_Exit/node = SubResource("AnimationNodeAnimation_spell_simple_exit")
+states/Spell_Simple_Exit/position = Vector2(700, 340)
+states/Dance/node = SubResource("AnimationNodeAnimation_dance")
+states/Dance/position = Vector2(-200, -137)
+states/Push/node = SubResource("AnimationNodeAnimation_push")
+states/Push/position = Vector2(-200, -57)
+states/Swim_Idle/node = SubResource("AnimationNodeAnimation_swim_idle")
+states/Swim_Idle/position = Vector2(94, 420)
+states/Swim_Fwd/node = SubResource("AnimationNodeAnimation_swim_fwd")
+states/Swim_Fwd/position = Vector2(250, 420)
+states/PickUp_Table/node = SubResource("AnimationNodeAnimation_pickup_table")
+states/PickUp_Table/position = Vector2(450, 420)
+states/Fixing_Kneeling/node = SubResource("AnimationNodeAnimation_fixing_kneeling")
+states/Fixing_Kneeling/position = Vector2(600, 420)
+states/Sitting_Enter/node = SubResource("AnimationNodeAnimation_sitting_enter")
+states/Sitting_Enter/position = Vector2(-200, 500)
+states/Sitting_Idle/node = SubResource("AnimationNodeAnimation_sitting_idle")
+states/Sitting_Idle/position = Vector2(-50, 500)
+states/Sitting_Exit/node = SubResource("AnimationNodeAnimation_sitting_exit")
+states/Sitting_Exit/position = Vector2(100, 500)
+states/Idle_Talking/node = SubResource("AnimationNodeAnimation_idle_talking")
+states/Idle_Talking/position = Vector2(-50, -137)
+states/Walk_Formal/node = SubResource("AnimationNodeAnimation_walk_formal")
+states/Walk_Formal/position = Vector2(250, -137)
+states/Driving/node = SubResource("AnimationNodeAnimation_driving")
+states/Driving/position = Vector2(450, 500)
+states/Idle_Torch/node = SubResource("AnimationNodeAnimation_idle_torch")
+states/Idle_Torch/position = Vector2(-50, -217)
 states/Start/position = Vector2(-50, 100)
 states/Walk/node = SubResource("AnimationNodeAnimation_walk")
 states/Walk/position = Vector2(250, 100)
-transitions = ["Start", "Idle", SubResource("trans_start_idle"), "Idle", "Walk", SubResource("trans_idle_walk"), "Walk", "Idle", SubResource("trans_walk_idle"), "Walk", "Sprint", SubResource("trans_walk_sprint"), "Sprint", "Walk", SubResource("trans_sprint_walk"), "Sprint", "Idle", SubResource("trans_sprint_idle"), "Idle", "Crouch_Idle", SubResource("trans_idle_crouch_idle"), "Crouch_Idle", "Idle", SubResource("trans_crouch_idle_idle"), "Crouch_Idle", "Crouch_Fwd", SubResource("trans_crouch_idle_crouch_fwd"), "Crouch_Fwd", "Crouch_Idle", SubResource("trans_crouch_fwd_crouch_idle"), "Walk", "Jump", SubResource("trans_walk_jump"), "Sprint", "Jump", SubResource("trans_sprint_jump"), "Jump", "Jump_Land", SubResource("trans_jump_jump_land"), "Jump_Land", "Idle", SubResource("trans_jump_land_idle"), "Jump_Land", "Walk", SubResource("trans_jump_land_walk"), "Jump_Land", "Sprint", SubResource("trans_jump_land_sprint"), "Idle", "Jump_Start", SubResource("AnimationNodeStateMachineTransition_tugtx"), "Walk", "Jump_Start", SubResource("trans_walk_jump_start"), "Sprint", "Jump_Start", SubResource("trans_sprint_jump_start"), "Jump_Start", "Idle", SubResource("AnimationNodeStateMachineTransition_wqoky"), "Jump_Start", "Jump", SubResource("AnimationNodeStateMachineTransition_ubrfs"), "Jump_Start", "Jump_Land", SubResource("trans_jump_start_jump_land"), "Idle", "Roll", SubResource("trans_idle_roll"), "Walk", "Roll", SubResource("trans_walk_roll"), "Sprint", "Roll", SubResource("trans_sprint_roll"), "Roll", "Idle", SubResource("trans_roll_idle"), "Roll", "Walk", SubResource("trans_roll_walk"), "Roll", "Sprint", SubResource("trans_roll_sprint"), "Crouch_Idle", "Jump_Start", SubResource("trans_crouch_idle_jump_start"), "Crouch_Fwd", "Jump_Start", SubResource("trans_crouch_fwd_jump_start")]
+transitions = ["Start", "Idle", SubResource("trans_start_idle"), "Idle", "Walk", SubResource("trans_idle_walk"), "Walk", "Idle", SubResource("trans_walk_idle"), "Walk", "Sprint", SubResource("trans_walk_sprint"), "Sprint", "Walk", SubResource("trans_sprint_walk"), "Sprint", "Idle", SubResource("trans_sprint_idle"), "Idle", "Crouch_Idle", SubResource("trans_idle_crouch_idle"), "Crouch_Idle", "Idle", SubResource("trans_crouch_idle_idle"), "Crouch_Idle", "Crouch_Fwd", SubResource("trans_crouch_idle_crouch_fwd"), "Crouch_Fwd", "Crouch_Idle", SubResource("trans_crouch_fwd_crouch_idle"), "Walk", "Jump", SubResource("trans_walk_jump"), "Sprint", "Jump", SubResource("trans_sprint_jump"), "Jump", "Jump_Land", SubResource("trans_jump_jump_land"), "Jump_Land", "Idle", SubResource("trans_jump_land_idle"), "Jump_Land", "Walk", SubResource("trans_jump_land_walk"), "Jump_Land", "Sprint", SubResource("trans_jump_land_sprint"), "Idle", "Jump_Start", SubResource("AnimationNodeStateMachineTransition_tugtx"), "Walk", "Jump_Start", SubResource("trans_walk_jump_start"), "Sprint", "Jump_Start", SubResource("trans_sprint_jump_start"), "Jump_Start", "Idle", SubResource("AnimationNodeStateMachineTransition_wqoky"), "Jump_Start", "Jump", SubResource("AnimationNodeStateMachineTransition_ubrfs"), "Jump_Start", "Jump_Land", SubResource("trans_jump_start_jump_land"), "Idle", "Roll", SubResource("trans_idle_roll"), "Walk", "Roll", SubResource("trans_walk_roll"), "Sprint", "Roll", SubResource("trans_sprint_roll"), "Roll", "Idle", SubResource("trans_roll_idle"), "Roll", "Walk", SubResource("trans_roll_walk"), "Roll", "Sprint", SubResource("trans_roll_sprint"), "Crouch_Idle", "Jump_Start", SubResource("trans_crouch_idle_jump_start"), "Crouch_Fwd", "Jump_Start", SubResource("trans_crouch_fwd_jump_start"), "Idle", "Interact", SubResource("trans_idle_interact"), "Interact", "Idle", SubResource("trans_interact_idle"), "Idle", "Hit_Chest", SubResource("trans_idle_hit_chest"), "Idle", "Hit_Head", SubResource("trans_idle_hit_head"), "Hit_Chest", "Idle", SubResource("trans_hit_chest_idle"), "Hit_Head", "Idle", SubResource("trans_hit_head_idle"), "Idle", "Death01", SubResource("trans_idle_death01"), "Idle", "Punch_Enter", SubResource("trans_idle_punch_enter"), "Punch_Enter", "Idle", SubResource("trans_punch_enter_idle"), "Punch_Enter", "Punch_Jab", SubResource("trans_punch_enter_punch_jab"), "Punch_Jab", "Idle", SubResource("trans_punch_jab_idle"), "Punch_Jab", "Punch_Cross", SubResource("trans_punch_jab_punch_cross"), "Punch_Cross", "Idle", SubResource("trans_punch_cross_idle"), "Idle", "Sword_Idle", SubResource("trans_idle_sword_idle"), "Sword_Idle", "Idle", SubResource("trans_sword_idle_idle"), "Sword_Idle", "Sword_Attack", SubResource("trans_sword_idle_sword_attack"), "Sword_Attack", "Sword_Idle", SubResource("trans_sword_attack_sword_idle"), "Idle", "Pistol_Idle", SubResource("trans_idle_pistol_idle"), "Pistol_Idle", "Idle", SubResource("trans_pistol_idle_idle"), "Pistol_Idle", "Pistol_Aim_Neutral", SubResource("trans_pistol_idle_pistol_aim_neutral"), "Pistol_Aim_Neutral", "Pistol_Idle", SubResource("trans_pistol_aim_neutral_pistol_idle"), "Pistol_Aim_Neutral", "Pistol_Shoot", SubResource("trans_pistol_aim_neutral_pistol_shoot"), "Pistol_Shoot", "Pistol_Aim_Neutral", SubResource("trans_pistol_shoot_pistol_aim_neutral"), "Pistol_Idle", "Pistol_Reload", SubResource("trans_pistol_idle_pistol_reload"), "Pistol_Reload", "Pistol_Idle", SubResource("trans_pistol_reload_pistol_idle"), "Idle", "Spell_Simple_Enter", SubResource("trans_idle_spell_simple_enter"), "Spell_Simple_Enter", "Spell_Simple_Idle", SubResource("trans_spell_simple_enter_spell_simple_idle"), "Spell_Simple_Idle", "Spell_Simple_Shoot", SubResource("trans_spell_simple_idle_spell_simple_shoot"), "Spell_Simple_Shoot", "Spell_Simple_Idle", SubResource("trans_spell_simple_shoot_spell_simple_idle"), "Spell_Simple_Idle", "Spell_Simple_Exit", SubResource("trans_spell_simple_idle_spell_simple_exit"), "Spell_Simple_Exit", "Idle", SubResource("trans_spell_simple_exit_idle"), "Idle", "Dance", SubResource("trans_idle_dance"), "Dance", "Idle", SubResource("trans_dance_idle"), "Idle", "Sitting_Enter", SubResource("trans_idle_sitting_enter"), "Sitting_Enter", "Sitting_Idle", SubResource("trans_sitting_enter_sitting_idle"), "Sitting_Idle", "Sitting_Exit", SubResource("trans_sitting_idle_sitting_exit"), "Sitting_Exit", "Idle", SubResource("trans_sitting_exit_idle"), "Idle", "PickUp_Table", SubResource("trans_idle_pickup_table"), "PickUp_Table", "Idle", SubResource("trans_pickup_table_idle"), "Idle", "Fixing_Kneeling", SubResource("trans_idle_fixing_kneeling"), "Fixing_Kneeling", "Idle", SubResource("trans_fixing_kneeling_idle"), "Idle", "Push", SubResource("trans_idle_push"), "Push", "Idle", SubResource("trans_push_idle"), "Idle", "Swim_Idle", SubResource("trans_idle_swim_idle"), "Swim_Idle", "Swim_Fwd", SubResource("trans_swim_idle_swim_fwd"), "Swim_Fwd", "Swim_Idle", SubResource("trans_swim_fwd_swim_idle"), "Swim_Idle", "Idle", SubResource("trans_swim_idle_idle")]
 graph_offset = Vector2(-465, -210)
 
 [node name="CharacterModel" instance=ExtResource("1_model")]
