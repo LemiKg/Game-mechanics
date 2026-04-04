@@ -105,6 +105,24 @@ func _enter_tree() -> void:
 		preload("res://addons/player_control_core/core/gait_data.gd"),
 		preload("res://addons/player_control_core/icons/settings.svg")
 	)
+	add_custom_type(
+		"StaminaComponent",
+		"Node",
+		preload("res://addons/player_control_core/core/stamina_component.gd"),
+		preload("res://addons/player_control_core/icons/controller.svg")
+	)
+	add_custom_type(
+		"DodgeState",
+		"Node",
+		preload("res://addons/player_control_core/core/state_machine/dodge_state.gd"),
+		preload("res://addons/player_control_core/icons/state.svg")
+	)
+	add_custom_type(
+		"RagdollState",
+		"Node",
+		preload("res://addons/player_control_core/core/state_machine/ragdoll_state.gd"),
+		preload("res://addons/player_control_core/icons/state.svg")
+	)
 
 
 func _exit_tree() -> void:
@@ -129,3 +147,6 @@ func _exit_tree() -> void:
 	remove_custom_type("InputActions3D")
 	remove_custom_type("MantleSettings3D")
 	remove_custom_type("GaitData")
+	remove_custom_type("StaminaComponent")
+	remove_custom_type("DodgeState")
+	remove_custom_type("RagdollState")
