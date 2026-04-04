@@ -123,8 +123,8 @@ func set_lod_distances(distances: Array[float]) -> void:
 		mesh_instance.visibility_range_begin_margin = 10.0
 		mesh_instance.visibility_range_end_margin = 10.0
 		
-		# Disable fade mode - it can cause visibility issues
-		mesh_instance.visibility_range_fade_mode = GeometryInstance3D.VISIBILITY_RANGE_FADE_DISABLED
+		# Use FADE_SELF for smooth LOD transitions instead of hard pops
+		mesh_instance.visibility_range_fade_mode = GeometryInstance3D.VISIBILITY_RANGE_FADE_SELF
 
 
 ## Enables HeightMapShape3D collision for this chunk
