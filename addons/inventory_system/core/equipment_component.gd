@@ -22,6 +22,10 @@ func equip(item: Resource, slot_name: String) -> bool:
 	if not item:
 		return unequip(slot_name)
 
+	if not equipment_slots.has(slot_name):
+		push_warning("EquipmentComponent: Slot '%s' does not exist. Defined slots: %s" % [slot_name, defined_slots])
+		return false
+
 	if item.slot_type_name != slot_name:
 		return false
 
@@ -32,12 +36,13 @@ func equip(item: Resource, slot_name: String) -> bool:
 
 
 func unequip(slot_name: String) -> bool:
-	if equipment_slots.has(slot_name):
-		equipment_slots[slot_name] = null
-		equipment_changed.emit(slot_name, null)
-		stats_changed.emit()
-		return true
-	return false
+	if not equipment_slots.has(slot_name):
+		push_warning("EquipmentComponent: Cannot unequip — slot '%s' does not exist" % slot_name)
+		return false
+	equipment_slots[slot_name] = null
+	equipment_changed.emit(slot_name, null)
+	stats_changed.emit()
+	return true
 
 
 func get_item_in_slot(slot_name: String) -> Resource:

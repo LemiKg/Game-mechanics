@@ -56,6 +56,9 @@ var _time: float = 0.0
 
 
 func _ready() -> void:
+	if not item:
+		push_warning("WorldItem: No item assigned to '%s'" % name)
+
 	_base_y = position.y
 	_time = randf() * TAU  # Random start phase so items don't bob in sync
 
