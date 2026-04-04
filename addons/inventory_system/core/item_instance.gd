@@ -16,9 +16,6 @@ var durability: float = -1.0
 ## Maximum durability (copied from definition on creation).
 var max_durability: float = -1.0
 
-## Random stat modifiers (populated by loot generation in Phase 2).
-var affixes: Array[Resource] = []
-
 ## Upgrade level (+0, +1, +2, etc.).
 var upgrade_level: int = 0
 
