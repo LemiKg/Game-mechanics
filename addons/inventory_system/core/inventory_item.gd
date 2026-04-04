@@ -65,8 +65,8 @@ func get_categories() -> Array[ItemCategory]:
 ## @virtual Returns formatted tooltip text (BBCode) for UI display.
 ## Override in subclasses to add type-specific information.
 func get_tooltip_text() -> String:
-	var rarity_color := RARITY_COLORS.get(rarity, Color.WHITE)
-	var color_hex := rarity_color.to_html(false)
+	var rarity_color: Color = RARITY_COLORS.get(rarity, Color.WHITE)
+	var color_hex: String = rarity_color.to_html(false)
 	var text = "[b][color=#%s]%s[/color][/b]" % [color_hex, name]
 	if rarity != Rarity.COMMON:
 		text += "\n[color=#%s]%s[/color]" % [color_hex, RARITY_NAMES.get(rarity, "")]

@@ -1,5 +1,4 @@
 extends Node
-class_name ItemDatabase
 ## Autoload singleton that maps item IDs to InventoryItem Resources.
 ##
 ## Scans the items directory on startup and registers all .tres files.
