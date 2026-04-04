@@ -16,10 +16,12 @@ extends Resource
 @export var enable_stride_warping: bool = true
 
 ## The Walk animation's intended speed (m/s). Stride scales relative to this.
-@export_range(0.1, 10.0, 0.1) var base_walk_speed: float = 2.0
+## Must match your PlayerMotor3D walk speed for correct results.
+@export_range(0.1, 10.0, 0.1) var base_walk_speed: float = 5.0
 
 ## The Sprint animation's intended speed (m/s). Used when speed exceeds walk threshold.
-@export_range(0.1, 20.0, 0.1) var base_sprint_speed: float = 5.0
+## Must match your PlayerMotor3D sprint speed for correct results.
+@export_range(0.1, 20.0, 0.1) var base_sprint_speed: float = 8.0
 
 ## Maximum stride scale multiplier (1.2 = 20% stretch, industry standard).
 @export_range(1.0, 1.5, 0.05) var max_speed_scale: float = 1.2

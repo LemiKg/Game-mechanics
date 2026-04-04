@@ -5,8 +5,8 @@
 [resource]
 script = ExtResource("1")
 enable_stride_warping = true
-base_walk_speed = 2.0
-base_sprint_speed = 5.0
+base_walk_speed = 5.0
+base_sprint_speed = 8.0
 max_speed_scale = 1.2
 min_speed_scale = 0.8
 min_speed_for_stride = 0.5
