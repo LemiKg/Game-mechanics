@@ -157,7 +157,7 @@ func _try_pickup() -> void:
 func _play_pickup_effect() -> void:
 	# Quick scale-down animation before freeing
 	var tween := create_tween()
-	tween.tween_property(self, "scale", Vector3.ZERO, 0.15).set_ease(Tween.EASE_IN)
+	tween.tween_property(self, "scale", Vector3(0.01, 0.01, 0.01), 0.15).set_ease(Tween.EASE_IN)
 	tween.tween_callback(queue_free)
 	# Prevent further interaction during animation
 	_player_in_range = false
