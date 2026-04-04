@@ -4,24 +4,41 @@ extends Resource
 ## Tuning values for player movement physics.
 ##
 ## Create a .tres file to customize movement feel per project or character.
-## Used by both FPS and third-person controllers.
+## Uses GaitData resources for per-gait tuning (walk, run, sprint).
 
 
-@export_group("Speed")
-## Walking speed in units per second.
-@export_range(0.0, 50.0, 0.1) var walk_speed: float = 5.0
-## Sprinting speed in units per second.
-@export_range(0.0, 50.0, 0.1) var sprint_speed: float = 8.0
-## Crouching speed in units per second.
-@export_range(0.0, 50.0, 0.1) var crouch_speed: float = 2.5
+# =============================================================================
+# GAIT DATA
+# =============================================================================
 
-@export_group("Acceleration")
-## How quickly the player reaches target speed (units/second²).
-@export_range(0.0, 100.0, 0.5) var acceleration: float = 25.0
-## How quickly the player stops when no input (units/second²).
-@export_range(0.0, 100.0, 0.5) var deceleration: float = 30.0
+@export_group("Gait: Walk")
+## Movement tuning for walking gait.
+@export var gait_walk: GaitData
+
+@export_group("Gait: Run")
+## Movement tuning for running gait.
+@export var gait_run: GaitData
+
+@export_group("Gait: Sprint")
+## Movement tuning for sprinting gait.
+@export var gait_sprint: GaitData
+
+
+# =============================================================================
+# STANCE
+# =============================================================================
+
+@export_group("Stance")
+## Speed multiplier when crouching (applied on top of gait speed).
+@export_range(0.1, 1.0, 0.05) var stance_crouch_speed_multiplier: float = 0.5
+
 ## Movement control multiplier while airborne (0 = no air control, 1 = full).
 @export_range(0.0, 1.0, 0.05) var air_control: float = 0.3
+
+
+# =============================================================================
+# JUMP & GRAVITY
+# =============================================================================
 
 @export_group("Jump & Gravity")
 ## Upward velocity applied when jumping.
@@ -29,11 +46,40 @@ extends Resource
 ## Gravity strength (positive = downward).
 @export_range(0.0, 50.0, 0.1) var gravity: float = 9.8
 
+
+# =============================================================================
+# JUMP FEEL
+# =============================================================================
+
 @export_group("Jump Feel")
+## Velocity.y multiplied by this on early jump release (lower = shorter hop).
+@export_range(0.0, 1.0, 0.05) var jump_cut_multiplier: float = 0.5
+## Gravity multiplier when falling (higher = snappier landing).
+@export_range(1.0, 5.0, 0.1) var fall_gravity_multiplier: float = 1.8
+## Gravity multiplier when ascending with jump released (higher = faster peak).
+@export_range(1.0, 5.0, 0.1) var jump_cut_gravity_multiplier: float = 2.5
 ## Grace period after leaving platform where jump still works (coyote time).
 @export_range(0.0, 0.3, 0.01) var coyote_time: float = 0.1
 ## How long a jump input is buffered before landing.
 @export_range(0.0, 0.3, 0.01) var jump_buffer_time: float = 0.1
+
+
+# =============================================================================
+# SLOPES
+# =============================================================================
+
+@export_group("Slopes")
+## Uphill speed penalty factor (0.3 = 30% slower at max slope).
+@export_range(0.0, 1.0, 0.05) var slope_speed_reduction: float = 0.3
+## Downhill speed bonus factor (0.15 = 15% faster at max slope).
+@export_range(0.0, 1.0, 0.05) var downhill_speed_boost: float = 0.15
+## Maximum walkable slope angle in degrees. Above this, character slides.
+@export_range(15.0, 60.0, 1.0) var max_walkable_slope: float = 45.0
+
+
+# =============================================================================
+# CROUCH
+# =============================================================================
 
 @export_group("Crouch")
 ## Height of collision shape when crouching.
@@ -41,19 +87,32 @@ extends Resource
 ## Height of collision shape when standing.
 @export_range(0.0, 3.0, 0.1) var stand_height: float = 1.8
 
+
+# =============================================================================
+# STATE TIMING
+# =============================================================================
+
 @export_group("State Timing")
 ## Grace period after landing before movement animations resume.
 @export_range(0.0, 1.0, 0.05) var landing_grace_time: float = 0.5
-## Minimum time in air before landing can be detected (prevents false positives).
+## Minimum time in air before landing can be detected.
 @export_range(0.0, 0.5, 0.01) var min_airtime: float = 0.1
 
 
+# =============================================================================
+# RIGIDBODY
+# =============================================================================
+
 @export_group("RigidBody Settings")
-## Force multiplier for RigidBody movement (higher = snappier).
+## Force multiplier for RigidBody movement.
 @export_range(1.0, 200.0, 1.0) var rigid_body_force_multiplier: float = 50.0
 ## Raycast distance for RigidBody ground detection.
 @export_range(0.05, 0.5, 0.01) var rigid_body_ground_raycast_distance: float = 0.1
 
+
+# =============================================================================
+# ROTATE IN PLACE
+# =============================================================================
 
 @export_group("Rotate in Place")
 ## Enable rotate-in-place animations when camera exceeds angle threshold.
@@ -68,35 +127,31 @@ extends Resource
 @export var turn_right_animation: StringName = &"turn_right"
 
 
-@export_group("Stance Overrides")
-## Optional settings override for crouching (null = use base values).
-@export var crouch_settings_override: MovementSettings3D
-## Optional settings override for sprinting (null = use base values).
-@export var sprint_settings_override: MovementSettings3D
+# =============================================================================
+# HELPERS
+# =============================================================================
+
+## Get GaitData for a given gait enum value (from PlayerMotor3D.Gait).
+## Returns walk data as fallback if the requested gait data is null.
+func get_gait_data(gait: int) -> GaitData:
+	match gait:
+		0: return gait_walk if gait_walk else _default_walk()
+		1: return gait_run if gait_run else _default_run()
+		2: return gait_sprint if gait_sprint else _default_sprint()
+	return gait_walk if gait_walk else _default_walk()
 
 
-## Get effective walk speed for current stance.
-func get_walk_speed_for_stance(is_crouching: bool, is_sprinting: bool) -> float:
-	if is_crouching and crouch_settings_override:
-		return crouch_settings_override.walk_speed
-	elif is_sprinting and sprint_settings_override:
-		return sprint_settings_override.walk_speed
-	return walk_speed
+static func _default_walk() -> GaitData:
+	var d := GaitData.new()
+	d.speed = 2.5; d.acceleration = 20.0; d.deceleration = 25.0; d.rotation_rate = 360.0
+	return d
 
+static func _default_run() -> GaitData:
+	var d := GaitData.new()
+	d.speed = 5.0; d.acceleration = 25.0; d.deceleration = 30.0; d.rotation_rate = 300.0
+	return d
 
-## Get effective acceleration for current stance.
-func get_acceleration_for_stance(is_crouching: bool, is_sprinting: bool) -> float:
-	if is_crouching and crouch_settings_override:
-		return crouch_settings_override.acceleration
-	elif is_sprinting and sprint_settings_override:
-		return sprint_settings_override.acceleration
-	return acceleration
-
-
-## Get effective deceleration for current stance.
-func get_deceleration_for_stance(is_crouching: bool, is_sprinting: bool) -> float:
-	if is_crouching and crouch_settings_override:
-		return crouch_settings_override.deceleration
-	elif is_sprinting and sprint_settings_override:
-		return sprint_settings_override.deceleration
-	return deceleration
+static func _default_sprint() -> GaitData:
+	var d := GaitData.new()
+	d.speed = 8.0; d.acceleration = 15.0; d.deceleration = 35.0; d.rotation_rate = 180.0
+	return d
