@@ -1,4 +1,4 @@
-[gd_scene load_steps=121 format=3 uid="uid://c0wo2ldbnefie"]
+[gd_scene load_steps=120 format=3 uid="uid://c0wo2ldbnefie"]
 
 [ext_resource type="PackedScene" uid="uid://d3rpqr655oidf" path="res://assets/characters/quaternius/AnimationLibrary_Godot_Standard.glb" id="1_model"]
 
