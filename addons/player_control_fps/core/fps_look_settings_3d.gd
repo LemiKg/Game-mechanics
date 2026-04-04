@@ -17,3 +17,11 @@ extends Resource
 @export_range(-90.0, 0.0, 1.0) var min_pitch_degrees: float = -89.0
 ## Maximum pitch angle in degrees (looking down). Usually positive.
 @export_range(0.0, 90.0, 1.0) var max_pitch_degrees: float = 89.0
+
+@export_group("FOV")
+## Base field of view.
+@export_range(50.0, 120.0, 1.0) var base_fov: float = 75.0
+## FOV when sprinting.
+@export_range(50.0, 120.0, 1.0) var sprint_fov: float = 85.0
+## How fast FOV transitions.
+@export_range(1.0, 30.0, 1.0) var fov_transition_speed: float = 5.0

@@ -164,6 +164,13 @@ func _unhandled_input(event: InputEvent) -> void:
 		toggle_perspective()
 		get_viewport().set_input_as_handled()
 
+	# Handle shoulder switch (third-person only)
+	if perspective == Perspective.THIRD_PERSON:
+		if event.is_action_pressed(&"shoulder_switch"):
+			if orbit_camera_controller and orbit_camera_controller.has_method("cycle_shoulder"):
+				orbit_camera_controller.cycle_shoulder()
+				get_viewport().set_input_as_handled()
+
 
 func _physics_process(delta: float) -> void:
 	super._physics_process(delta)
@@ -176,6 +183,36 @@ func _physics_process(delta: float) -> void:
 		# Handle body tilt in third-person
 		if enable_body_tilt and character_mesh and motor:
 			_update_body_tilt(delta)
+
+	# Update speed-based FOV for both perspectives
+	_update_speed_fov(delta)
+
+
+func _update_speed_fov(delta: float) -> void:
+	if not motor:
+		return
+
+	# Calculate speed ratio (0 = idle, 1 = at sprint speed)
+	var sprint_speed := 8.0
+	if movement_settings:
+		var sprint_data := movement_settings.get_gait_data(PlayerMotor3D.Gait.SPRINT)
+		sprint_speed = sprint_data.speed
+
+	var horizontal_speed := Vector2(motor.actual_velocity.x, motor.actual_velocity.z).length()
+	var speed_ratio := clampf(horizontal_speed / maxf(sprint_speed, 1.0), 0.0, 1.0)
+
+	if perspective == Perspective.FIRST_PERSON:
+		# FPS FOV
+		if fps_camera and fps_look_controller and fps_look_controller.look_settings:
+			var settings := fps_look_controller.look_settings
+			if "base_fov" in settings and "sprint_fov" in settings:
+				var target_fov := lerpf(settings.base_fov, settings.sprint_fov, speed_ratio)
+				var fov_speed: float = settings.fov_transition_speed if "fov_transition_speed" in settings else 5.0
+				fps_camera.fov = lerpf(fps_camera.fov, target_fov, fov_speed * delta)
+	else:
+		# Third-person FOV
+		if orbit_camera_controller and orbit_camera_controller.has_method("update_speed_fov"):
+			orbit_camera_controller.update_speed_fov(speed_ratio, delta)
 
 
 ## Toggle between first-person and third-person perspectives.
