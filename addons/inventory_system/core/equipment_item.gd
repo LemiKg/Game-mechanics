@@ -11,6 +11,9 @@ class_name EquipmentItem
 ## Flexible stats dictionary for custom attributes
 @export var stats: Dictionary = {}
 
+## Maximum durability for this equipment. 0 = no durability tracking.
+@export_range(0, 1000, 1) var max_durability: int = 0
+
 func is_equippable() -> bool:
 	return slot_type_name != ""
 
