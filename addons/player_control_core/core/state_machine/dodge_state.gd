@@ -55,7 +55,7 @@ func enter() -> void:
 		transition_to(&"grounded")
 		return
 
-	# Determine dodge direction from input, fallback to body forward
+	# Determine dodge direction from input — requires directional input
 	var dodge_dir := Vector3.ZERO
 	if input_router:
 		var input := input_router.movement_intent
@@ -63,10 +63,17 @@ func enter() -> void:
 			dodge_dir = (motor.movement_basis.x * input.x + motor.movement_basis.z * input.y).normalized()
 
 	if dodge_dir.length() < 0.1:
-		dodge_dir = -controller.body.global_transform.basis.z  # Body forward
+		# No direction held — cancel dodge, return to grounded
+		if motor:
+			motor.enabled = true
+		transition_to(&"grounded")
+		return
 
 	_dodge_direction = dodge_dir.normalized()
 	_dodge_direction.y = 0.0
+
+	# Rotate body to face dodge direction
+	controller.body.rotation.y = atan2(_dodge_direction.x, _dodge_direction.z)
 
 	# Disable motor — we control movement directly
 	motor.enabled = false
@@ -106,12 +113,16 @@ func physics_update(delta: float) -> void:
 	# Update invincibility frames
 	_update_iframes(progress)
 
-	# Apply dodge movement
+	# Apply dodge movement with easeout in final 30%
 	if controller.body.has_method("move_and_slide"):
-		# Maintain dodge velocity, apply gravity
 		var gravity := movement_settings.gravity if movement_settings else 9.8
-		controller.body.velocity.x = _dodge_direction.x * dodge_speed
-		controller.body.velocity.z = _dodge_direction.z * dodge_speed
+		var speed_factor := 1.0
+		if progress > 0.7:
+			# Ease out speed in the last 30% of the dodge
+			speed_factor = (1.0 - progress) / 0.3
+		var current_dodge_speed := dodge_speed * speed_factor
+		controller.body.velocity.x = _dodge_direction.x * current_dodge_speed
+		controller.body.velocity.z = _dodge_direction.z * current_dodge_speed
 		controller.body.velocity.y -= gravity * delta
 		controller.body.move_and_slide()
 
@@ -128,6 +139,16 @@ func _update_iframes(progress: float) -> void:
 
 
 func _finish_dodge() -> void:
+	# Request the next movement animation immediately to prevent T-pose flash.
+	# Determine what animation should play based on input state.
+	if input_router and input_router.movement_intent.length() > 0.1:
+		if input_router.sprint_held:
+			request_animation(&"run", 0.15)
+		else:
+			request_animation(&"walk", 0.15)
+	else:
+		request_animation(&"idle", 0.15)
+
 	# Determine next state based on ground check
 	if motor and motor.is_grounded:
 		transition_to(&"grounded")
