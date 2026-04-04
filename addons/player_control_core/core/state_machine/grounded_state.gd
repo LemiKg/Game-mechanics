@@ -31,6 +31,10 @@ var _logger := DebugLogger.new("[GroundedState]")
 ## The capsule collision shape to resize when crouching.
 @export var collision_shape: CollisionShape3D
 
+@export_group("Stamina")
+## Optional stamina component for sprint drain and dodge cost.
+@export var stamina_component: Node
+
 
 func enter() -> void:
 	_logger.debug("ENTER")
@@ -72,12 +76,26 @@ func physics_update(delta: float) -> void:
 	# Update gait and stance from input
 	_update_movement_modifiers()
 
+	# Drain stamina while sprinting
+	if motor.gait == PlayerMotor3D.Gait.SPRINT and motor.is_moving:
+		if stamina_component and stamina_component.has_method("drain"):
+			if not stamina_component.drain(stamina_component.sprint_drain, delta):
+				motor.gait = PlayerMotor3D.Gait.RUN  # Stamina depleted, force run
+
 	# Rotate-in-place
 	if movement_settings and movement_settings.enable_rotate_in_place:
 		if not motor.is_moving:
 			_check_rotate_in_place(delta)
 		else:
 			_is_rotating_in_place = false
+
+	# Handle dodge input
+	if input_router.consume_dodge():
+		if _can_dodge():
+			if stamina_component and stamina_component.has_method("try_consume"):
+				stamina_component.try_consume(stamina_component.dodge_cost)
+			transition_to(&"dodge")
+			return
 
 	# Handle jump
 	var jump_consumed := input_router.consume_jump() or motor.consume_direct_jump()
@@ -117,7 +135,12 @@ func _update_movement_modifiers() -> void:
 			_wants_to_stand = true
 
 	# Gait: sprint takes priority, cannot sprint while crouching
-	if input_router.sprint_held and motor.stance != PlayerMotor3D.Stance.CROUCHING:
+	# Sprint requires stamina if stamina component is present
+	var can_sprint := input_router.sprint_held and motor.stance != PlayerMotor3D.Stance.CROUCHING
+	if can_sprint and stamina_component and stamina_component.has_method("can_sprint"):
+		can_sprint = stamina_component.can_sprint()
+
+	if can_sprint:
 		motor.gait = PlayerMotor3D.Gait.SPRINT
 	else:
 		motor.gait = PlayerMotor3D.Gait.RUN
@@ -178,6 +201,14 @@ func _get_camera_yaw() -> float:
 	if controller.has_method("get_camera_yaw"):
 		return controller.get_camera_yaw()
 	return 0.0
+
+
+func _can_dodge() -> bool:
+	if not state_machine.has_state(&"dodge"):
+		return false
+	if stamina_component and stamina_component.has_method("can_dodge"):
+		return stamina_component.can_dodge()
+	return true  # Allow dodge if no stamina component
 
 
 func _update_crouch_collision(delta: float) -> void:
