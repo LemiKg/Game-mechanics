@@ -29,6 +29,7 @@ class_name QuickInventoryUI
 var selected_index: int = 0 # Default to first slot
 
 func _ready():
+	_use_full_refresh = false
 	super._ready()
 
 func refresh():
@@ -56,6 +57,15 @@ func refresh():
 			slot_ui.add_theme_stylebox_override("panel", style)
 			
 	_update_selection()
+
+func on_slot_updated(inventory: Inventory, index: int) -> void:
+	if inventory != inventory_component.hotbar_inventory:
+		return
+	if index < 0 or index >= container.get_child_count():
+		return
+	var slot_ui: SlotUI = container.get_child(index) as SlotUI
+	if slot_ui:
+		slot_ui.set_slot(inventory, index, inventory.slots[index])
 
 func _input(event):
 	if not visible:

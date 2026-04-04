@@ -19,6 +19,7 @@ class_name InventoryUI
 var _equipment_slot_cache: Dictionary = {} # slot_name -> EquipmentSlotUI
 
 func _ready():
+	_use_full_refresh = false
 	super._ready()
 	if equipment_component:
 		set_equipment(equipment_component)
@@ -135,6 +136,23 @@ func _connect_equipment_slot_signals(slot_ui: EquipmentSlotUI):
 			slot_ui.equip_requested.connect(interaction_handler.handle_equip_request)
 	if tooltip_controller:
 		tooltip_controller.connect_slot(slot_ui)
+
+func on_slot_updated(inventory: Inventory, index: int) -> void:
+	var container: Container = null
+	if inventory == inventory_component.main_inventory:
+		container = grid_container
+	elif inventory == inventory_component.hotbar_inventory:
+		container = hotbar_container
+
+	if not container:
+		return
+
+	if index < 0 or index >= container.get_child_count():
+		return
+
+	var slot_ui: SlotUI = container.get_child(index) as SlotUI
+	if slot_ui:
+		slot_ui.set_slot(inventory, index, inventory.slots[index])
 
 func refresh_equipment_slot(slot_name: String, item: InventoryItem) -> void:
 	# Use cached slot for O(1) lookup
