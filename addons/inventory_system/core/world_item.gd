@@ -74,6 +74,23 @@ func _ready() -> void:
 		glow_color = InventoryItem.RARITY_COLORS.get(item.rarity, Color.WHITE)
 
 
+func _physics_process(_delta: float) -> void:
+	# Focus competition: all in-range items compete, closest wins.
+	# _physics_process runs for ALL nodes before any _process runs,
+	# so by the time _process checks _focused_item, competition is settled.
+	var frame := Engine.get_physics_frames()
+	if frame != _focus_frame:
+		_focus_frame = frame
+		_focused_item = null
+		_focused_distance = INF
+
+	if _player_in_range and not auto_pickup and _player:
+		var dist := global_position.distance_to(_player.global_position)
+		if dist < _focused_distance:
+			_focused_distance = dist
+			_focused_item = self
+
+
 func _process(delta: float) -> void:
 	_time += delta
 
@@ -82,23 +99,8 @@ func _process(delta: float) -> void:
 		_visual.rotation.y += deg_to_rad(spin_speed) * delta
 		_visual.position.y = sin(_time * bob_speed) * bob_amplitude
 
-	# Focus system: only the closest in-range item shows prompt and is interactable
-	var frame := Engine.get_process_frames()
-	if frame != _focus_frame:
-		# New frame — reset focus
-		_focus_frame = frame
-		_focused_item = null
-		_focused_distance = INF
-
-	var is_focused := false
-	if _player_in_range and not auto_pickup and _player:
-		var dist := global_position.distance_to(_player.global_position)
-		if dist < _focused_distance:
-			_focused_distance = dist
-			_focused_item = self
-		is_focused = (_focused_item == self)
-
-	# Show prompt only on focused item
+	# Show prompt only if this is the focused item (decided in _physics_process)
+	var is_focused := (_focused_item == self)
 	if _prompt_label:
 		_prompt_label.visible = is_focused
 
