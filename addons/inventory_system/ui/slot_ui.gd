@@ -32,10 +32,17 @@ func set_slot(p_inventory: Inventory, p_index: int, p_slot: InventorySlot) -> vo
 			amount_label.visible = true
 		else:
 			amount_label.visible = false
+		# Tint slot border by rarity
+		if item.rarity != InventoryItem.Rarity.COMMON:
+			var rarity_color := InventoryItem.RARITY_COLORS.get(item.rarity, Color.WHITE)
+			self_modulate = rarity_color.lerp(Color.WHITE, 0.5)
+		else:
+			self_modulate = Color.WHITE
 	else:
 		icon_texture.texture = null
 		icon_texture.visible = false
 		amount_label.visible = false
+		self_modulate = Color.WHITE
 
 func set_selected(selected: bool):
 	var border = get_node_or_null("SelectionBorder")
