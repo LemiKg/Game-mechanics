@@ -1,7 +1,7 @@
 @tool
 extends Node
 class_name AsyncGenerationHandler
-## Handles asynchronous chunk data generation using a background thread.
+## Handles asynchronous chunk data generation using WorkerThreadPool.
 ## Thread-safe: uses Mutex for queue access, call_deferred for results.
 ##
 ## Usage:
@@ -32,10 +32,8 @@ var _queue_mutex: Mutex = Mutex.new()
 var _results: Array[Dictionary] = [] # [{coord, data}]
 var _results_mutex: Mutex = Mutex.new()
 
-## Worker thread
-var _thread: Thread = null
-var _thread_running: bool = false
-var _should_stop: bool = false
+## WorkerThreadPool state
+var _running: bool = false
 
 ## Cancelled requests (checked before delivering results)
 var _cancelled: Dictionary = {}
@@ -74,17 +72,25 @@ func request_chunk(coord: Vector2i) -> void:
 	if not world_config:
 		push_error("AsyncGenerationHandler: No world_config assigned")
 		return
-	
+
+	if not _running:
+		return
+
 	_queue_mutex.lock()
-	if coord not in _queue:
-		_queue.append(coord)
-		queue_size_changed.emit(_queue.size())
+	if _queue.has(coord):
+		_queue_mutex.unlock()
+		return
+	_queue.append(coord)
+	queue_size_changed.emit(_queue.size())
 	_queue_mutex.unlock()
-	
+
 	# Remove from cancelled if re-requested
 	_cancelled_mutex.lock()
 	_cancelled.erase(coord)
 	_cancelled_mutex.unlock()
+
+	# Dispatch as a WorkerThreadPool task
+	WorkerThreadPool.add_task(_process_next_in_queue)
 
 
 ## Cancel a pending chunk request
@@ -127,62 +133,48 @@ func is_queued(coord: Vector2i) -> bool:
 	return found
 
 
-## Start the worker thread
+## Start async generation (enables WorkerThreadPool dispatching)
 func _start_thread() -> void:
-	if _thread != null and _thread.is_alive():
-		return
-	
-	_should_stop = false
-	_thread_running = true
-	_thread = Thread.new()
-	_thread.start(_worker_loop)
-	print("AsyncGenerationHandler: Worker thread started")
+	_running = true
+	print("AsyncGenerationHandler: WorkerThreadPool dispatch enabled")
 
 
-## Stop the worker thread
+## Stop async generation (no new tasks will be dispatched)
 func _stop_thread() -> void:
-	if _thread == null:
+	_running = false
+	print("AsyncGenerationHandler: WorkerThreadPool dispatch disabled")
+
+
+## Process a single chunk from the queue (called by WorkerThreadPool)
+func _process_next_in_queue() -> void:
+	var coord: Variant = null
+
+	_queue_mutex.lock()
+	if not _queue.is_empty():
+		coord = _queue.pop_front()
+		queue_size_changed.emit.call_deferred(_queue.size())
+	_queue_mutex.unlock()
+
+	if coord == null:
 		return
-	
-	_should_stop = true
-	
-	if _thread.is_alive():
-		_thread.wait_to_finish()
-	
-	_thread = null
-	_thread_running = false
-	print("AsyncGenerationHandler: Worker thread stopped")
 
+	# Check if cancelled
+	_cancelled_mutex.lock()
+	var was_cancelled := _cancelled.has(coord)
+	if was_cancelled:
+		_cancelled.erase(coord)
+	_cancelled_mutex.unlock()
 
-## Worker thread main loop
-func _worker_loop() -> void:
-	while not _should_stop:
-		var coord: Variant = null
-		
-		# Get next item from queue
-		_queue_mutex.lock()
-		if not _queue.is_empty():
-			coord = _queue.pop_front()
-			queue_size_changed.emit.call_deferred(_queue.size())
-		_queue_mutex.unlock()
-		
-		if coord != null:
-			# Check if cancelled
-			_cancelled_mutex.lock()
-			var was_cancelled := _cancelled.has(coord)
-			_cancelled_mutex.unlock()
-			
-			if not was_cancelled:
-				# Generate chunk data (thread-safe)
-				var data := _generate_chunk_data(coord as Vector2i)
-				
-				# Queue result for main thread
-				_results_mutex.lock()
-				_results.append({"coord": coord, "data": data})
-				_results_mutex.unlock()
-		else:
-			# No work, sleep briefly
-			OS.delay_msec(5)
+	if was_cancelled:
+		return
+
+	# Generate chunk data (thread-safe)
+	var data := _generate_chunk_data(coord as Vector2i)
+
+	# Queue result for main thread
+	_results_mutex.lock()
+	_results.append({"coord": coord, "data": data})
+	_results_mutex.unlock()
 
 
 ## Generate chunk data (called on worker thread - must be thread-safe)
