@@ -18,7 +18,11 @@ func _enter_tree():
 	add_custom_type("ManaEffect", "Resource", preload("core/mana_effect.gd"), preload("icons/item.svg"))
 	add_custom_type("ItemInstance", "RefCounted", preload("core/item_instance.gd"), preload("icons/item.svg"))
 
+	add_custom_type("SpawnEntry", "Resource", preload("core/spawn_entry.gd"), preload("icons/item.svg"))
+
 	# Core Nodes
+	add_custom_type("WorldItem", "Area3D", preload("core/world_item.gd"), preload("icons/item.svg"))
+	add_custom_type("WorldItemSpawner", "Node3D", preload("core/world_item_spawner.gd"), preload("icons/item.svg"))
 	add_custom_type("InventoryComponent", "Node", preload("core/inventory_component.gd"), preload("icons/inventory.svg"))
 	add_custom_type("EquipmentComponent", "Node", preload("core/equipment_component.gd"), preload("icons/inventory.svg"))
 	add_custom_type("InventoryInteractionHandler", "Node", preload("core/inventory_interaction_handler.gd"), preload("icons/inventory.svg"))
@@ -46,6 +50,9 @@ func _exit_tree():
 	remove_custom_type("ItemInstance")
 
 	# Core Nodes
+	remove_custom_type("WorldItem")
+	remove_custom_type("WorldItemSpawner")
+	remove_custom_type("SpawnEntry")
 	remove_custom_type("InventoryComponent")
 	remove_custom_type("EquipmentComponent")
 	remove_custom_type("InventoryInteractionHandler")

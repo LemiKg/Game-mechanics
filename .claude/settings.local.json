@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__godot__get_project_info",
+      "WebSearch",
+      "WebFetch(domain:dev.epicgames.com)",
+      "WebFetch(domain:arrowinmyknee.com)",
+      "WebFetch(domain:www.playfault.com)",
+      "Bash(gh api:*)",
+      "WebFetch(domain:gameprogrammingpatterns.com)",
+      "WebFetch(domain:www.gamedeveloper.com)"
+    ]
+  }
+}

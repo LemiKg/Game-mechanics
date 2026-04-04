@@ -1,10 +1,16 @@
-[gd_scene load_steps=9 format=3 uid="uid://dubasu1ixt185"]
+[gd_scene format=3 uid="uid://dubasu1ixt185"]
 
 [ext_resource type="Script" uid="uid://vudhcqvuvjus" path="res://addons/procedural_world/core/chunk_manager.gd" id="1_lcofj"]
 [ext_resource type="Resource" uid="uid://ddikae18i3r6x" path="res://world/world_config.tres" id="2_pyv2p"]
 [ext_resource type="PackedScene" uid="uid://bv4xp8r0k5qm2" path="res://scenes/player.tscn" id="3_pyv2p"]
 [ext_resource type="Script" uid="uid://68mn754avpb6" path="res://addons/procedural_world/ui/debug_overlay_ui.gd" id="4_debug"]
 [ext_resource type="Script" uid="uid://m66il3rbqxo6" path="res://addons/procedural_world/core/vegetation_spawner.gd" id="5_veg"]
+[ext_resource type="Script" path="res://addons/inventory_system/core/world_item_spawner.gd" id="6_spawner"]
+[ext_resource type="Script" path="res://addons/inventory_system/core/spawn_entry.gd" id="7_spawn_entry"]
+[ext_resource type="Resource" path="res://items/health_potion.tres" id="8_health_pot"]
+[ext_resource type="Resource" path="res://items/gold_coin.tres" id="9_gold"]
+[ext_resource type="Resource" path="res://items/steel_sword.tres" id="10_sword"]
+[ext_resource type="Resource" path="res://items/iron_helmet.tres" id="11_helmet"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_lcofj"]
 sky_horizon_color = Color(0.7, 0.75, 0.85, 1)
@@ -27,33 +33,61 @@ fog_depth_curve = 0.5
 fog_depth_begin = 50.0
 fog_depth_end = 600.0
 
-[node name="Procedural" type="Node3D"]
+[sub_resource type="Resource" id="SpawnEntry_potions"]
+script = ExtResource("7_spawn_entry")
+item = ExtResource("8_health_pot")
+count = 5
+amount_per_pickup = 2
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+[sub_resource type="Resource" id="SpawnEntry_gold"]
+script = ExtResource("7_spawn_entry")
+item = ExtResource("9_gold")
+count = 8
+amount_per_pickup = 10
+auto_pickup = true
+
+[sub_resource type="Resource" id="SpawnEntry_sword"]
+script = ExtResource("7_spawn_entry")
+item = ExtResource("10_sword")
+count = 2
+
+[sub_resource type="Resource" id="SpawnEntry_helmet"]
+script = ExtResource("7_spawn_entry")
+item = ExtResource("11_helmet")
+count = 2
+
+[node name="Procedural" type="Node3D" unique_id=2073947320]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=435065556]
 environment = SubResource("Environment_6ts6f")
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1846042544]
 transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
 shadow_enabled = true
 
-[node name="ChunkManager" type="Node" parent="." node_paths=PackedStringArray("player")]
+[node name="ChunkManager" type="Node" parent="." unique_id=1363189744 node_paths=PackedStringArray("player")]
 script = ExtResource("1_lcofj")
 world_config = ExtResource("2_pyv2p")
 player = NodePath("../Player")
 metadata/_custom_type_script = "uid://vudhcqvuvjus"
 
-[node name="DebugOverlayUI" type="CanvasLayer" parent="." node_paths=PackedStringArray("chunk_manager")]
+[node name="DebugOverlayUI" type="CanvasLayer" parent="." unique_id=1689146802 node_paths=PackedStringArray("chunk_manager")]
 layer = 100
-visible = false
 script = ExtResource("4_debug")
 chunk_manager = NodePath("../ChunkManager")
 
-[node name="VegetationSpawner" type="Node" parent="." node_paths=PackedStringArray("chunk_manager")]
+[node name="VegetationSpawner" type="Node" parent="." unique_id=1060745073 node_paths=PackedStringArray("chunk_manager")]
 script = ExtResource("5_veg")
 chunk_manager = NodePath("../ChunkManager")
 world_config = ExtResource("2_pyv2p")
 max_per_chunk = 1000
 spawn_radius = 1
 
-[node name="Player" parent="." instance=ExtResource("3_pyv2p")]
+[node name="Player" parent="." unique_id=1886886982 instance=ExtResource("3_pyv2p")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 48.11914, 80.35122, 85.69061)
+
+[node name="WorldItemSpawner" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 48, 81, 86)
+script = ExtResource("6_spawner")
+spawn_entries = Array[Resource]([SubResource("SpawnEntry_potions"), SubResource("SpawnEntry_gold"), SubResource("SpawnEntry_sword"), SubResource("SpawnEntry_helmet")])
+spawn_radius = 15.0

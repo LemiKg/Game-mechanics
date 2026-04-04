@@ -290,7 +290,7 @@ grow_horizontal = 2
 
 [node name="Label" type="Label" parent="CanvasLayer/HUD"]
 layout_mode = 2
-text = "WASD: Move | Space: Jump | Shift: Sprint | Ctrl: Crouch | Alt+Dir: Dodge | V: Perspective | T: Shoulder | F: Theme | I: Inventory"
+text = "WASD: Move | Space: Jump | Shift: Sprint | Ctrl: Crouch | Alt+Dir: Dodge | E: Pickup | V: Perspective | T: Shoulder | F: Theme | I: Inventory"
 horizontal_alignment = 1
 
 [node name="StaminaBarUI" type="Control" parent="CanvasLayer" node_paths=PackedStringArray("stamina_component")]
