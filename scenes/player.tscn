@@ -1,4 +1,4 @@
-[gd_scene load_steps=29 format=3 uid="uid://bv4xp8r0k5qm2"]
+[gd_scene load_steps=57 format=3 uid="uid://bv4xp8r0k5qm2"]
 
 [ext_resource type="Script" uid="uid://ddprtht2qo7se" path="res://addons/inventory_system/core/inventory_component.gd" id="1_inv_comp"]
 [ext_resource type="Script" uid="uid://bgudcqpbogui8" path="res://addons/inventory_system/core/equipment_component.gd" id="2_equip_comp"]
@@ -15,12 +15,18 @@
 [ext_resource type="Script" uid="uid://7dy7k5juccbd" path="res://addons/player_control_core/core/state_machine/ui_state.gd" id="13_ui_state"]
 [ext_resource type="PackedScene" uid="uid://c4ciyr75aow6p" path="res://addons/inventory_system/ui/inventory_ui.tscn" id="14_inv_ui"]
 [ext_resource type="PackedScene" path="res://addons/inventory_system/ui/quick_inventory_ui.tscn" id="15_quick_inv"]
+[ext_resource type="Script" uid="uid://cbq0osrr5prct" path="res://addons/inventory_system/core/item_category.gd" id="16_l71n6"]
 [ext_resource type="PackedScene" path="res://addons/inventory_system/ui/item_tooltip_ui.tscn" id="16_tooltip"]
 [ext_resource type="Script" uid="uid://b7qhwhcj7pgjr" path="res://addons/inventory_system/ui/tooltip_controller.gd" id="17_tooltip_ctrl"]
 [ext_resource type="Script" uid="uid://bxuwiwu17py1y" path="res://addons/inventory_system/core/inventory_interaction_handler.gd" id="18_handler"]
 [ext_resource type="PackedScene" uid="uid://c0wo2ldbnefie" path="res://assets/characters/quaternius/player.tscn" id="19_character"]
 [ext_resource type="Script" uid="uid://ckhcbx5786s1m" path="res://addons/player_control_core/core/animation_controller.gd" id="20_anim_ctrl"]
-[ext_resource type="Script" path="res://scenes/reusable_player.gd" id="21_player_script"]
+[ext_resource type="Script" uid="uid://bcop3agcqywg5" path="res://scenes/reusable_player.gd" id="21_player_script"]
+[ext_resource type="Script" uid="uid://kug2icv6kyj3" path="res://addons/pose_warping/core/pose_warping_controller.gd" id="22_pose_ctrl"]
+[ext_resource type="Resource" path="res://addons/pose_warping/default_pose_warping_settings.tres" id="25_pose_settings"]
+[ext_resource type="Script" path="res://addons/pose_warping/core/orientation_warping_modifier.gd" id="26_orient_mod"]
+[ext_resource type="Script" path="res://addons/pose_warping/core/stride_warping_modifier.gd" id="27_stride_mod"]
+[ext_resource type="Script" path="res://addons/pose_warping/core/slope_warping_modifier.gd" id="28_slope_mod"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_player"]
 radius = 0.2
@@ -123,8 +129,18 @@ shape = SubResource("CapsuleShape3D_player")
 [node name="CharacterMesh" parent="." instance=ExtResource("19_character")]
 transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
 
+[node name="OrientationWarpingModifier" type="SkeletonModifier3D" parent="CharacterMesh/Rig/Skeleton3D"]
+script = ExtResource("26_orient_mod")
+
+[node name="StrideWarpingModifier" type="SkeletonModifier3D" parent="CharacterMesh/Rig/Skeleton3D"]
+script = ExtResource("27_stride_mod")
+
+[node name="SlopeWarpingModifier" type="SkeletonModifier3D" parent="CharacterMesh/Rig/Skeleton3D"]
+script = ExtResource("28_slope_mod")
+
 [node name="FPSPitchPivot" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
+rotation_edit_mode = 1
 
 [node name="FPSCamera" type="Camera3D" parent="FPSPitchPivot"]
 
@@ -185,6 +201,15 @@ script = ExtResource("13_ui_state")
 script = ExtResource("20_anim_ctrl")
 state_machine = NodePath("../PlayerStateMachine")
 animation_tree = NodePath("../CharacterMesh/AnimationTree")
+
+[node name="PoseWarpingController" type="Node" parent="." node_paths=PackedStringArray("skeleton", "velocity_source", "stride_modifier", "orientation_modifier", "slope_modifier")]
+script = ExtResource("22_pose_ctrl")
+skeleton = NodePath("../CharacterMesh/Rig/Skeleton3D")
+velocity_source = NodePath("../PlayerMotor3D")
+stride_modifier = NodePath("../CharacterMesh/Rig/Skeleton3D/StrideWarpingModifier")
+orientation_modifier = NodePath("../CharacterMesh/Rig/Skeleton3D/OrientationWarpingModifier")
+slope_modifier = NodePath("../CharacterMesh/Rig/Skeleton3D/SlopeWarpingModifier")
+settings = ExtResource("25_pose_settings")
 
 [node name="InventoryComponent" type="Node" parent="."]
 script = ExtResource("1_inv_comp")
