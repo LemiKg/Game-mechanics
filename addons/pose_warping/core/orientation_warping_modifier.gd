@@ -110,11 +110,7 @@ func update_warping(
 
 ## Wrap angle to [-PI, PI] range.
 func _wrap_angle(angle: float) -> float:
-	while angle > PI:
-		angle -= TAU
-	while angle < -PI:
-		angle += TAU
-	return angle
+	return fposmod(angle + PI, TAU) - PI
 
 
 # =============================================================================

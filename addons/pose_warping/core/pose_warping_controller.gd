@@ -81,6 +81,11 @@ var look_direction: Vector3 = Vector3.FORWARD
 ## Whether warping is currently active.
 var is_warping: bool = false
 
+
+# =============================================================================
+# PRIVATE STATE
+# =============================================================================
+
 ## Cached RID for raycast self-exclusion.
 var _character_rid: RID
 

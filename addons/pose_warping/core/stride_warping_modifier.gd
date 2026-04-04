@@ -132,7 +132,14 @@ func update_warping(
 		_cached_settings = settings
 		_cache_bone_data()
 
-	if not _settings or not _settings.enable_stride_warping:
+	if not _settings:
+		_target_scale = 1.0
+		_target_pelvis_pulldown = 0.0
+		_current_scale = lerpf(_current_scale, _target_scale, delta * 10.0)
+		_current_pelvis_pulldown = lerpf(_current_pelvis_pulldown, _target_pelvis_pulldown, delta * 10.0)
+		return
+
+	if not _settings.enable_stride_warping:
 		_target_scale = 1.0
 		_target_pelvis_pulldown = 0.0
 	elif not is_warping or speed < _settings.min_speed_for_stride:
