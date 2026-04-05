@@ -27,6 +27,9 @@ var _wants_to_stand: bool = false
 ## Whether the player was moving last frame (for stop detection).
 var _was_moving: bool = false
 
+## Whether torch mode is active (swaps idle animation).
+var _torch_active: bool = false
+
 ## Debug logger for this state.
 var _logger := DebugLogger.new("[GroundedState]")
 
@@ -112,6 +115,22 @@ func physics_update(delta: float) -> void:
 			transition_to(&"airborne")
 			return
 
+	# Handle sit input
+	if input_router.consume_sit():
+		if state_machine.has_state(&"sit"):
+			transition_to(&"sit")
+			return
+
+	# Handle dance input
+	if input_router.consume_dance():
+		if state_machine.has_state(&"dance"):
+			transition_to(&"dance")
+			return
+
+	# Handle torch toggle
+	if input_router.consume_torch_toggle():
+		_torch_active = not _torch_active
+
 	# Update crouch collision shape
 	_update_crouch_collision(delta)
 
@@ -175,9 +194,9 @@ func _update_animation() -> void:
 			if time_to_stop < 0.3:
 				new_animation = &"stop"
 			else:
-				new_animation = &"idle"
+				new_animation = &"torch" if _torch_active else &"idle"
 		else:
-			new_animation = &"idle"
+			new_animation = &"torch" if _torch_active else &"idle"
 
 	_was_moving = has_movement
 
