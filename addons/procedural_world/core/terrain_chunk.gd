@@ -163,13 +163,6 @@ func enable_collision() -> void:
 	var half_depth := (chunk_data.depth - 1) * _cell_size * 0.5
 	_collision_body.position = Vector3(half_width, 0.0, half_depth)
 
-	# Scale collision to match terrain cell size
-	# HeightMapShape3D distributes samples over map_width meters (1:1)
-	# But mesh spans (map_width-1) * cell_size meters
-	# Scale factor: (map_width-1) * cell_size / map_width
-	var scale_factor := (float(chunk_data.width) - 1.0) * _cell_size / float(chunk_data.width)
-	_collision_body.scale = Vector3(scale_factor, 1.0, scale_factor)
-
 	_has_collision = true
 
 
