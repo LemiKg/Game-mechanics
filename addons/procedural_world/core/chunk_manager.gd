@@ -71,6 +71,11 @@ func get_active_chunk_count() -> int:
 	return _active_chunks.size()
 
 
+## Returns all currently active chunk coordinates
+func get_active_chunk_coords() -> Array:
+	return _active_chunks.keys()
+
+
 ## Returns number of chunks in the reuse pool
 func get_pool_size() -> int:
 	return _chunk_pool.size()

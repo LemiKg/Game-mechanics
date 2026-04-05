@@ -67,12 +67,24 @@ func _ready() -> void:
 func _connect_to_chunk_manager() -> void:
 	if not chunk_manager:
 		return
-	
+
 	if not chunk_manager.chunk_ready.is_connected(_on_chunk_ready):
 		chunk_manager.chunk_ready.connect(_on_chunk_ready)
-	
+
 	if not chunk_manager.chunk_unloaded.is_connected(_on_chunk_unloaded):
 		chunk_manager.chunk_unloaded.connect(_on_chunk_unloaded)
+
+	# Populate vegetation for chunks that were already loaded before we connected
+	call_deferred("_spawn_for_existing_chunks")
+
+
+## Spawn vegetation for all chunks that are already loaded.
+## Called deferred after _ready() so all systems are initialized.
+func _spawn_for_existing_chunks() -> void:
+	if not chunk_manager or not chunk_manager.has_method("get_active_chunk_coords"):
+		return
+	for coord in chunk_manager.get_active_chunk_coords():
+		_on_chunk_ready(coord)
 
 
 ## Called when a chunk is ready
