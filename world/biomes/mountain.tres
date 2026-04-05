@@ -1,15 +1,11 @@
-[gd_resource type="Resource" script_class="MountainBiome" load_steps=11 format=3 uid="uid://b224575qkq8qe"]
+[gd_resource type="Resource" script_class="MountainBiome" load_steps=7 format=3 uid="uid://b224575qkq8qe"]
 
 [ext_resource type="Script" uid="uid://of0lp0y6u7ub" path="res://addons/procedural_world/core/biomes/mountain_biome.gd" id="1_mountain"]
 [ext_resource type="Resource" path="res://world/materials/mountain_terrain.tres" id="6_mat"]
 [ext_resource type="Script" uid="uid://kxng7b8qpiu7" path="res://addons/procedural_world/core/decoration_definition.gd" id="1_p70lh"]
-[ext_resource type="Resource" uid="uid://bcyq6u7oxqi81" path="res://addons/procedural_world/decorations/rocks_tall.tres" id="2_rocks_tall"]
-[ext_resource type="Resource" uid="uid://dmxkpqia0s4rk" path="res://addons/procedural_world/decorations/stones_large.tres" id="3_stones"]
-[ext_resource type="Resource" uid="uid://cdafy3nykhjl0" path="res://addons/procedural_world/decorations/pine_trees_small.tres" id="4_pine_small"]
-[ext_resource type="Resource" path="res://addons/procedural_world/decorations/mountain_rocks_large.tres" id="7_rocks_large"]
-[ext_resource type="Resource" path="res://addons/procedural_world/decorations/mountain_rocks_small.tres" id="8_rocks_small"]
-[ext_resource type="Resource" path="res://addons/procedural_world/decorations/mountain_stones_small.tres" id="9_stones_small"]
-[ext_resource type="Resource" path="res://addons/procedural_world/decorations/mountain_ground_pine.tres" id="10_ground_pine"]
+[ext_resource type="Resource" path="res://addons/procedural_world/decorations/rocks_standard.tres" id="2_rocks_std"]
+[ext_resource type="Resource" path="res://addons/procedural_world/decorations/resource_stones.tres" id="3_res_stones"]
+[ext_resource type="Resource" path="res://addons/procedural_world/decorations/tree_trunks_mountain.tres" id="4_trunks"]
 
 [resource]
 script = ExtResource("1_mountain")
@@ -20,4 +16,4 @@ terrain_color = Color(0.89059, 0.89059, 0.8905901, 1)
 min_elevation = 0.556
 min_moisture = 0.207
 terrain_materials = ExtResource("6_mat")
-decorations = Array[ExtResource("1_p70lh")]([ExtResource("2_rocks_tall"), ExtResource("3_stones"), ExtResource("4_pine_small"), ExtResource("7_rocks_large"), ExtResource("8_rocks_small"), ExtResource("9_stones_small"), ExtResource("10_ground_pine")])
+decorations = Array[ExtResource("1_p70lh")]([ExtResource("2_rocks_std"), ExtResource("3_res_stones"), ExtResource("4_trunks")])

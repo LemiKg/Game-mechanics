@@ -1,14 +1,10 @@
-[gd_resource type="Resource" script_class="DesertBiome" load_steps=10 format=3 uid="uid://dtn2y0lesqjk6"]
+[gd_resource type="Resource" script_class="DesertBiome" load_steps=6 format=3 uid="uid://dtn2y0lesqjk6"]
 
 [ext_resource type="Script" uid="uid://baho7k721oe64" path="res://addons/procedural_world/core/biomes/desert_biome.gd" id="1_desert"]
 [ext_resource type="Resource" path="res://world/materials/desert_terrain.tres" id="6_mat"]
 [ext_resource type="Script" uid="uid://kxng7b8qpiu7" path="res://addons/procedural_world/core/decoration_definition.gd" id="2_decdef"]
-[ext_resource type="Resource" path="res://addons/procedural_world/decorations/cactus_tall.tres" id="3_cactus_tall"]
-[ext_resource type="Resource" path="res://addons/procedural_world/decorations/cactus_short.tres" id="4_cactus_short"]
-[ext_resource type="Resource" path="res://addons/procedural_world/decorations/rocks_flat.tres" id="5_rocks_flat"]
-[ext_resource type="Resource" path="res://addons/procedural_world/decorations/desert_rocks_small.tres" id="7_rocks_small"]
-[ext_resource type="Resource" path="res://addons/procedural_world/decorations/desert_stones_flat.tres" id="8_stones_flat"]
-[ext_resource type="Resource" path="res://addons/procedural_world/decorations/desert_dead_stumps.tres" id="9_dead_stumps"]
+[ext_resource type="Resource" path="res://addons/procedural_world/decorations/rocks_sandy.tres" id="3_rocks_sandy"]
+[ext_resource type="Resource" path="res://addons/procedural_world/decorations/rocks_flat.tres" id="4_rocks_flat"]
 
 [resource]
 script = ExtResource("1_desert")
@@ -19,4 +15,4 @@ terrain_color = Color(0.9, 0.8, 0.5, 1)
 max_elevation = 0.7
 max_moisture = 0.4
 terrain_materials = ExtResource("6_mat")
-decorations = Array[ExtResource("2_decdef")]([ExtResource("3_cactus_tall"), ExtResource("4_cactus_short"), ExtResource("5_rocks_flat"), ExtResource("7_rocks_small"), ExtResource("8_stones_flat"), ExtResource("9_dead_stumps")])
+decorations = Array[ExtResource("2_decdef")]([ExtResource("3_rocks_sandy"), ExtResource("4_rocks_flat")])
