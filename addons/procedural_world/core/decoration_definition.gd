@@ -204,30 +204,55 @@ func _ensure_meshes_cached() -> void:
 				_cached_variant_meshes.append(extracted)
 
 
-## Extract the first mesh found in a PackedScene
+## Extract the first mesh found in a PackedScene, preserving materials.
 func _extract_mesh_from_scene(scene: PackedScene) -> Mesh:
 	var instance := scene.instantiate()
 	if not instance:
 		return null
-	
+
 	var found_mesh: Mesh = null
-	
+	var found_mesh_instance: MeshInstance3D = null
+
 	# Check if root is a MeshInstance3D
 	if instance is MeshInstance3D:
-		found_mesh = instance.mesh
+		found_mesh_instance = instance
 	else:
 		# Search children for MeshInstance3D
 		for child in instance.get_children():
 			if child is MeshInstance3D:
-				found_mesh = child.mesh
+				found_mesh_instance = child
 				break
 			# Check grandchildren (common in GLB imports)
 			for grandchild in child.get_children():
 				if grandchild is MeshInstance3D:
-					found_mesh = grandchild.mesh
+					found_mesh_instance = grandchild
 					break
-			if found_mesh:
+			if found_mesh_instance:
 				break
-	
+
+	if found_mesh_instance and found_mesh_instance.mesh:
+		found_mesh = found_mesh_instance.mesh
+		# Bake MeshInstance3D material overrides into the mesh so they
+		# survive MultiMesh instancing (which has no per-instance materials).
+		_bake_materials(found_mesh_instance, found_mesh)
+
 	instance.queue_free()
 	return found_mesh
+
+
+## Copy material overrides from a MeshInstance3D into the mesh's surfaces.
+## GLB imports often store materials as overrides on the MeshInstance3D
+## rather than directly on the mesh surfaces. MultiMesh only reads surface
+## materials, so we need to bake them in.
+func _bake_materials(mesh_instance: MeshInstance3D, mesh: Mesh) -> void:
+	if mesh_instance.material_override:
+		# Single override applies to all surfaces
+		for i in range(mesh.get_surface_count()):
+			if not mesh.surface_get_material(i):
+				mesh.surface_set_material(i, mesh_instance.material_override)
+	else:
+		# Check per-surface overrides
+		for i in range(mesh.get_surface_count()):
+			var override := mesh_instance.get_surface_override_material(i)
+			if override and not mesh.surface_get_material(i):
+				mesh.surface_set_material(i, override)
