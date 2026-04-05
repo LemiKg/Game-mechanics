@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="DecorationDefinition" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://addons/procedural_world/core/decoration_definition.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://assets/environment/rock-a.glb" id="2_s1"]
+[ext_resource type="PackedScene" path="res://assets/environment/rock-b.glb" id="3_s2"]
+[ext_resource type="PackedScene" path="res://assets/environment/rock-c.glb" id="4_s3"]
+
+[resource]
+script = ExtResource("1_script")
+decoration_type = 1
+scene_variants = Array[PackedScene]([ExtResource("2_s1"), ExtResource("3_s2"), ExtResource("4_s3")])
+density = 0.02
+min_scale = 0.6
+max_scale = 1.5
+max_slope = 0.7
+random_rotation = 6.283
+scale_variance = Vector3(0.2, 0.15, 0.2)
+random_tilt = 0.2
+y_offset = -0.1
+y_offset_variance = 0.1
+cluster_strength = 0.4
+cluster_scale = 0.02
+cluster_group_id = 2
+use_poisson_sampling = true
+has_collision = true
+collision_shape = 0
+collision_radius = 0.6
+collision_height = 1.5
+collision_distance = 40.0

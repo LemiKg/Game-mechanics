@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="DecorationDefinition" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://addons/procedural_world/core/decoration_definition.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://assets/environment/resource-stone.glb" id="2_s1"]
+[ext_resource type="PackedScene" path="res://assets/environment/resource-stone-large.glb" id="3_s2"]
+
+[resource]
+script = ExtResource("1_script")
+decoration_type = 1
+scene_variants = Array[PackedScene]([ExtResource("2_s1"), ExtResource("3_s2")])
+density = 0.015
+min_scale = 0.6
+max_scale = 1.2
+max_slope = 0.6
+random_rotation = 6.283
+random_tilt = 0.2
+y_offset = -0.1
+cluster_strength = 0.5
+cluster_scale = 0.02
+cluster_group_id = 2
+use_poisson_sampling = true
+has_collision = true
+collision_shape = 0
+collision_radius = 0.5
+collision_height = 1.0
+collision_distance = 35.0

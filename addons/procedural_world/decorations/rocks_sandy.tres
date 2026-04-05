@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="DecorationDefinition" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://addons/procedural_world/core/decoration_definition.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://assets/environment/rock-sand-a.glb" id="2_s1"]
+[ext_resource type="PackedScene" path="res://assets/environment/rock-sand-b.glb" id="3_s2"]
+[ext_resource type="PackedScene" path="res://assets/environment/rock-sand-c.glb" id="4_s3"]
+
+[resource]
+script = ExtResource("1_script")
+decoration_type = 1
+scene_variants = Array[PackedScene]([ExtResource("2_s1"), ExtResource("3_s2"), ExtResource("4_s3")])
+density = 0.03
+min_scale = 0.5
+max_scale = 1.2
+max_slope = 0.5
+random_rotation = 6.283
+scale_variance = Vector3(0.2, 0.15, 0.2)
+random_tilt = 0.15
+y_offset = -0.05
+y_offset_variance = 0.05
+cluster_strength = 0.3
+cluster_scale = 0.03
+cluster_group_id = 1

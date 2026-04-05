@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="DecorationDefinition" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://addons/procedural_world/core/decoration_definition.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://assets/environment/rock-flat.glb" id="2_s1"]
+[ext_resource type="PackedScene" path="res://assets/environment/rock-flat-grass.glb" id="3_s2"]
+
+[resource]
+script = ExtResource("1_script")
+decoration_type = 1
+scene_variants = Array[PackedScene]([ExtResource("2_s1"), ExtResource("3_s2")])
+density = 0.01
+min_scale = 0.7
+max_scale = 1.3
+max_slope = 0.4
+align_to_normal = true
+random_rotation = 6.283
+y_offset = -0.05
+cluster_strength = 0.2
+cluster_scale = 0.03
+cluster_group_id = 2
+cluster_seed_offset = 10
