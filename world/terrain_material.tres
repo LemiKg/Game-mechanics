@@ -1,6 +1,9 @@
-[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://c6qr8m5x2pnw1"]
+[gd_resource type="ShaderMaterial" load_steps=5 format=3 uid="uid://c6qr8m5x2pnw1"]
 
 [ext_resource type="Shader" path="res://addons/procedural_world/shaders/terrain_triplanar.gdshader" id="1_shader"]
+[ext_resource type="Texture2D" path="res://assets/textures/terrain/shared/snow_albedo.png" id="2_snow_alb"]
+[ext_resource type="Texture2D" path="res://assets/textures/terrain/shared/snow_normal.png" id="3_snow_nrm"]
+[ext_resource type="Texture2D" path="res://assets/textures/terrain/shared/snow_roughness.png" id="4_snow_rgh"]
 
 [resource]
 render_priority = 0
@@ -22,3 +25,6 @@ shader_parameter/roughness_base = 0.85
 shader_parameter/roughness_variation = 0.1
 shader_parameter/height_blend_sharpness = 0.15
 shader_parameter/height_blend_scale = 0.05
+shader_parameter/texture_a_albedo = ExtResource("2_snow_alb")
+shader_parameter/texture_a_normal = ExtResource("3_snow_nrm")
+shader_parameter/texture_a_roughness = ExtResource("4_snow_rgh")

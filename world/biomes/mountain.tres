@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="MountainBiome" load_steps=6 format=3 uid="uid://b224575qkq8qe"]
+[gd_resource type="Resource" script_class="MountainBiome" load_steps=7 format=3 uid="uid://b224575qkq8qe"]
 
 [ext_resource type="Script" uid="uid://of0lp0y6u7ub" path="res://addons/procedural_world/core/biomes/mountain_biome.gd" id="1_mountain"]
+[ext_resource type="Resource" path="res://world/materials/mountain_terrain.tres" id="6_mat"]
 [ext_resource type="Script" uid="uid://kxng7b8qpiu7" path="res://addons/procedural_world/core/decoration_definition.gd" id="1_p70lh"]
 [ext_resource type="Resource" uid="uid://bcyq6u7oxqi81" path="res://addons/procedural_world/decorations/rocks_tall.tres" id="2_rocks_tall"]
 [ext_resource type="Resource" uid="uid://dmxkpqia0s4rk" path="res://addons/procedural_world/decorations/stones_large.tres" id="3_stones"]
@@ -14,4 +15,5 @@ splatmap_channel = 1
 terrain_color = Color(0.89059, 0.89059, 0.8905901, 1)
 min_elevation = 0.556
 min_moisture = 0.207
+terrain_materials = ExtResource("6_mat")
 decorations = Array[ExtResource("1_p70lh")]([ExtResource("2_rocks_tall"), ExtResource("3_stones"), ExtResource("4_pine_small")])

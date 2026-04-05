@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="TerrainMaterialSet" load_steps=11 format=3]
+
+[ext_resource type="Script" path="res://addons/procedural_world/core/terrain_material_set.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/textures/terrain/forest/grass_albedo.png" id="2_r_alb"]
+[ext_resource type="Texture2D" path="res://assets/textures/terrain/forest/grass_normal.png" id="3_r_nrm"]
+[ext_resource type="Texture2D" path="res://assets/textures/terrain/forest/grass_roughness.png" id="4_r_rgh"]
+[ext_resource type="Texture2D" path="res://assets/textures/terrain/forest/rock_albedo.png" id="5_g_alb"]
+[ext_resource type="Texture2D" path="res://assets/textures/terrain/forest/rock_normal.png" id="6_g_nrm"]
+[ext_resource type="Texture2D" path="res://assets/textures/terrain/forest/rock_roughness.png" id="7_g_rgh"]
+[ext_resource type="Texture2D" path="res://assets/textures/terrain/forest/ground_albedo.png" id="8_b_alb"]
+[ext_resource type="Texture2D" path="res://assets/textures/terrain/forest/ground_normal.png" id="9_b_nrm"]
+[ext_resource type="Texture2D" path="res://assets/textures/terrain/forest/ground_roughness.png" id="10_b_rgh"]
+
+[resource]
+script = ExtResource("1_script")
+channel_r_albedo = ExtResource("2_r_alb")
+channel_r_normal = ExtResource("3_r_nrm")
+channel_r_roughness = ExtResource("4_r_rgh")
+channel_g_albedo = ExtResource("5_g_alb")
+channel_g_normal = ExtResource("6_g_nrm")
+channel_g_roughness = ExtResource("7_g_rgh")
+channel_b_albedo = ExtResource("8_b_alb")
+channel_b_normal = ExtResource("9_b_nrm")
+channel_b_roughness = ExtResource("10_b_rgh")
