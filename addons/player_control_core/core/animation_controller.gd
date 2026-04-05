@@ -35,51 +35,7 @@ signal animation_started(animation_name: StringName)
 ## Keys are the names emitted by states (idle, walk, run, etc.)
 ## Values are the actual animation names in your AnimationTree/Player.
 ## Leave empty to use state names directly.
-@export var animation_map: Dictionary = {
-	&"idle": &"Idle",
-	&"walk": &"Walk",
-	&"run": &"Sprint",
-	&"jog": &"Jog_Fwd",
-	&"walk_formal": &"Walk_Formal",
-	&"jump": &"Jump_Start",
-	&"jump_loop": &"Jump",
-	&"land": &"Jump_Land",
-	&"crouch_idle": &"Crouch_Idle",
-	&"crouch_walk": &"Crouch_Fwd",
-	&"dodge": &"Roll",
-	&"stop": &"Idle",
-	&"interact": &"Interact",
-	&"pickup": &"PickUp_Table",
-	&"low_mantle": &"Interact",
-	&"high_mantle": &"Jump_Land",
-	&"hit_chest": &"Hit_Chest",
-	&"hit_head": &"Hit_Head",
-	&"death": &"Death01",
-	&"punch_enter": &"Punch_Enter",
-	&"punch_jab": &"Punch_Jab",
-	&"punch_cross": &"Punch_Cross",
-	&"sword_idle": &"Sword_Idle",
-	&"sword_attack": &"Sword_Attack",
-	&"pistol_idle": &"Pistol_Idle",
-	&"pistol_aim": &"Pistol_Aim_Neutral",
-	&"pistol_shoot": &"Pistol_Shoot",
-	&"pistol_reload": &"Pistol_Reload",
-	&"spell_enter": &"Spell_Simple_Enter",
-	&"spell_idle": &"Spell_Simple_Idle",
-	&"spell_shoot": &"Spell_Simple_Shoot",
-	&"spell_exit": &"Spell_Simple_Exit",
-	&"dance": &"Dance",
-	&"push": &"Push",
-	&"swim_idle": &"Swim_Idle",
-	&"swim_fwd": &"Swim_Fwd",
-	&"craft": &"Fixing_Kneeling",
-	&"sit_enter": &"Sitting_Enter",
-	&"sit_idle": &"Sitting_Idle",
-	&"sit_exit": &"Sitting_Exit",
-	&"talk": &"Idle_Talking",
-	&"torch": &"Idle_Torch",
-	&"drive": &"Driving",
-}
+@export var animation_map: Dictionary = {}
 
 
 ## Currently playing animation name.
@@ -93,16 +49,7 @@ var _logger := DebugLogger.new("[AnimCtrl]")
 
 
 func _ready() -> void:
-	_validate_dependencies()
 	_connect_state_signals()
-	_setup_animation_tree()
-
-
-func _validate_dependencies() -> void:
-	if not state_machine:
-		push_warning("AnimationController: 'state_machine' is not assigned")
-	if not animation_tree and not animation_player:
-		push_warning("AnimationController: No animation_tree or animation_player assigned")
 
 
 func _connect_state_signals() -> void:
@@ -125,6 +72,17 @@ func _setup_animation_tree() -> void:
 			push_warning("AnimationController: Could not get state machine playback at '%s'" % state_machine_path)
 
 
+## Called by the player after assigning animation_tree and animation_map.
+## Must be called before any animation playback occurs.
+func setup() -> void:
+	_setup_animation_tree()
+
+
+## Check if a logical animation name is supported by the current animation map.
+func is_animation_supported(logical_name: StringName) -> bool:
+	return animation_map.has(logical_name)
+
+
 func _on_animation_requested(animation_name: StringName, blend_time: float) -> void:
 	play_animation(animation_name, blend_time)
 
@@ -142,23 +100,30 @@ func _on_state_changed(_old_state: PlayerState, _new_state: PlayerState) -> void
 func play_animation(animation_name: StringName, blend_time: float = -1.0) -> void:
 	# Remap animation name if mapping exists
 	var mapped_name: StringName = _get_mapped_animation(animation_name)
-	
+
+	# Fallback: if the logical name has no mapping and the map is non-empty, use idle
+	if mapped_name == animation_name and animation_map.size() > 0 and not animation_map.has(animation_name):
+		_logger.debugf("play_animation('%s') - UNSUPPORTED, falling back to idle", [animation_name])
+		mapped_name = _get_mapped_animation(&"idle")
+		if mapped_name == &"idle" and not animation_map.has(&"idle"):
+			return
+
 	_logger.debugf("play_animation('%s') -> mapped='%s', current='%s'",
 		[animation_name, mapped_name, current_animation])
-	
+
 	if mapped_name == current_animation:
 		_logger.debug("SKIPPED - same as current")
 		return
-	
+
 	var actual_blend := blend_time if blend_time >= 0 else default_blend_time
-	
+
 	if animation_tree and _state_playback:
 		_play_via_tree(mapped_name, actual_blend)
 	elif animation_player:
 		_play_via_player(mapped_name, actual_blend)
 	else:
 		return
-	
+
 	current_animation = mapped_name
 	animation_started.emit(mapped_name)
 
