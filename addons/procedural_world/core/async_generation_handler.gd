@@ -81,8 +81,9 @@ func request_chunk(coord: Vector2i) -> void:
 		_queue_mutex.unlock()
 		return
 	_queue.append(coord)
-	queue_size_changed.emit(_queue.size())
+	var new_size := _queue.size()
 	_queue_mutex.unlock()
+	queue_size_changed.emit(new_size)
 
 	# Remove from cancelled if re-requested
 	_cancelled_mutex.lock()
@@ -98,10 +99,13 @@ func request_chunk(coord: Vector2i) -> void:
 func cancel_request(coord: Vector2i) -> void:
 	_queue_mutex.lock()
 	var idx := _queue.find(coord)
+	var cancelled_size := -1
 	if idx >= 0:
 		_queue.remove_at(idx)
-		queue_size_changed.emit(_queue.size())
+		cancelled_size = _queue.size()
 	_queue_mutex.unlock()
+	if cancelled_size >= 0:
+		queue_size_changed.emit(cancelled_size)
 	
 	# Mark as cancelled so any in-progress result is discarded
 	_cancelled_mutex.lock()
@@ -113,8 +117,8 @@ func cancel_request(coord: Vector2i) -> void:
 func cancel_all() -> void:
 	_queue_mutex.lock()
 	_queue.clear()
-	queue_size_changed.emit(0)
 	_queue_mutex.unlock()
+	queue_size_changed.emit(0)
 
 
 ## Get the current queue size
@@ -301,11 +305,14 @@ func _process_queue_sync() -> void:
 	while processed < max_sync_per_frame:
 		var coord: Variant = null
 		
+		var sync_size := -1
 		_queue_mutex.lock()
 		if not _queue.is_empty():
 			coord = _queue.pop_front()
-			queue_size_changed.emit(_queue.size())
+			sync_size = _queue.size()
 		_queue_mutex.unlock()
+		if sync_size >= 0:
+			queue_size_changed.emit(sync_size)
 		
 		if coord == null:
 			break
