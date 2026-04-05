@@ -39,6 +39,9 @@ class_name BiomeData
 ## Decorations to spawn in this biome (used by VegetationSpawner)
 @export var decorations: Array[DecorationDefinition] = []
 
+## Terrain texture set for this biome. Applied to chunks where this biome dominates.
+@export var terrain_materials: TerrainMaterialSet
+
 
 ## Check if this biome matches the given environmental conditions.
 ## Override in subclasses for custom selection logic.
