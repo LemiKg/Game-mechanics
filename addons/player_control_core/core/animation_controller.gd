@@ -49,6 +49,7 @@ var _logger := DebugLogger.new("[AnimCtrl]")
 
 
 func _ready() -> void:
+	add_to_group("character_consumers")
 	_connect_state_signals()
 
 
@@ -70,6 +71,13 @@ func _setup_animation_tree() -> void:
 		_state_playback = animation_tree.get(state_machine_path)
 		if not _state_playback:
 			push_warning("AnimationController: Could not get state machine playback at '%s'" % state_machine_path)
+
+
+## Called by the player when a character adapter is available.
+func bind_character(adapter: CharacterAdapter) -> void:
+	animation_tree = adapter.get_animation_tree()
+	animation_map = adapter.get_animation_map()
+	setup()
 
 
 ## Called by the player after assigning animation_tree and animation_map.

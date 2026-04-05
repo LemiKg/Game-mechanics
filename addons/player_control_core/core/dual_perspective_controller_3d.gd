@@ -115,6 +115,7 @@ var _default_fov: float = 75.0
 
 func _ready() -> void:
 	super._ready()
+	add_to_group("character_consumers")
 	_validate_perspective_dependencies()
 	_wire_perspective_components()
 	_apply_perspective()
@@ -392,6 +393,11 @@ func set_lock_on_target(target: Node3D) -> void:
 ## Clear the current lock-on target.
 func clear_lock_on() -> void:
 	set_lock_on_target(null)
+
+
+## Called by the player when a character adapter is available.
+func bind_character(adapter: CharacterAdapter) -> void:
+	character_mesh = adapter
 
 
 ## Get the camera's current yaw angle.

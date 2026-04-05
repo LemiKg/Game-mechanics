@@ -35,6 +35,15 @@ var _recovery_duration: float = 0.5
 var _logger := DebugLogger.new("[RagdollState]")
 
 
+func _ready() -> void:
+	add_to_group("character_consumers")
+
+
+## Called by the player when a character adapter is available.
+func bind_character(adapter: CharacterAdapter) -> void:
+	skeleton = adapter.get_skeleton()
+
+
 func enter() -> void:
 	_logger.debug("ENTER")
 	_ragdoll_timer = 0.0

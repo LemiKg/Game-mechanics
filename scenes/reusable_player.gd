@@ -17,9 +17,6 @@ signal inventory_toggled(is_open: bool)
 @onready var perspective_label: PanelContainer = $CanvasLayer/PerspectiveLabel
 @onready var hud_label: PanelContainer = $CanvasLayer/HUD
 @onready var character: CharacterAdapter = $CharacterMesh
-@onready var animation_controller: AnimationController = $AnimationController
-@onready var pose_warping_controller = $PoseWarpingController
-@onready var ragdoll_state = $PlayerStateMachine/ragdoll
 
 ## Whether to add test items on ready (for debugging)
 @export var add_test_items: bool = false
@@ -136,41 +133,15 @@ func switch_to_third_person() -> void:
 	dual_controller.switch_to_third_person()
 
 
-## Query the CharacterAdapter and distribute references to dependent nodes.
+## Discover character consumers and distribute the adapter to them.
 func _bind_character() -> void:
 	if not character:
 		push_warning("ReusablePlayer: No CharacterAdapter found at $CharacterMesh")
 		return
 
-	var skeleton := character.get_skeleton()
-	var anim_tree := character.get_animation_tree()
-	var anim_map := character.get_animation_map()
-	var modifiers := character.get_pose_warping_modifiers()
-
-	# AnimationController
-	if animation_controller:
-		animation_controller.animation_tree = anim_tree
-		animation_controller.animation_map = anim_map
-		animation_controller.setup()
-
-	# RagdollState
-	if ragdoll_state and skeleton:
-		ragdoll_state.skeleton = skeleton
-
-	# PoseWarpingController
-	if pose_warping_controller:
-		if modifiers.is_empty():
-			pose_warping_controller.set_process(false)
-			pose_warping_controller.set_physics_process(false)
-		else:
-			pose_warping_controller.skeleton = skeleton
-			pose_warping_controller.stride_modifier = modifiers.get("stride")
-			pose_warping_controller.orientation_modifier = modifiers.get("orientation")
-			pose_warping_controller.slope_modifier = modifiers.get("slope")
-
-	# DualPerspectiveController
-	if dual_controller:
-		dual_controller.character_mesh = character
+	for node in get_tree().get_nodes_in_group("character_consumers"):
+		if node.has_method("bind_character"):
+			node.bind_character(character)
 
 
 func _on_mouse_capture_requested(mode: Input.MouseMode) -> void:

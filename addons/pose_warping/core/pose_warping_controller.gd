@@ -95,6 +95,7 @@ var _character_rid: RID
 # =============================================================================
 
 func _ready() -> void:
+	add_to_group("character_consumers")
 	if not settings:
 		push_warning("PoseWarpingController: 'settings' is not assigned. Using defaults.")
 		settings = PoseWarpingSettings.new()
@@ -236,3 +237,16 @@ func set_velocity_override(velocity: Vector3) -> void:
 ## Force refresh of character RID cache.
 func refresh_character_rid() -> void:
 	_cache_character_rid()
+
+
+## Called by the player when a character adapter is available.
+func bind_character(adapter: CharacterAdapter) -> void:
+	var modifiers := adapter.get_pose_warping_modifiers()
+	if modifiers.is_empty():
+		set_process(false)
+		set_physics_process(false)
+	else:
+		skeleton = adapter.get_skeleton()
+		stride_modifier = modifiers.get("stride")
+		orientation_modifier = modifiers.get("orientation")
+		slope_modifier = modifiers.get("slope")
