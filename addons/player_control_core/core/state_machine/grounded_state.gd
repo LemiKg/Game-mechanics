@@ -237,7 +237,7 @@ func _check_rotate_in_place(delta: float) -> void:
 
 
 func _get_camera_yaw() -> float:
-	if controller.has_method("get_camera_yaw"):
+	if controller:
 		return controller.get_camera_yaw()
 	return 0.0
 

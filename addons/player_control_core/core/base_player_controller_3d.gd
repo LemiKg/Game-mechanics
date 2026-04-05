@@ -148,9 +148,3 @@ func _on_ui_state_exited() -> void:
 ## Used by GroundedState for rotate-in-place.
 func get_camera_yaw() -> float:
 	return body.rotation.y if body else 0.0
-
-
-## Override in subclasses that support perspective switching.
-## Returns true if in third-person mode (body rotation independent of camera).
-func is_third_person() -> bool:
-	return false
