@@ -284,7 +284,14 @@ func _generate_and_apply_chunk(coord: Vector2i, chunk_data: ChunkData = null) ->
 	var cell_size := world_config.get_cell_size()
 	var chunk := _get_chunk_from_pool()
 	chunk.name = "Chunk_%d_%d" % [coord.x, coord.y]
-	chunk.initialize(chunk_data, world_config.terrain_material, cell_size)
+	# Determine dominant biome for per-chunk texture selection
+	var material_set: TerrainMaterialSet = null
+	if world_config.biome_map:
+		var dominant_biome := ChunkGenerator.get_dominant_biome(chunk_data, world_config.biome_map)
+		if dominant_biome and dominant_biome.terrain_materials:
+			material_set = dominant_biome.terrain_materials
+
+	chunk.initialize(chunk_data, world_config.terrain_material, cell_size, material_set)
 	
 	# Set LOD distances
 	if not world_config.lod_distances.is_empty():
