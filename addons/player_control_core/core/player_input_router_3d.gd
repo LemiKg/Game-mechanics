@@ -27,6 +27,12 @@ var enabled: bool = true:
 			crouch_held = false
 			dodge_requested = false
 			_dodge_buffered = false
+			sit_requested = false
+			_sit_buffered = false
+			dance_requested = false
+			_dance_buffered = false
+			torch_toggle_requested = false
+			_torch_toggle_buffered = false
 			look_delta = Vector2.ZERO
 
 ## Current movement intent as a normalized 2D vector (x = strafe, y = forward/back).
@@ -50,6 +56,24 @@ var dodge_requested: bool = false
 ## Internal buffer for dodge input.
 var _dodge_buffered: bool = false
 
+## True if sit was requested (buffered for physics frame).
+var sit_requested: bool = false
+
+## Internal buffer for sit input.
+var _sit_buffered: bool = false
+
+## True if dance was requested (buffered for physics frame).
+var dance_requested: bool = false
+
+## Internal buffer for dance input.
+var _dance_buffered: bool = false
+
+## True if torch toggle was requested (buffered for physics frame).
+var torch_toggle_requested: bool = false
+
+## Internal buffer for torch toggle input.
+var _torch_toggle_buffered: bool = false
+
 ## Mouse look delta accumulated this frame.
 var look_delta: Vector2 = Vector2.ZERO
 
@@ -62,6 +86,9 @@ var _jump: StringName = &"jump"
 var _sprint: StringName = &"sprint"
 var _crouch: StringName = &"crouch"
 var _dodge: StringName = &"dodge"
+var _sit: StringName = &"sit"
+var _dance: StringName = &"dance"
+var _toggle_torch: StringName = &"toggle_torch"
 
 
 func _ready() -> void:
@@ -79,6 +106,12 @@ func _cache_action_names() -> void:
 		_crouch = input_actions.crouch
 		if "dodge" in input_actions:
 			_dodge = input_actions.dodge
+		if "sit" in input_actions:
+			_sit = input_actions.sit
+		if "dance" in input_actions:
+			_dance = input_actions.dance
+		if "toggle_torch" in input_actions:
+			_toggle_torch = input_actions.toggle_torch
 
 
 func _process(_delta: float) -> void:
@@ -97,6 +130,12 @@ func _process(_delta: float) -> void:
 	crouch_held = Input.is_action_pressed(_crouch)
 	if Input.is_action_just_pressed(_dodge):
 		_dodge_buffered = true
+	if Input.is_action_just_pressed(_sit):
+		_sit_buffered = true
+	if Input.is_action_just_pressed(_dance):
+		_dance_buffered = true
+	if Input.is_action_just_pressed(_toggle_torch):
+		_torch_toggle_buffered = true
 
 
 func _physics_process(_delta: float) -> void:
@@ -108,6 +147,12 @@ func _physics_process(_delta: float) -> void:
 	_jump_buffered = false
 	dodge_requested = _dodge_buffered
 	_dodge_buffered = false
+	sit_requested = _sit_buffered
+	_sit_buffered = false
+	dance_requested = _dance_buffered
+	_dance_buffered = false
+	torch_toggle_requested = _torch_toggle_buffered
+	_torch_toggle_buffered = false
 
 
 ## Consume and clear the jump request. Returns true if jump was requested.
@@ -121,6 +166,27 @@ func consume_jump() -> bool:
 func consume_dodge() -> bool:
 	var was_requested := dodge_requested
 	dodge_requested = false
+	return was_requested
+
+
+## Consume and clear the sit request. Returns true if sit was requested.
+func consume_sit() -> bool:
+	var was_requested := sit_requested
+	sit_requested = false
+	return was_requested
+
+
+## Consume and clear the dance request. Returns true if dance was requested.
+func consume_dance() -> bool:
+	var was_requested := dance_requested
+	dance_requested = false
+	return was_requested
+
+
+## Consume and clear the torch toggle request. Returns true if torch toggle was requested.
+func consume_torch_toggle() -> bool:
+	var was_requested := torch_toggle_requested
+	torch_toggle_requested = false
 	return was_requested
 
 
