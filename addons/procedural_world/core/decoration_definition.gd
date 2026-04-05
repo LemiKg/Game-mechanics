@@ -231,7 +231,9 @@ func _extract_mesh_from_scene(scene: PackedScene) -> Mesh:
 				break
 
 	if found_mesh_instance and found_mesh_instance.mesh:
-		found_mesh = found_mesh_instance.mesh
+		# Duplicate the mesh so we can safely modify surface materials
+		# without affecting the shared imported resource.
+		found_mesh = found_mesh_instance.mesh.duplicate()
 		# Bake MeshInstance3D material overrides into the mesh so they
 		# survive MultiMesh instancing (which has no per-instance materials).
 		_bake_materials(found_mesh_instance, found_mesh)
@@ -248,11 +250,11 @@ func _bake_materials(mesh_instance: MeshInstance3D, mesh: Mesh) -> void:
 	if mesh_instance.material_override:
 		# Single override applies to all surfaces
 		for i in range(mesh.get_surface_count()):
-			if not mesh.surface_get_material(i):
-				mesh.surface_set_material(i, mesh_instance.material_override)
+			mesh.surface_set_material(i, mesh_instance.material_override)
 	else:
-		# Check per-surface overrides
+		# Copy per-surface overrides (always write, even if surface has a material,
+		# because the imported mesh may have empty/placeholder materials)
 		for i in range(mesh.get_surface_count()):
 			var override := mesh_instance.get_surface_override_material(i)
-			if override and not mesh.surface_get_material(i):
+			if override:
 				mesh.surface_set_material(i, override)
