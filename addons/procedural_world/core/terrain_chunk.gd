@@ -35,7 +35,7 @@ func _ready() -> void:
 
 
 ## Initializes the chunk with generated data and material
-func initialize(data: ChunkData, material: ShaderMaterial, cell_size: float = 1.0) -> void:
+func initialize(data: ChunkData, material: ShaderMaterial, cell_size: float = 1.0, material_set: TerrainMaterialSet = null) -> void:
 	chunk_data = data
 	_cell_size = cell_size
 	
@@ -50,6 +50,8 @@ func initialize(data: ChunkData, material: ShaderMaterial, cell_size: float = 1.
 	if material:
 		_material = material.duplicate() as ShaderMaterial
 		_setup_splatmap()
+		if material_set:
+			material_set.apply_to_material(_material)
 	else:
 		_material = null
 	
