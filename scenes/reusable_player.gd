@@ -177,9 +177,9 @@ func _on_mouse_capture_requested(mode: Input.MouseMode) -> void:
 	Input.set_mouse_mode(mode)
 
 
-func _on_perspective_changed(is_first_person: bool) -> void:
+func _on_perspective_changed(first_person: bool) -> void:
 	_update_perspective_label()
-	perspective_changed.emit(is_first_person)
+	perspective_changed.emit(first_person)
 
 
 func _update_perspective_label() -> void:

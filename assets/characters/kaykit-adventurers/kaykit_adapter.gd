@@ -158,7 +158,9 @@ func _resolve_skeleton() -> void:
 		return
 	_skeleton = _find_node_of_type(mesh_node, "Skeleton3D") as Skeleton3D
 	if _skeleton:
-		_skeleton_path = String(_animation_player.get_path_to(_skeleton))
+		# Path must be relative to AnimationPlayer's root node, not the AnimationPlayer itself
+		var anim_root := _animation_player.get_node(_animation_player.root_node)
+		_skeleton_path = String(anim_root.get_path_to(_skeleton))
 
 
 func _merge_animations() -> void:
