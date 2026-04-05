@@ -25,6 +25,7 @@ shader_parameter/roughness_base = 0.85
 shader_parameter/roughness_variation = 0.1
 shader_parameter/height_blend_sharpness = 0.15
 shader_parameter/height_blend_scale = 0.05
+shader_parameter/snow_has_textures = true
 shader_parameter/texture_snow = ExtResource("2_snow_alb")
 shader_parameter/texture_snow_normal = ExtResource("3_snow_nrm")
 shader_parameter/texture_snow_roughness = ExtResource("4_snow_rgh")

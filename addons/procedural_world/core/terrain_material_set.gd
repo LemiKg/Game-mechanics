@@ -35,18 +35,26 @@ func apply_to_material(material: ShaderMaterial) -> void:
 	if not material:
 		return
 	# Channel R = Grass
+	if channel_r_albedo:
+		material.set_shader_parameter("grass_has_textures", true)
 	_set_if_valid(material, "texture_grass", channel_r_albedo)
 	_set_if_valid(material, "texture_grass_normal", channel_r_normal)
 	_set_if_valid(material, "texture_grass_roughness", channel_r_roughness)
 	# Channel G = Rock
+	if channel_g_albedo:
+		material.set_shader_parameter("rock_has_textures", true)
 	_set_if_valid(material, "texture_rock", channel_g_albedo)
 	_set_if_valid(material, "texture_rock_normal", channel_g_normal)
 	_set_if_valid(material, "texture_rock_roughness", channel_g_roughness)
 	# Channel B = Sand
+	if channel_b_albedo:
+		material.set_shader_parameter("sand_has_textures", true)
 	_set_if_valid(material, "texture_sand", channel_b_albedo)
 	_set_if_valid(material, "texture_sand_normal", channel_b_normal)
 	_set_if_valid(material, "texture_sand_roughness", channel_b_roughness)
 	# Channel A = Snow
+	if channel_a_albedo:
+		material.set_shader_parameter("snow_has_textures", true)
 	_set_if_valid(material, "texture_snow", channel_a_albedo)
 	_set_if_valid(material, "texture_snow_normal", channel_a_normal)
 	_set_if_valid(material, "texture_snow_roughness", channel_a_roughness)
