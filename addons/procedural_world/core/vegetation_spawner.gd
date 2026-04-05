@@ -123,38 +123,44 @@ func spawn_for_chunk(coord: Vector2i) -> void:
 	
 	var chunk_data := chunk.chunk_data
 	
-	# Get decorations from biomes or use defaults
-	var decorations := _get_decorations_for_chunk(chunk_data)
-	if decorations.is_empty():
-		decorations = default_decorations
-	
-	if decorations.is_empty():
+	# Get decorations tagged with their biome's splatmap channel
+	var tagged_decorations := _get_decorations_for_chunk(chunk_data)
+	if tagged_decorations.is_empty():
+		# Fall back to default decorations with no biome weighting
+		for dec in default_decorations:
+			if dec:
+				tagged_decorations.append({"decoration": dec, "splatmap_channel": -1})
+
+	if tagged_decorations.is_empty():
 		return
-	
+
 	# Seed RNG for reproducible placement based on chunk coord
 	_rng.seed = seed + coord.x * 73856093 + coord.y * 19349663
-	
+
 	var chunk_size := world_config.chunk_size
 	var cell_size := world_config.get_cell_size()
 	var resolution := chunk_data.width
-	
+
 	# World offset for this chunk
 	var world_offset := Vector3(
 		coord.x * chunk_size,
 		0.0,
 		coord.y * chunk_size
 	)
-	
+
 	# Spawn each decoration type
 	var multimeshes: Array[MultiMeshInstance3D] = []
 	var collision_bodies: Array[StaticBody3D] = []
-	
-	for decoration in decorations:
+
+	for entry in tagged_decorations:
+		var decoration: DecorationDefinition = entry["decoration"]
+		var splatmap_channel: int = entry["splatmap_channel"]
+
 		if not decoration:
 			continue
-		
+
 		var all_instances: Array[Transform3D] = []
-		
+
 		# Check if decoration has mesh variants
 		if decoration.has_variants():
 			# Generate instances grouped by mesh variant
@@ -164,27 +170,28 @@ func spawn_for_chunk(coord: Vector2i) -> void:
 				world_offset,
 				chunk_size,
 				cell_size,
-				resolution
+				resolution,
+				splatmap_channel
 			)
-			
+
 			# Get cached meshes extracted from scenes
 			var variant_meshes := decoration.get_variant_meshes()
-			
+
 			# Create one MultiMesh per variant for GPU batching
 			for variant_idx in variant_instances:
 				var instances: Array[Transform3D] = variant_instances[variant_idx]
 				if instances.is_empty():
 					continue
-				
+
 				if variant_idx >= variant_meshes.size():
 					continue
-				
+
 				var mesh: Mesh = variant_meshes[variant_idx]
 				var mmi := _create_multimesh_from_mesh(mesh, instances, decoration.material)
 				if mmi:
 					add_child(mmi)
 					multimeshes.append(mmi)
-				
+
 				# Collect all transforms for collision
 				all_instances.append_array(instances)
 		else:
@@ -195,20 +202,21 @@ func spawn_for_chunk(coord: Vector2i) -> void:
 				world_offset,
 				chunk_size,
 				cell_size,
-				resolution
+				resolution,
+				splatmap_channel
 			)
-			
+
 			if instances.is_empty():
 				continue
-			
+
 			# Create MultiMesh for this decoration type
 			var mmi := _create_multimesh_instance(decoration, instances)
 			if mmi:
 				add_child(mmi)
 				multimeshes.append(mmi)
-			
+
 			all_instances = instances
-		
+
 		# Spawn collision bodies if enabled
 		if decoration.has_collision and not all_instances.is_empty():
 			var bodies := _spawn_collision_bodies(decoration, all_instances)
@@ -228,9 +236,10 @@ func _generate_instances(
 	world_offset: Vector3,
 	chunk_size: float,
 	cell_size: float,
-	resolution: int
+	resolution: int,
+	splatmap_channel: int = -1
 ) -> Array[Transform3D]:
-	return _generate_sample_transforms(decoration, chunk_data, world_offset, chunk_size, cell_size, resolution)
+	return _generate_sample_transforms(decoration, chunk_data, world_offset, chunk_size, cell_size, resolution, splatmap_channel)
 
 
 ## Core instance generation - shared by both single-mesh and variant paths.
@@ -241,7 +250,8 @@ func _generate_sample_transforms(
 	world_offset: Vector3,
 	chunk_size: float,
 	cell_size: float,
-	resolution: int
+	resolution: int,
+	splatmap_channel: int = -1
 ) -> Array[Transform3D]:
 	var transforms: Array[Transform3D] = []
 
@@ -282,6 +292,16 @@ func _generate_sample_transforms(
 				continue
 			if decoration.cluster_edge_scale_falloff > 0.0:
 				cluster_edge_factor = clampf((noise_val - threshold) / (1.0 - threshold + 0.001), 0.0, 1.0)
+
+		# Biome weight check — skip if this biome is not dominant here
+		if splatmap_channel >= 0 and not chunk_data.biome_weights.is_empty():
+			var grid_x := clampi(int(local_x / cell_size), 0, resolution - 1)
+			var grid_z := clampi(int(local_z / cell_size), 0, resolution - 1)
+			var weight_idx := (grid_z * resolution + grid_x) * 4 + splatmap_channel
+			if weight_idx < chunk_data.biome_weights.size():
+				var biome_weight := chunk_data.biome_weights[weight_idx]
+				if _rng.randf() > biome_weight:
+					continue
 
 		# Height and slope
 		var height := _sample_height_at(local_x, local_z, chunk_data, cell_size, resolution)
@@ -357,7 +377,8 @@ func _generate_instances_with_variants(
 	world_offset: Vector3,
 	chunk_size: float,
 	cell_size: float,
-	resolution: int
+	resolution: int,
+	splatmap_channel: int = -1
 ) -> Dictionary:
 	var variant_instances: Dictionary = {}
 	var variant_count := decoration.get_mesh_count()
@@ -365,7 +386,7 @@ func _generate_instances_with_variants(
 	for i in range(variant_count):
 		variant_instances[i] = [] as Array[Transform3D]
 
-	var all_transforms := _generate_sample_transforms(decoration, chunk_data, world_offset, chunk_size, cell_size, resolution)
+	var all_transforms := _generate_sample_transforms(decoration, chunk_data, world_offset, chunk_size, cell_size, resolution, splatmap_channel)
 
 	for transform in all_transforms:
 		var variant_idx := _rng.randi() % variant_count
@@ -708,25 +729,25 @@ func _get_decoration_mesh(decoration: DecorationDefinition) -> Mesh:
 	return mesh
 
 
-## Get decorations for a chunk based on biome data
-func _get_decorations_for_chunk(chunk_data: ChunkData) -> Array[DecorationDefinition]:
-	var decorations: Array[DecorationDefinition] = []
-	
+## Get decorations for a chunk tagged with their biome's splatmap channel.
+## Returns all decorations from all biomes so each can be weighted per-position.
+func _get_decorations_for_chunk(chunk_data: ChunkData) -> Array[Dictionary]:
+	var tagged: Array[Dictionary] = []
+
 	if not world_config or not world_config.biome_map:
-		return decorations
-	
-	# Sample center of chunk for dominant biome
-	var center_idx := (chunk_data.width / 2) * chunk_data.width + (chunk_data.width / 2)
-	var height := chunk_data.height_data[center_idx] if center_idx < chunk_data.height_data.size() else 0.0
-	var moisture := chunk_data.moisture_data[center_idx] if center_idx < chunk_data.moisture_data.size() else 0.5
-	
-	var elevation := HeightGenerator.get_normalized_elevation(height, world_config)
-	var biome := world_config.biome_map.get_biome(elevation, moisture)
-	
-	if biome:
-		decorations.append_array(biome.get_decorations())
-	
-	return decorations
+		return tagged
+
+	for biome in world_config.biome_map.biomes:
+		if not biome:
+			continue
+		for decoration in biome.get_decorations():
+			if decoration:
+				tagged.append({
+					"decoration": decoration,
+					"splatmap_channel": biome.splatmap_channel,
+				})
+
+	return tagged
 
 
 ## Spawn collision bodies for a decoration type at given transforms
