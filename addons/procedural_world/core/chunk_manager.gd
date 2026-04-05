@@ -278,28 +278,7 @@ func _generate_and_apply_chunk(coord: Vector2i, chunk_data: ChunkData = null) ->
 	
 	# Generate synchronously if no data provided
 	if chunk_data == null:
-		chunk_data = ChunkData.new()
-		chunk_data.initialize(coord, world_config.chunk_resolution)
-		
-		# Pass 1: Generate base heights and moisture
-		chunk_data.height_data = HeightGenerator.generate_height_data(coord, world_config)
-		chunk_data.moisture_data = HeightGenerator.generate_moisture_data(coord, world_config)
-		
-		# Pass 2: Calculate biome weights and apply height modifications
-		_apply_biome_data(chunk_data, coord)
-		
-		# Build meshes (after biome height modifications)
-		var cell_size := world_config.get_cell_size()
-		var lod_count := world_config.lod_distances.size() + 1
-		chunk_data.mesh_lods = TerrainMeshBuilder.build_lod_meshes(
-			chunk_data.height_data,
-			chunk_data.width,
-			chunk_data.depth,
-			cell_size,
-			lod_count
-		)
-		
-		chunk_data.state = ChunkData.GenerationState.READY
+		chunk_data = ChunkGenerator.generate(coord, world_config)
 	
 	# Get chunk node from pool and initialize
 	var cell_size := world_config.get_cell_size()
@@ -319,66 +298,6 @@ func _generate_and_apply_chunk(coord: Vector2i, chunk_data: ChunkData = null) ->
 	_active_chunks[coord] = chunk
 	
 	chunk_ready.emit(coord)
-
-
-## Applies biome weights and height modifications to chunk data
-func _apply_biome_data(chunk_data: ChunkData, coord: Vector2i) -> void:
-	if not world_config or not world_config.biome_map:
-		# No biome map configured - use default grass weights
-		for i in range(chunk_data.width * chunk_data.depth):
-			var idx := i * 4
-			chunk_data.biome_weights[idx] = 1.0 # R = grass
-			chunk_data.biome_weights[idx + 1] = 0.0
-			chunk_data.biome_weights[idx + 2] = 0.0
-			chunk_data.biome_weights[idx + 3] = 0.0
-		return
-	
-	var biome_map := world_config.biome_map
-	var cell_size := world_config.get_cell_size()
-	var resolution := chunk_data.width
-	
-	# World offset for this chunk
-	var world_offset_x := coord.x * world_config.chunk_size
-	var world_offset_z := coord.y * world_config.chunk_size
-	
-	for z in range(resolution):
-		for x in range(resolution):
-			var idx := z * resolution + x
-			
-			# Get height and moisture at this vertex
-			var height := chunk_data.height_data[idx]
-			var moisture := chunk_data.moisture_data[idx]
-			
-			# Calculate normalized elevation
-			var elevation := HeightGenerator.get_normalized_elevation(height, world_config)
-			
-			# Get world position for this vertex
-			var world_x := world_offset_x + x * cell_size
-			var world_z := world_offset_z + z * cell_size
-			
-			# Blend height modifications from ALL matching biomes (smooth transitions)
-			var matching := biome_map.get_matching_biomes(elevation, moisture)
-			if not matching.is_empty():
-				var total_strength := 0.0
-				var blended_height := 0.0
-				
-				for match_data in matching:
-					var biome: BiomeData = match_data["biome"]
-					var strength: float = match_data["strength"]
-					var modified := biome.modify_height(height, world_x, world_z)
-					blended_height += modified * strength
-					total_strength += strength
-				
-				if total_strength > 0.0:
-					chunk_data.height_data[idx] = blended_height / total_strength
-			
-			# Calculate blended biome weights for splatmap
-			var weights := biome_map.get_biome_weights(elevation, moisture)
-			var weight_idx := idx * 4
-			chunk_data.biome_weights[weight_idx] = weights.r
-			chunk_data.biome_weights[weight_idx + 1] = weights.g
-			chunk_data.biome_weights[weight_idx + 2] = weights.b
-			chunk_data.biome_weights[weight_idx + 3] = weights.a
 
 
 ## Unloads a chunk at the specified coordinate
