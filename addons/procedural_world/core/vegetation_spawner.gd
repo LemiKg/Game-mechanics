@@ -218,107 +218,104 @@ func _generate_instances(
 	cell_size: float,
 	resolution: int
 ) -> Array[Transform3D]:
-	var instances: Array[Transform3D] = []
-	
-	# Calculate min distance based on density
+	return _generate_sample_transforms(decoration, chunk_data, world_offset, chunk_size, cell_size, resolution)
+
+
+## Core instance generation - shared by both single-mesh and variant paths.
+## Returns Array of Transform3D for all valid sample positions.
+func _generate_sample_transforms(
+	decoration: DecorationDefinition,
+	chunk_data: ChunkData,
+	world_offset: Vector3,
+	chunk_size: float,
+	cell_size: float,
+	resolution: int
+) -> Array[Transform3D]:
+	var transforms: Array[Transform3D] = []
+
 	var min_distance := 1.0 / sqrt(decoration.density) if decoration.density > 0 else 10.0
-	
-	# Configure cluster noise for this decoration
+
+	# Configure cluster noise
 	var use_clustering := decoration.cluster_strength > 0.0 and _cluster_noise
 	if use_clustering:
 		_cluster_noise.frequency = decoration.cluster_scale
-		# Use cluster_group_id for base pattern, cluster_seed_offset for variation
 		_cluster_noise.seed = seed + decoration.cluster_group_id * 1000 + decoration.cluster_seed_offset
-	
-	# Get sample points - either Poisson disk or jittered grid
+
+	# Get sample points
 	var sample_points: Array[Vector2] = []
 	if decoration.use_poisson_sampling:
 		var decoration_seed := decoration.cluster_group_id * 1000 + decoration.cluster_seed_offset
 		sample_points = _generate_poisson_points_with_margin(chunk_data.coord, chunk_size, min_distance, decoration_seed)
 	else:
 		sample_points = _generate_jittered_grid_points(chunk_size, min_distance)
-	
+
 	for point in sample_points:
-		if instances.size() >= max_per_chunk:
+		if transforms.size() >= max_per_chunk:
 			break
-		
+
 		var local_x := point.x
 		var local_z := point.y
-		
-		# Skip if outside chunk bounds
+
 		if local_x >= chunk_size or local_z >= chunk_size:
 			continue
-		
-		# Apply clustering - use noise to determine spawn probability
-		var cluster_edge_factor := 1.0 # 1.0 = cluster center, 0.0 = cluster edge
+
+		# Clustering
+		var cluster_edge_factor := 1.0
 		if use_clustering:
 			var world_x := world_offset.x + local_x
 			var world_z := world_offset.z + local_z
-			var noise_val := (_cluster_noise.get_noise_2d(world_x, world_z) + 1.0) * 0.5 # 0-1
-			var threshold := decoration.cluster_strength * 0.7 # Higher strength = higher threshold
+			var noise_val := (_cluster_noise.get_noise_2d(world_x, world_z) + 1.0) * 0.5
+			var threshold := decoration.cluster_strength * 0.7
 			if noise_val < threshold:
-				continue # Skip this position (creates gaps = clusters)
-			
-			# Calculate edge factor for scale falloff
+				continue
 			if decoration.cluster_edge_scale_falloff > 0.0:
 				cluster_edge_factor = clampf((noise_val - threshold) / (1.0 - threshold + 0.001), 0.0, 1.0)
-		
-		# Sample height from chunk data
+
+		# Height and slope
 		var height := _sample_height_at(local_x, local_z, chunk_data, cell_size, resolution)
-		
-		# Calculate slope at this position
 		var slope := _calculate_slope_at(local_x, local_z, chunk_data, cell_size, resolution)
-		
-		# Check slope constraints
 		if not decoration.is_slope_valid(slope):
 			continue
-		
-		# Calculate Y offset with variance (negative = buried)
+
+		# Y offset
 		var y_off := decoration.y_offset
 		if decoration.y_offset_variance > 0.0:
 			y_off -= _rng.randf() * decoration.y_offset_variance
-		
-		# Create transform
+
+		# Build transform
 		var pos := world_offset + Vector3(local_x, height + y_off, local_z)
 		var rotation := decoration.get_random_rotation(_rng)
-		
-		# Get base scale with cluster edge falloff
+
 		var base_scale := decoration.get_random_scale(_rng)
 		if decoration.cluster_edge_scale_falloff > 0.0:
 			var min_edge_scale := lerpf(decoration.min_scale, base_scale, 1.0 - decoration.cluster_edge_scale_falloff)
 			base_scale = lerpf(min_edge_scale, base_scale, cluster_edge_factor)
-		
+
 		var transform := Transform3D.IDENTITY
-		
-		# Apply normal alignment if enabled (with angle limit)
+
 		if decoration.align_to_normal:
 			var normal := _sample_normal_at(local_x, local_z, chunk_data, cell_size, resolution)
 			transform = _align_to_normal_limited(normal, decoration.max_align_angle)
-		
-		# Apply random tilt on X/Z axes for natural settling
+
 		if decoration.random_tilt > 0.0:
 			var tilt_x := _rng.randf_range(-decoration.random_tilt, decoration.random_tilt)
 			var tilt_z := _rng.randf_range(-decoration.random_tilt, decoration.random_tilt)
 			transform = transform.rotated(transform.basis.x.normalized(), tilt_x)
 			transform = transform.rotated(transform.basis.z.normalized(), tilt_z)
-		
-		# Apply rotation around Y axis
+
 		transform = transform.rotated(Vector3.UP, rotation)
-		
-		# Apply scale (non-uniform if variance is set)
+
 		var scale_vec := Vector3.ONE * base_scale
 		if decoration.scale_variance != Vector3.ZERO:
 			scale_vec.x *= 1.0 + _rng.randf_range(-decoration.scale_variance.x, decoration.scale_variance.x)
 			scale_vec.y *= 1.0 + _rng.randf_range(-decoration.scale_variance.y, decoration.scale_variance.y)
 			scale_vec.z *= 1.0 + _rng.randf_range(-decoration.scale_variance.z, decoration.scale_variance.z)
 		transform = transform.scaled(scale_vec)
-		
-		# Apply position
+
 		transform.origin = pos
-		
-		instances.append(transform)
-	
-	return instances
+		transforms.append(transform)
+
+	return transforms
 
 
 ## Generate jittered grid sample points (fallback when not using Poisson)
@@ -352,114 +349,16 @@ func _generate_instances_with_variants(
 ) -> Dictionary:
 	var variant_instances: Dictionary = {}
 	var variant_count := decoration.get_mesh_count()
-	
-	# Initialize arrays for each variant
+
 	for i in range(variant_count):
 		variant_instances[i] = [] as Array[Transform3D]
-	
-	# Calculate min distance based on density
-	var min_distance := 1.0 / sqrt(decoration.density) if decoration.density > 0 else 10.0
-	var total_count := 0
-	
-	# Configure cluster noise for this decoration
-	var use_clustering := decoration.cluster_strength > 0.0 and _cluster_noise
-	if use_clustering:
-		_cluster_noise.frequency = decoration.cluster_scale
-		# Use cluster_group_id for base pattern, cluster_seed_offset for variation
-		_cluster_noise.seed = seed + decoration.cluster_group_id * 1000 + decoration.cluster_seed_offset
-	
-	# Get sample points - either Poisson disk or jittered grid
-	var sample_points: Array[Vector2] = []
-	if decoration.use_poisson_sampling:
-		var decoration_seed := decoration.cluster_group_id * 1000 + decoration.cluster_seed_offset
-		sample_points = _generate_poisson_points_with_margin(chunk_data.coord, chunk_size, min_distance, decoration_seed)
-	else:
-		sample_points = _generate_jittered_grid_points(chunk_size, min_distance)
-	
-	for point in sample_points:
-		if total_count >= max_per_chunk:
-			break
-		
-		var local_x := point.x
-		var local_z := point.y
-		
-		# Skip if outside chunk bounds
-		if local_x >= chunk_size or local_z >= chunk_size:
-			continue
-		
-		# Apply clustering - use noise to determine spawn probability
-		var cluster_edge_factor := 1.0 # 1.0 = cluster center, 0.0 = cluster edge
-		if use_clustering:
-			var world_x := world_offset.x + local_x
-			var world_z := world_offset.z + local_z
-			var noise_val := (_cluster_noise.get_noise_2d(world_x, world_z) + 1.0) * 0.5 # 0-1
-			var threshold := decoration.cluster_strength * 0.7 # Higher strength = higher threshold
-			if noise_val < threshold:
-				continue # Skip this position (creates gaps = clusters)
-			
-			# Calculate edge factor for scale falloff
-			if decoration.cluster_edge_scale_falloff > 0.0:
-				cluster_edge_factor = clampf((noise_val - threshold) / (1.0 - threshold + 0.001), 0.0, 1.0)
-		
-		# Sample height from chunk data
-		var height := _sample_height_at(local_x, local_z, chunk_data, cell_size, resolution)
-		
-		# Calculate slope at this position
-		var slope := _calculate_slope_at(local_x, local_z, chunk_data, cell_size, resolution)
-		
-		# Check slope constraints
-		if not decoration.is_slope_valid(slope):
-			continue
-		
-		# Pick a random variant
+
+	var all_transforms := _generate_sample_transforms(decoration, chunk_data, world_offset, chunk_size, cell_size, resolution)
+
+	for transform in all_transforms:
 		var variant_idx := _rng.randi() % variant_count
-		
-		# Calculate Y offset with variance (negative = buried)
-		var y_off := decoration.y_offset
-		if decoration.y_offset_variance > 0.0:
-			y_off -= _rng.randf() * decoration.y_offset_variance
-		
-		# Create transform
-		var pos := world_offset + Vector3(local_x, height + y_off, local_z)
-		var rotation := decoration.get_random_rotation(_rng)
-		
-		# Get base scale with cluster edge falloff
-		var base_scale := decoration.get_random_scale(_rng)
-		if decoration.cluster_edge_scale_falloff > 0.0:
-			var min_edge_scale := lerpf(decoration.min_scale, base_scale, 1.0 - decoration.cluster_edge_scale_falloff)
-			base_scale = lerpf(min_edge_scale, base_scale, cluster_edge_factor)
-		
-		var transform := Transform3D.IDENTITY
-		
-		# Apply normal alignment if enabled (with angle limit)
-		if decoration.align_to_normal:
-			var normal := _sample_normal_at(local_x, local_z, chunk_data, cell_size, resolution)
-			transform = _align_to_normal_limited(normal, decoration.max_align_angle)
-		
-		# Apply random tilt on X/Z axes for natural settling
-		if decoration.random_tilt > 0.0:
-			var tilt_x := _rng.randf_range(-decoration.random_tilt, decoration.random_tilt)
-			var tilt_z := _rng.randf_range(-decoration.random_tilt, decoration.random_tilt)
-			transform = transform.rotated(transform.basis.x.normalized(), tilt_x)
-			transform = transform.rotated(transform.basis.z.normalized(), tilt_z)
-		
-		# Apply rotation around Y axis
-		transform = transform.rotated(Vector3.UP, rotation)
-		
-		# Apply scale (non-uniform if variance is set)
-		var scale_vec := Vector3.ONE * base_scale
-		if decoration.scale_variance != Vector3.ZERO:
-			scale_vec.x *= 1.0 + _rng.randf_range(-decoration.scale_variance.x, decoration.scale_variance.x)
-			scale_vec.y *= 1.0 + _rng.randf_range(-decoration.scale_variance.y, decoration.scale_variance.y)
-			scale_vec.z *= 1.0 + _rng.randf_range(-decoration.scale_variance.z, decoration.scale_variance.z)
-		transform = transform.scaled(scale_vec)
-		
-		# Apply position
-		transform.origin = pos
-		
 		variant_instances[variant_idx].append(transform)
-		total_count += 1
-	
+
 	return variant_instances
 
 
