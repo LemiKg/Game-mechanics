@@ -20,6 +20,15 @@ var _skeleton: Skeleton3D
 var _skeleton_path: String = ""
 
 
+## Animations that should loop continuously (movement, idles, holds).
+const LOOPING_ANIMATIONS := [
+	&"Idle_A", &"Idle_B", &"Walking_A", &"Walking_B", &"Walking_C",
+	&"Running_A", &"Running_B", &"Crouching", &"Sneaking", &"Jump_Idle",
+	&"Sit_Chair_Idle", &"Cheering", &"Holding_A", &"Holding_B", &"Holding_C",
+	&"Melee_2H_Idle", &"Melee_Unarmed_Idle", &"Walking_Backwards",
+]
+
+
 const ANIMATION_MAP := {
 	&"idle": &"Idle_A",
 	&"walk": &"Walking_A",
@@ -192,6 +201,11 @@ func _merge_animations() -> void:
 					default_lib.add_animation(anim_name, remapped)
 
 		instance.free()
+
+	# Set loop mode on animations that should loop
+	for anim_name in LOOPING_ANIMATIONS:
+		if default_lib.has_animation(anim_name):
+			default_lib.get_animation(anim_name).loop_mode = Animation.LOOP_LINEAR
 
 
 func _build_state_machine() -> void:

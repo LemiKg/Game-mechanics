@@ -98,8 +98,7 @@ func _ready() -> void:
 	if not settings:
 		push_warning("PoseWarpingController: 'settings' is not assigned. Using defaults.")
 		settings = PoseWarpingSettings.new()
-	if not skeleton:
-		push_warning("PoseWarpingController: 'skeleton' is not assigned.")
+	# skeleton is assigned by _bind_character() via CharacterAdapter at runtime
 	if not velocity_source:
 		push_warning("PoseWarpingController: 'velocity_source' is not assigned.")
 	_cache_character_rid()
