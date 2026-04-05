@@ -80,7 +80,7 @@ chunk_manager = NodePath("../ChunkManager")
 script = ExtResource("5_veg")
 chunk_manager = NodePath("../ChunkManager")
 world_config = ExtResource("2_pyv2p")
-max_per_chunk = 1000
+max_per_chunk = 5000
 spawn_radius = 1
 
 [node name="Player" parent="." unique_id=1886886982 instance=ExtResource("3_pyv2p")]
