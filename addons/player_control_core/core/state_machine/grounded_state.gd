@@ -117,19 +117,20 @@ func physics_update(delta: float) -> void:
 
 	# Handle sit input
 	if input_router.consume_sit():
-		if state_machine.has_state(&"sit"):
+		if state_machine.has_state(&"sit") and is_animation_supported(&"sit_enter"):
 			transition_to(&"sit")
 			return
 
 	# Handle dance input
 	if input_router.consume_dance():
-		if state_machine.has_state(&"dance"):
+		if state_machine.has_state(&"dance") and is_animation_supported(&"dance"):
 			transition_to(&"dance")
 			return
 
 	# Handle torch toggle
 	if input_router.consume_torch_toggle():
-		_torch_active = not _torch_active
+		if is_animation_supported(&"torch"):
+			_torch_active = not _torch_active
 
 	# Update crouch collision shape
 	_update_crouch_collision(delta)
