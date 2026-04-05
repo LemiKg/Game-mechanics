@@ -79,7 +79,7 @@ func enter() -> void:
 	# Rotate body to face dodge direction (third-person only).
 	# In first-person the body IS the camera yaw node — rotating it
 	# would jerk the view away from where the player is looking.
-	if controller is DualPerspectiveController3D and controller.is_third_person():
+	if controller and controller.is_third_person():
 		controller.body.rotation.y = atan2(_dodge_direction.x, _dodge_direction.z)
 
 	# Disable motor — we control movement directly

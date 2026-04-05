@@ -142,3 +142,15 @@ func _on_ui_state_entered() -> void:
 ## Called by UIState when exiting. Override in subclasses for additional behavior.
 func _on_ui_state_exited() -> void:
 	pass
+
+
+## Override in subclasses to return the current camera yaw angle.
+## Used by GroundedState for rotate-in-place.
+func get_camera_yaw() -> float:
+	return body.rotation.y if body else 0.0
+
+
+## Override in subclasses that support perspective switching.
+## Returns true if in third-person mode (body rotation independent of camera).
+func is_third_person() -> bool:
+	return false
