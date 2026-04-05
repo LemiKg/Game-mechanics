@@ -1,4 +1,4 @@
-[gd_scene load_steps=67 format=3 uid="uid://bv4xp8r0k5qm2"]
+[gd_scene load_steps=70 format=3 uid="uid://bv4xp8r0k5qm2"]
 
 [ext_resource type="Script" uid="uid://ddprtht2qo7se" path="res://addons/inventory_system/core/inventory_component.gd" id="1_inv_comp"]
 [ext_resource type="Script" uid="uid://bgudcqpbogui8" path="res://addons/inventory_system/core/equipment_component.gd" id="2_equip_comp"]
@@ -33,6 +33,9 @@
 [ext_resource type="Script" path="res://addons/player_control_core/core/state_machine/mantle_state.gd" id="34_mantle"]
 [ext_resource type="Script" path="res://addons/player_control_core/core/mantle_detector.gd" id="35_mantle_det"]
 [ext_resource type="Script" path="res://addons/player_control_core/core/mantle_settings_3d.gd" id="36_mantle_set"]
+[ext_resource type="Script" path="res://addons/player_control_core/core/state_machine/sit_state.gd" id="37_sit"]
+[ext_resource type="Script" path="res://addons/player_control_core/core/state_machine/dance_state.gd" id="38_dance"]
+[ext_resource type="Script" path="res://addons/player_control_core/core/state_machine/interaction_state.gd" id="39_interaction"]
 [ext_resource type="Script" path="res://addons/player_control_core/ui/stamina_bar_ui.gd" id="32_stamina_bar"]
 [ext_resource type="Script" path="res://addons/inventory_system/ui/themes/theme_manager.gd" id="33_theme_mgr"]
 
@@ -223,6 +226,15 @@ mantle_settings = SubResource("MantleSettings")
 script = ExtResource("30_ragdoll")
 skeleton = NodePath("../../CharacterMesh/Rig/Skeleton3D")
 collision_shape = NodePath("../../CollisionShape3D")
+
+[node name="sit" type="Node" parent="PlayerStateMachine"]
+script = ExtResource("37_sit")
+
+[node name="dance" type="Node" parent="PlayerStateMachine"]
+script = ExtResource("38_dance")
+
+[node name="interaction" type="Node" parent="PlayerStateMachine"]
+script = ExtResource("39_interaction")
 
 [node name="AnimationController" type="Node" parent="." node_paths=PackedStringArray("state_machine", "animation_tree")]
 script = ExtResource("20_anim_ctrl")
