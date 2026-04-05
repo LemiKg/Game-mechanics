@@ -8,5 +8,5 @@ extends RefCounted
 
 ## Apply this generation pass to the chunk data.
 ## Override in subclasses. Must be thread-safe.
-func apply(chunk_data: ChunkData, coord: Vector2i, config) -> void:
+func apply(chunk_data: ChunkData, coord: Vector2i, config: WorldConfig) -> void:
 	pass

@@ -17,7 +17,7 @@ static var default_pipeline: Array[ChunkGenerationPass] = [
 
 
 ## Generate a complete chunk using the provided pipeline (or default).
-static func generate(coord: Vector2i, config, pipeline: Array[ChunkGenerationPass] = []) -> ChunkData:
+static func generate(coord: Vector2i, config: WorldConfig, pipeline: Array[ChunkGenerationPass] = []) -> ChunkData:
 	var chunk_data := ChunkData.new()
 	chunk_data.initialize(coord, config.chunk_resolution)
 
@@ -30,7 +30,7 @@ static func generate(coord: Vector2i, config, pipeline: Array[ChunkGenerationPas
 
 
 ## Apply biome height modifications to chunk data.
-static func apply_biome_heights(chunk_data: ChunkData, coord: Vector2i, config) -> void:
+static func apply_biome_heights(chunk_data: ChunkData, coord: Vector2i, config: WorldConfig) -> void:
 	if not config or not config.biome_map:
 		return
 
@@ -67,13 +67,13 @@ static func apply_biome_heights(chunk_data: ChunkData, coord: Vector2i, config) 
 
 
 ## Calculate biome weights for splatmap rendering.
-static func calculate_biome_weights(chunk_data: ChunkData, coord: Vector2i, config) -> void:
-	var biome_map = config.biome_map if config else null
-	var cell_size := config.get_cell_size() if config else 1.0
+static func calculate_biome_weights(chunk_data: ChunkData, coord: Vector2i, config: WorldConfig) -> void:
+	var biome_map: BiomeMap = config.biome_map if config else null
+	var cell_size: float = config.get_cell_size() if config else 1.0
 	var resolution := chunk_data.width
 
-	var world_offset_x := coord.x * config.chunk_size if config else 0.0
-	var world_offset_z := coord.y * config.chunk_size if config else 0.0
+	var world_offset_x: float = coord.x * config.chunk_size if config else 0.0
+	var world_offset_z: float = coord.y * config.chunk_size if config else 0.0
 
 	for z in range(resolution):
 		for x in range(resolution):

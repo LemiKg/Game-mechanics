@@ -3,5 +3,5 @@ extends ChunkGenerationPass
 ## Calculates per-vertex biome weights for splatmap rendering.
 
 
-func apply(chunk_data: ChunkData, coord: Vector2i, config) -> void:
+func apply(chunk_data: ChunkData, coord: Vector2i, config: WorldConfig) -> void:
 	ChunkGenerator.calculate_biome_weights(chunk_data, coord, config)
