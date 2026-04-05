@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="DecorationDefinition" load_steps=8 format=3 uid="uid://mountain_stones_small"]
+
+[ext_resource type="Script" uid="uid://kxng7b8qpiu7" path="res://addons/procedural_world/core/decoration_definition.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://assets/nature-kit/stone_smallA.glb" id="2_scene1"]
+[ext_resource type="PackedScene" path="res://assets/nature-kit/stone_smallB.glb" id="3_scene2"]
+[ext_resource type="PackedScene" path="res://assets/nature-kit/stone_smallC.glb" id="4_scene3"]
+[ext_resource type="PackedScene" path="res://assets/nature-kit/stone_smallD.glb" id="5_scene4"]
+[ext_resource type="PackedScene" path="res://assets/nature-kit/stone_smallE.glb" id="6_scene5"]
+[ext_resource type="PackedScene" path="res://assets/nature-kit/stone_smallF.glb" id="7_scene6"]
+
+[resource]
+script = ExtResource("1_script")
+decoration_type = 1
+scene_variants = Array[PackedScene]([ExtResource("2_scene1"), ExtResource("3_scene2"), ExtResource("4_scene3"), ExtResource("5_scene4"), ExtResource("6_scene5"), ExtResource("7_scene6")])
+density = 0.06
+min_scale = 0.3
+max_scale = 0.8
+max_slope = 0.6
+align_to_normal = true
+random_rotation = 6.283
+random_tilt = 0.2
+y_offset = -0.03
+cluster_strength = 0.2
+cluster_scale = 0.03
+cluster_group_id = 2
+cluster_seed_offset = 10
