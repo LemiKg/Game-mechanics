@@ -1,7 +1,10 @@
-[gd_scene load_steps=131 format=3 uid="uid://c0wo2ldbnefie"]
+[gd_scene load_steps=134 format=3 uid="uid://c0wo2ldbnefie"]
 
 [ext_resource type="PackedScene" uid="uid://d3rpqr655oidf" path="res://assets/characters/quaternius/AnimationLibrary_Godot_Standard.glb" id="1_model"]
 [ext_resource type="Script" path="res://assets/characters/quaternius/quaternius_adapter.gd" id="2_adapter"]
+[ext_resource type="Script" path="res://addons/pose_warping/core/orientation_warping_modifier.gd" id="3_orient_mod"]
+[ext_resource type="Script" path="res://addons/pose_warping/core/stride_warping_modifier.gd" id="4_stride_mod"]
+[ext_resource type="Script" path="res://addons/pose_warping/core/slope_warping_modifier.gd" id="5_slope_mod"]
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_crouch_fwd"]
 animation = &"Crouch_Fwd"
@@ -539,6 +542,15 @@ bones/49/rotation = Quaternion(0.990699, -0.13102405, 0.016154896, 0.0329744)
 bones/50/rotation = Quaternion(0.16017991, 0.35220802, -0.061327387, 0.9200712)
 bones/51/rotation = Quaternion(-0.59727675, -0.05324795, -0.16274926, 0.783542)
 bones/52/rotation = Quaternion(-0.00013704659, 0.9643068, -0.26478708, -0.000499421)
+
+[node name="OrientationWarpingModifier" type="SkeletonModifier3D" parent="Rig/Skeleton3D"]
+script = ExtResource("3_orient_mod")
+
+[node name="StrideWarpingModifier" type="SkeletonModifier3D" parent="Rig/Skeleton3D"]
+script = ExtResource("4_stride_mod")
+
+[node name="SlopeWarpingModifier" type="SkeletonModifier3D" parent="Rig/Skeleton3D"]
+script = ExtResource("5_slope_mod")
 
 [node name="AnimationTree" type="AnimationTree" parent="." index="2"]
 tree_root = SubResource("AnimationNodeStateMachine_main")

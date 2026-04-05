@@ -1,4 +1,4 @@
-[gd_scene load_steps=70 format=3 uid="uid://bv4xp8r0k5qm2"]
+[gd_scene load_steps=67 format=3 uid="uid://bv4xp8r0k5qm2"]
 
 [ext_resource type="Script" uid="uid://ddprtht2qo7se" path="res://addons/inventory_system/core/inventory_component.gd" id="1_inv_comp"]
 [ext_resource type="Script" uid="uid://bgudcqpbogui8" path="res://addons/inventory_system/core/equipment_component.gd" id="2_equip_comp"]
@@ -24,9 +24,6 @@
 [ext_resource type="Script" uid="uid://bcop3agcqywg5" path="res://scenes/reusable_player.gd" id="21_player_script"]
 [ext_resource type="Script" uid="uid://kug2icv6kyj3" path="res://addons/pose_warping/core/pose_warping_controller.gd" id="22_pose_ctrl"]
 [ext_resource type="Resource" path="res://addons/pose_warping/default_pose_warping_settings.tres" id="25_pose_settings"]
-[ext_resource type="Script" path="res://addons/pose_warping/core/orientation_warping_modifier.gd" id="26_orient_mod"]
-[ext_resource type="Script" path="res://addons/pose_warping/core/stride_warping_modifier.gd" id="27_stride_mod"]
-[ext_resource type="Script" path="res://addons/pose_warping/core/slope_warping_modifier.gd" id="28_slope_mod"]
 [ext_resource type="Script" path="res://addons/player_control_core/core/state_machine/dodge_state.gd" id="29_dodge"]
 [ext_resource type="Script" path="res://addons/player_control_core/core/state_machine/ragdoll_state.gd" id="30_ragdoll"]
 [ext_resource type="Script" path="res://addons/player_control_core/core/stamina_component.gd" id="31_stamina"]
@@ -143,15 +140,6 @@ shape = SubResource("CapsuleShape3D_player")
 [node name="CharacterMesh" parent="." instance=ExtResource("19_character")]
 transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
 
-[node name="OrientationWarpingModifier" type="SkeletonModifier3D" parent="CharacterMesh/Rig/Skeleton3D"]
-script = ExtResource("26_orient_mod")
-
-[node name="StrideWarpingModifier" type="SkeletonModifier3D" parent="CharacterMesh/Rig/Skeleton3D"]
-script = ExtResource("27_stride_mod")
-
-[node name="SlopeWarpingModifier" type="SkeletonModifier3D" parent="CharacterMesh/Rig/Skeleton3D"]
-script = ExtResource("28_slope_mod")
-
 [node name="FPSPitchPivot" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
 rotation_edit_mode = 1
@@ -222,9 +210,8 @@ stamina_component = NodePath("../../StaminaComponent")
 script = ExtResource("34_mantle")
 mantle_settings = SubResource("MantleSettings")
 
-[node name="ragdoll" type="Node" parent="PlayerStateMachine" node_paths=PackedStringArray("skeleton", "collision_shape")]
+[node name="ragdoll" type="Node" parent="PlayerStateMachine" node_paths=PackedStringArray("collision_shape")]
 script = ExtResource("30_ragdoll")
-skeleton = NodePath("../../CharacterMesh/Rig/Skeleton3D")
 collision_shape = NodePath("../../CollisionShape3D")
 
 [node name="sit" type="Node" parent="PlayerStateMachine"]
@@ -236,18 +223,13 @@ script = ExtResource("38_dance")
 [node name="interaction" type="Node" parent="PlayerStateMachine"]
 script = ExtResource("39_interaction")
 
-[node name="AnimationController" type="Node" parent="." node_paths=PackedStringArray("state_machine", "animation_tree")]
+[node name="AnimationController" type="Node" parent="." node_paths=PackedStringArray("state_machine")]
 script = ExtResource("20_anim_ctrl")
 state_machine = NodePath("../PlayerStateMachine")
-animation_tree = NodePath("../CharacterMesh/AnimationTree")
 
-[node name="PoseWarpingController" type="Node" parent="." node_paths=PackedStringArray("skeleton", "velocity_source", "stride_modifier", "orientation_modifier", "slope_modifier")]
+[node name="PoseWarpingController" type="Node" parent="." node_paths=PackedStringArray("velocity_source")]
 script = ExtResource("22_pose_ctrl")
-skeleton = NodePath("../CharacterMesh/Rig/Skeleton3D")
 velocity_source = NodePath("../PlayerMotor3D")
-stride_modifier = NodePath("../CharacterMesh/Rig/Skeleton3D/StrideWarpingModifier")
-orientation_modifier = NodePath("../CharacterMesh/Rig/Skeleton3D/OrientationWarpingModifier")
-slope_modifier = NodePath("../CharacterMesh/Rig/Skeleton3D/SlopeWarpingModifier")
 settings = ExtResource("25_pose_settings")
 
 [node name="MantleDetector" type="Node" parent="." node_paths=PackedStringArray("body")]
