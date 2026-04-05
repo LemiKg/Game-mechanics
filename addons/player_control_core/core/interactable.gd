@@ -94,13 +94,10 @@ func _start_interaction() -> void:
 	var state_machine: PlayerStateMachine = _player.get_node_or_null("PlayerStateMachine") as PlayerStateMachine
 
 	if state_machine and state_machine.has_state(&"interaction"):
-		# Pass interaction data via meta
-		state_machine.set_meta("interaction_data", {
-			"interactable": self,
-			"animation": animation_name,
-			"duration": interaction_duration,
-		})
-		state_machine.transition_to(&"interaction")
+		var interaction_state: InteractionState = state_machine.get_state(&"interaction") as InteractionState
+		if interaction_state:
+			interaction_state.start_interaction(self, animation_name, interaction_duration)
+			state_machine.transition_to(&"interaction")
 	else:
 		# No state machine — just emit the signal directly
 		interacted.emit(_player)

@@ -2,15 +2,24 @@ class_name InteractionState
 extends PlayerState
 ## Active when the player is interacting with a world object.
 ##
-## Reads interaction_data from state machine meta (set by Interactable).
+## Caller must invoke start_interaction() before transitioning to this state.
 ## Disables motor, plays animation, waits for duration, emits signal, exits.
 
 
 var _interactable: Node  # Interactable reference
+var _pending_animation: StringName = &"interact"
 var _duration: float = 0.0
 var _timer: float = 0.0
 
 var _logger := DebugLogger.new("[InteractionState]")
+
+
+## Set up interaction data before transitioning to this state.
+## Call this BEFORE state_machine.transition_to(&"interaction").
+func start_interaction(interactable: Node, animation: StringName = &"interact", duration: float = 0.0) -> void:
+	_interactable = interactable
+	_pending_animation = animation
+	_duration = duration
 
 
 func enter() -> void:
@@ -21,16 +30,10 @@ func enter() -> void:
 		transition_to(&"grounded")
 		return
 
-	# Read interaction data from state machine meta
-	var data: Dictionary = state_machine.get_meta("interaction_data", {})
-	if data.is_empty():
-		_logger.debug("No interaction data, aborting")
+	if not _interactable:
+		_logger.debug("No interactable set, aborting")
 		transition_to(&"grounded")
 		return
-
-	_interactable = data.get("interactable")
-	var anim_name: StringName = data.get("animation", &"interact")
-	_duration = data.get("duration", 0.0)
 
 	# Clear buffered inputs
 	if input_router:
@@ -47,17 +50,15 @@ func enter() -> void:
 		if dir.length() > 0.1:
 			controller.body.rotation.y = atan2(dir.x, dir.z)
 
-	request_animation(anim_name, 0.15)
+	request_animation(_pending_animation, 0.15)
 
 
 func exit() -> void:
 	_logger.debug("EXIT")
 	if motor:
 		motor.enabled = true
-
-	# Clean up meta
-	if state_machine.has_meta("interaction_data"):
-		state_machine.remove_meta("interaction_data")
+	_interactable = null
+	_pending_animation = &"interact"
 
 
 func physics_update(delta: float) -> void:
