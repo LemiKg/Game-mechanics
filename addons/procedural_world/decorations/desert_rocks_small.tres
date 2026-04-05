@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="DecorationDefinition" load_steps=9 format=3]
+
+[ext_resource type="Script" uid="uid://kxng7b8qpiu7" path="res://addons/procedural_world/core/decoration_definition.gd" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://c6ev5gu7mb2og" path="res://assets/nature-kit/rock_smallA.glb" id="2_scene1"]
+[ext_resource type="PackedScene" uid="uid://bpkm2kw6cudw6" path="res://assets/nature-kit/rock_smallB.glb" id="3_scene2"]
+[ext_resource type="PackedScene" uid="uid://2lv46kk78wv" path="res://assets/nature-kit/rock_smallC.glb" id="4_scene3"]
+[ext_resource type="PackedScene" uid="uid://wtqn8vlqsofe" path="res://assets/nature-kit/rock_smallD.glb" id="5_scene4"]
+[ext_resource type="PackedScene" uid="uid://jglajb4gmptg" path="res://assets/nature-kit/rock_smallE.glb" id="6_scene5"]
+[ext_resource type="PackedScene" uid="uid://bsiy00nfd56u8" path="res://assets/nature-kit/rock_smallF.glb" id="7_scene6"]
+[ext_resource type="PackedScene" uid="uid://cqttpqp5dvrog" path="res://assets/nature-kit/rock_smallG.glb" id="8_scene7"]
+
+[resource]
+script = ExtResource("1_script")
+decoration_type = 1
+scene_variants = Array[PackedScene]([ExtResource("2_scene1"), ExtResource("3_scene2"), ExtResource("4_scene3"), ExtResource("5_scene4"), ExtResource("6_scene5"), ExtResource("7_scene6"), ExtResource("8_scene7")])
+density = 0.04
+min_scale = 0.5
+max_scale = 1.2
+max_slope = 0.6
+random_rotation = 6.283
+scale_variance = Vector3(0.2, 0.15, 0.2)
+random_tilt = 0.25
+y_offset = -0.05
+y_offset_variance = 0.05
+cluster_strength = 0.2
+cluster_scale = 0.03
+cluster_group_id = 2

@@ -9,7 +9,7 @@
 script = ExtResource("1_script")
 decoration_type = 1
 scene_variants = Array[PackedScene]([ExtResource("2_scene1"), ExtResource("3_scene2"), ExtResource("4_scene3")])
-density = 0.01
+density = 0.05
 min_scale = 0.5
 max_scale = 1.5
 max_slope = 0.4
