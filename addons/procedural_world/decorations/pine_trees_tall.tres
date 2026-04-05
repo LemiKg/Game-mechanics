@@ -10,7 +10,7 @@
 script = ExtResource("1_script")
 decoration_type = 0
 scene_variants = [ExtResource("2_scene1"), ExtResource("3_scene2"), ExtResource("4_scene3"), ExtResource("5_scene4")]
-density = 0.005
+density = 0.012
 min_scale = 1.5
 max_scale = 3.5
 min_slope = 0.0

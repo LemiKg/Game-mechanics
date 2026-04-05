@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="DecorationDefinition" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://addons/procedural_world/core/decoration_definition.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://assets/nature-kit/tree_oak.glb" id="2_scene1"]
+[ext_resource type="PackedScene" path="res://assets/nature-kit/tree_default.glb" id="3_scene2"]
+[ext_resource type="PackedScene" path="res://assets/nature-kit/tree_detailed.glb" id="4_scene3"]
+
+[resource]
+script = ExtResource("1_script")
+decoration_type = 0
+scene_variants = [ExtResource("2_scene1"), ExtResource("3_scene2"), ExtResource("4_scene3")]
+density = 0.008
+min_scale = 1.5
+max_scale = 3.0
+min_slope = 0.0
+max_slope = 0.4
+align_to_normal = false
+y_offset = 0.0
+random_rotation = 6.283
+cluster_strength = 0.7
+cluster_scale = 0.015
+cluster_group_id = 1
+cluster_seed_offset = 50
+cluster_edge_scale_falloff = 0.3
+use_poisson_sampling = true
+has_collision = true
+collision_shape = 0
+collision_radius = 0.5
+collision_height = 8.0
+collision_distance = 60.0
