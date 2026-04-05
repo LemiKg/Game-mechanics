@@ -1,9 +1,18 @@
-[gd_resource type="ShaderMaterial" load_steps=5 format=3 uid="uid://c6qr8m5x2pnw1"]
+[gd_resource type="ShaderMaterial" load_steps=14 format=3 uid="uid://c6qr8m5x2pnw1"]
 
 [ext_resource type="Shader" path="res://addons/procedural_world/shaders/terrain_triplanar.gdshader" id="1_shader"]
-[ext_resource type="Texture2D" path="res://assets/textures/terrain/shared/snow_albedo.png" id="2_snow_alb"]
-[ext_resource type="Texture2D" path="res://assets/textures/terrain/shared/snow_normal.png" id="3_snow_nrm"]
-[ext_resource type="Texture2D" path="res://assets/textures/terrain/shared/snow_roughness.png" id="4_snow_rgh"]
+[ext_resource type="Texture2D" path="res://assets/textures/terrain/plains/grass_albedo.png" id="2_grass_alb"]
+[ext_resource type="Texture2D" path="res://assets/textures/terrain/plains/grass_normal.png" id="3_grass_nrm"]
+[ext_resource type="Texture2D" path="res://assets/textures/terrain/plains/grass_roughness.png" id="4_grass_rgh"]
+[ext_resource type="Texture2D" path="res://assets/textures/terrain/plains/rock_albedo.png" id="5_rock_alb"]
+[ext_resource type="Texture2D" path="res://assets/textures/terrain/plains/rock_normal.png" id="6_rock_nrm"]
+[ext_resource type="Texture2D" path="res://assets/textures/terrain/plains/rock_roughness.png" id="7_rock_rgh"]
+[ext_resource type="Texture2D" path="res://assets/textures/terrain/plains/ground_albedo.png" id="8_sand_alb"]
+[ext_resource type="Texture2D" path="res://assets/textures/terrain/plains/ground_normal.png" id="9_sand_nrm"]
+[ext_resource type="Texture2D" path="res://assets/textures/terrain/plains/ground_roughness.png" id="10_sand_rgh"]
+[ext_resource type="Texture2D" path="res://assets/textures/terrain/shared/snow_albedo.png" id="11_snow_alb"]
+[ext_resource type="Texture2D" path="res://assets/textures/terrain/shared/snow_normal.png" id="12_snow_nrm"]
+[ext_resource type="Texture2D" path="res://assets/textures/terrain/shared/snow_roughness.png" id="13_snow_rgh"]
 
 [resource]
 render_priority = 0
@@ -25,7 +34,19 @@ shader_parameter/roughness_base = 0.85
 shader_parameter/roughness_variation = 0.1
 shader_parameter/height_blend_sharpness = 0.15
 shader_parameter/height_blend_scale = 0.05
+shader_parameter/grass_has_textures = true
+shader_parameter/texture_grass = ExtResource("2_grass_alb")
+shader_parameter/texture_grass_normal = ExtResource("3_grass_nrm")
+shader_parameter/texture_grass_roughness = ExtResource("4_grass_rgh")
+shader_parameter/rock_has_textures = true
+shader_parameter/texture_rock = ExtResource("5_rock_alb")
+shader_parameter/texture_rock_normal = ExtResource("6_rock_nrm")
+shader_parameter/texture_rock_roughness = ExtResource("7_rock_rgh")
+shader_parameter/sand_has_textures = true
+shader_parameter/texture_sand = ExtResource("8_sand_alb")
+shader_parameter/texture_sand_normal = ExtResource("9_sand_nrm")
+shader_parameter/texture_sand_roughness = ExtResource("10_sand_rgh")
 shader_parameter/snow_has_textures = true
-shader_parameter/texture_snow = ExtResource("2_snow_alb")
-shader_parameter/texture_snow_normal = ExtResource("3_snow_nrm")
-shader_parameter/texture_snow_roughness = ExtResource("4_snow_rgh")
+shader_parameter/texture_snow = ExtResource("11_snow_alb")
+shader_parameter/texture_snow_normal = ExtResource("12_snow_nrm")
+shader_parameter/texture_snow_roughness = ExtResource("13_snow_rgh")
