@@ -73,8 +73,6 @@ func transition_to(state_name: StringName) -> void:
 ## Check if the current character supports a logical animation.
 ## Returns true if no AnimationController is found (permissive fallback).
 func is_animation_supported(logical_name: StringName) -> bool:
-	if controller and controller.body:
-		var anim_ctrl: AnimationController = controller.body.get_node_or_null("AnimationController")
-		if anim_ctrl:
-			return anim_ctrl.is_animation_supported(logical_name)
+	if state_machine and state_machine.animation_controller:
+		return state_machine.animation_controller.is_animation_supported(logical_name)
 	return true

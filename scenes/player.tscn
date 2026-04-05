@@ -19,7 +19,7 @@
 [ext_resource type="PackedScene" path="res://addons/inventory_system/ui/item_tooltip_ui.tscn" id="16_tooltip"]
 [ext_resource type="Script" uid="uid://b7qhwhcj7pgjr" path="res://addons/inventory_system/ui/tooltip_controller.gd" id="17_tooltip_ctrl"]
 [ext_resource type="Script" uid="uid://bxuwiwu17py1y" path="res://addons/inventory_system/core/inventory_interaction_handler.gd" id="18_handler"]
-[ext_resource type="PackedScene" uid="uid://c0wo2ldbnefie" path="res://assets/characters/quaternius/player.tscn" id="19_character"]
+[ext_resource type="PackedScene" path="res://assets/characters/kaykit-adventurers/knight_character.tscn" id="19_character"]
 [ext_resource type="Script" uid="uid://ckhcbx5786s1m" path="res://addons/player_control_core/core/animation_controller.gd" id="20_anim_ctrl"]
 [ext_resource type="Script" uid="uid://bcop3agcqywg5" path="res://scenes/reusable_player.gd" id="21_player_script"]
 [ext_resource type="Script" uid="uid://kug2icv6kyj3" path="res://addons/pose_warping/core/pose_warping_controller.gd" id="22_pose_ctrl"]
@@ -185,10 +185,11 @@ input_router = NodePath("../PlayerInputRouter3D")
 motor = NodePath("../PlayerMotor3D")
 state_machine = NodePath("../PlayerStateMachine")
 
-[node name="PlayerStateMachine" type="Node" parent="." node_paths=PackedStringArray("initial_state", "controller")]
+[node name="PlayerStateMachine" type="Node" parent="." node_paths=PackedStringArray("initial_state", "controller", "animation_controller")]
 script = ExtResource("10_state_machine")
 initial_state = NodePath("grounded")
 controller = NodePath("../DualPerspectiveController3D")
+animation_controller = NodePath("../AnimationController")
 
 [node name="grounded" type="Node" parent="PlayerStateMachine" node_paths=PackedStringArray("collision_shape", "stamina_component")]
 script = ExtResource("11_grounded")

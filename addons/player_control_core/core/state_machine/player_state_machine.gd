@@ -14,6 +14,8 @@ signal state_changed(old_state: PlayerState, new_state: PlayerState)
 @export var initial_state: PlayerState
 ## Reference to the player controller. Required.
 @export var controller: BasePlayerController3D
+## Animation controller for querying animation support. Optional.
+@export var animation_controller: AnimationController
 
 ## The currently active state.
 var current_state: PlayerState
