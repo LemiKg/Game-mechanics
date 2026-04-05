@@ -2,36 +2,28 @@ class_name ChunkGenerator
 extends RefCounted
 ## Stateless chunk generation pipeline.
 ##
-## Encapsulates the full generation pipeline: heights, moisture, biome
-## modifications, biome weights, and mesh building. Thread-safe.
-## Used by both ChunkManager (sync) and AsyncGenerationHandler (async).
+## Runs an ordered array of ChunkGenerationPass instances against chunk data.
+## The default pipeline handles heights, biomes, and mesh building.
+## Custom pipelines can insert erosion, caves, rivers, etc.
 
 
-## Generate a complete chunk with all passes.
-static func generate(coord: Vector2i, config) -> ChunkData:
+## The default generation pipeline used when no custom pipeline is provided.
+static var default_pipeline: Array[ChunkGenerationPass] = [
+	HeightPass.new(),
+	BiomeHeightPass.new(),
+	BiomeWeightPass.new(),
+	MeshPass.new(),
+]
+
+
+## Generate a complete chunk using the provided pipeline (or default).
+static func generate(coord: Vector2i, config, pipeline: Array[ChunkGenerationPass] = []) -> ChunkData:
 	var chunk_data := ChunkData.new()
 	chunk_data.initialize(coord, config.chunk_resolution)
 
-	# Pass 1: Generate base heights and moisture
-	chunk_data.height_data = HeightGenerator.generate_height_data(coord, config)
-	chunk_data.moisture_data = HeightGenerator.generate_moisture_data(coord, config)
-
-	# Pass 2: Apply biome height modifications
-	apply_biome_heights(chunk_data, coord, config)
-
-	# Pass 3: Calculate biome weights for splatmap
-	calculate_biome_weights(chunk_data, coord, config)
-
-	# Pass 4: Build LOD meshes
-	var cell_size := config.get_cell_size()
-	var lod_count := config.lod_distances.size() + 1
-	chunk_data.mesh_lods = TerrainMeshBuilder.build_lod_meshes(
-		chunk_data.height_data,
-		chunk_data.width,
-		chunk_data.depth,
-		cell_size,
-		lod_count
-	)
+	var passes := pipeline if not pipeline.is_empty() else default_pipeline
+	for pass_step in passes:
+		pass_step.apply(chunk_data, coord, config)
 
 	chunk_data.state = ChunkData.GenerationState.READY
 	return chunk_data
