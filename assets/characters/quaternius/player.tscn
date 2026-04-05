@@ -1,6 +1,7 @@
-[gd_scene load_steps=130 format=3 uid="uid://c0wo2ldbnefie"]
+[gd_scene load_steps=131 format=3 uid="uid://c0wo2ldbnefie"]
 
 [ext_resource type="PackedScene" uid="uid://d3rpqr655oidf" path="res://assets/characters/quaternius/AnimationLibrary_Godot_Standard.glb" id="1_model"]
+[ext_resource type="Script" path="res://assets/characters/quaternius/quaternius_adapter.gd" id="2_adapter"]
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_crouch_fwd"]
 animation = &"Crouch_Fwd"
@@ -483,6 +484,7 @@ transitions = ["Start", "Idle", SubResource("trans_start_idle"), "Idle", "Walk",
 graph_offset = Vector2(-465, -210)
 
 [node name="CharacterModel" instance=ExtResource("1_model")]
+script = ExtResource("2_adapter")
 
 [node name="Skeleton3D" parent="Rig" index="0"]
 bones/1/position = Vector3(0.0037184812, 0.08695835, 0.8715183)
