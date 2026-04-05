@@ -95,3 +95,36 @@ static func calculate_biome_weights(chunk_data: ChunkData, coord: Vector2i, conf
 				chunk_data.biome_weights[weight_idx + 1] = 0.0
 				chunk_data.biome_weights[weight_idx + 2] = 0.0
 				chunk_data.biome_weights[weight_idx + 3] = 0.0
+
+
+## Determine which biome dominates a chunk based on total biome weight sums.
+## Returns the BiomeData with the highest total weight, or fallback_biome.
+static func get_dominant_biome(chunk_data: ChunkData, biome_map: BiomeMap) -> BiomeData:
+	if not biome_map:
+		return null
+
+	# Sum weights per splatmap channel across all vertices
+	var channel_sums := [0.0, 0.0, 0.0, 0.0]
+	var vertex_count := chunk_data.width * chunk_data.depth
+
+	for i in range(vertex_count):
+		var idx := i * 4
+		channel_sums[0] += chunk_data.biome_weights[idx]
+		channel_sums[1] += chunk_data.biome_weights[idx + 1]
+		channel_sums[2] += chunk_data.biome_weights[idx + 2]
+		channel_sums[3] += chunk_data.biome_weights[idx + 3]
+
+	# Find dominant channel
+	var max_sum := 0.0
+	var dominant_channel := 0
+	for ch in range(4):
+		if channel_sums[ch] > max_sum:
+			max_sum = channel_sums[ch]
+			dominant_channel = ch
+
+	# Find the biome that uses this channel
+	for biome in biome_map.biomes:
+		if biome and biome.splatmap_channel == dominant_channel:
+			return biome
+
+	return biome_map.fallback_biome
