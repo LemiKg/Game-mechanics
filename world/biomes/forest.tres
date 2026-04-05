@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="ForestBiome" load_steps=8 format=3 uid="uid://c5t8a7lnxjeym"]
+[gd_resource type="Resource" script_class="ForestBiome" load_steps=14 format=3 uid="uid://c5t8a7lnxjeym"]
 
 [ext_resource type="Script" uid="uid://kxng7b8qpiu7" path="res://addons/procedural_world/core/decoration_definition.gd" id="1_58apm"]
 [ext_resource type="Resource" path="res://world/materials/forest_terrain.tres" id="6_mat"]
@@ -7,6 +7,12 @@
 [ext_resource type="Resource" path="res://addons/procedural_world/decorations/pine_trees_round.tres" id="3_pine_round"]
 [ext_resource type="Resource" path="res://addons/procedural_world/decorations/bushes_large.tres" id="4_bushes"]
 [ext_resource type="Resource" path="res://addons/procedural_world/decorations/mushrooms.tres" id="5_mushrooms"]
+[ext_resource type="Resource" path="res://addons/procedural_world/decorations/forest_oak_trees.tres" id="7_oak_trees"]
+[ext_resource type="Resource" path="res://addons/procedural_world/decorations/forest_dark_pines.tres" id="8_dark_pines"]
+[ext_resource type="Resource" path="res://addons/procedural_world/decorations/forest_fall_trees.tres" id="9_fall_trees"]
+[ext_resource type="Resource" path="res://addons/procedural_world/decorations/forest_bush_flat.tres" id="10_bush_flat"]
+[ext_resource type="Resource" path="res://addons/procedural_world/decorations/forest_logs.tres" id="11_logs"]
+[ext_resource type="Resource" path="res://addons/procedural_world/decorations/forest_stumps.tres" id="12_stumps"]
 
 [resource]
 script = ExtResource("1_forest")
@@ -17,4 +23,4 @@ min_elevation = 0.15
 max_elevation = 0.8
 min_moisture = 0.45
 terrain_materials = ExtResource("6_mat")
-decorations = Array[ExtResource("1_58apm")]([ExtResource("2_pine_tall"), ExtResource("3_pine_round"), ExtResource("4_bushes"), ExtResource("5_mushrooms")])
+decorations = Array[ExtResource("1_58apm")]([ExtResource("2_pine_tall"), ExtResource("3_pine_round"), ExtResource("4_bushes"), ExtResource("5_mushrooms"), ExtResource("7_oak_trees"), ExtResource("8_dark_pines"), ExtResource("9_fall_trees"), ExtResource("10_bush_flat"), ExtResource("11_logs"), ExtResource("12_stumps")])

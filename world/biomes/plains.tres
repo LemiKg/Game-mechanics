@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="PlainsBiome" load_steps=7 format=3 uid="uid://ivbjffjekp41"]
+[gd_resource type="Resource" script_class="PlainsBiome" load_steps=12 format=3 uid="uid://ivbjffjekp41"]
 
 [ext_resource type="Script" uid="uid://dfvnycsmsn4yb" path="res://addons/procedural_world/core/biomes/plains_biome.gd" id="1_plains"]
 [ext_resource type="Resource" path="res://world/materials/plains_terrain.tres" id="6_mat"]
@@ -6,6 +6,11 @@
 [ext_resource type="Resource" path="res://addons/procedural_world/decorations/grass_clumps.tres" id="3_grass"]
 [ext_resource type="Resource" path="res://addons/procedural_world/decorations/flowers_mixed.tres" id="4_flowers"]
 [ext_resource type="Resource" path="res://addons/procedural_world/decorations/bushes_small.tres" id="5_bushes"]
+[ext_resource type="Resource" path="res://addons/procedural_world/decorations/plains_grass_large_leafs.tres" id="7_grass_large_leafs"]
+[ext_resource type="Resource" path="res://addons/procedural_world/decorations/plains_flowers_purple.tres" id="8_flowers_purple"]
+[ext_resource type="Resource" path="res://addons/procedural_world/decorations/plains_flowers_red.tres" id="9_flowers_red"]
+[ext_resource type="Resource" path="res://addons/procedural_world/decorations/plains_bush_detailed.tres" id="10_bush_detailed"]
+[ext_resource type="Resource" path="res://addons/procedural_world/decorations/plains_stumps.tres" id="11_stumps"]
 
 [resource]
 script = ExtResource("1_plains")
@@ -16,4 +21,4 @@ max_elevation = 0.7
 min_moisture = 0.2
 max_moisture = 0.8
 terrain_materials = ExtResource("6_mat")
-decorations = Array[ExtResource("2_decdef")]([ExtResource("3_grass"), ExtResource("4_flowers"), ExtResource("5_bushes")])
+decorations = Array[ExtResource("2_decdef")]([ExtResource("3_grass"), ExtResource("4_flowers"), ExtResource("5_bushes"), ExtResource("7_grass_large_leafs"), ExtResource("8_flowers_purple"), ExtResource("9_flowers_red"), ExtResource("10_bush_detailed"), ExtResource("11_stumps")])
