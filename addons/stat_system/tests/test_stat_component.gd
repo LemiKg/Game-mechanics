@@ -73,3 +73,18 @@ func test_component_serialize_round_trip() -> bool:
 	c2.deserialize(data)
 	assert(c2.get_current(&"health") == 60.0)
 	return true
+
+func test_component_forwards_stat_changed_signal() -> bool:
+	# Tests don't enter SceneTree so _ready never fires.
+	# Manually wire the same connection _ready would, then verify
+	# the component re-emits when the underlying block emits.
+	var c := _make_component()
+	c.stat_block.stat_changed.connect(c._on_stat_changed)
+	var captured := []
+	c.stat_changed.connect(func(id, old, new_val): captured.append([id, old, new_val]))
+	c.modify_resource(&"health", -25.0)
+	assert(captured.size() == 1)
+	assert(captured[0][0] == &"health")
+	assert(captured[0][1] == 100.0)
+	assert(captured[0][2] == 75.0)
+	return true
