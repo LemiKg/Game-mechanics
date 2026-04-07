@@ -65,11 +65,48 @@ func get_current(id: StringName) -> float:
 # by Tasks 7–10. Empty bodies are correct enough that the runtime doesn't
 # crash if a consumer happens to call them mid-implementation.
 
-func modify_resource(_id: StringName, _delta: float) -> void:
-	pass
+func modify_resource(id: StringName, delta: float) -> void:
+	var def := _find_definition(id)
+	if def == null:
+		push_warning("StatBlock.modify_resource: unknown stat id '%s'" % id)
+		return
+	if not def.is_resource:
+		push_warning("StatBlock.modify_resource: '%s' is not a resource stat" % id)
+		return
 
-func set_current(_id: StringName, _value: float) -> void:
-	pass
+	var max_v := get_max(id)
+	var old_current := get_current(id)
+	var new_current := clampf(old_current + delta, 0.0, max_v)
+
+	if new_current == old_current:
+		return
+
+	current_resources[id] = new_current
+	stat_changed.emit(id, old_current, new_current)
+	if new_current <= 0.0 and old_current > 0.0:
+		resource_depleted.emit(id)
+	elif new_current >= max_v and old_current < max_v:
+		resource_filled.emit(id)
+
+func set_current(id: StringName, value: float) -> void:
+	var def := _find_definition(id)
+	if def == null:
+		push_warning("StatBlock.set_current: unknown stat id '%s'" % id)
+		return
+	if not def.is_resource:
+		push_warning("StatBlock.set_current: '%s' is not a resource stat" % id)
+		return
+	var max_v := get_max(id)
+	var old_current := get_current(id)
+	var new_current := clampf(value, 0.0, max_v)
+	if new_current == old_current:
+		return
+	current_resources[id] = new_current
+	stat_changed.emit(id, old_current, new_current)
+	if new_current <= 0.0 and old_current > 0.0:
+		resource_depleted.emit(id)
+	elif new_current >= max_v and old_current < max_v:
+		resource_filled.emit(id)
 
 func add_modifier(modifier: StatModifier) -> void:
 	if modifier == null:

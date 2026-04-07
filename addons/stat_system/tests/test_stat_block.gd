@@ -153,3 +153,79 @@ func test_stat_changed_does_not_fire_when_remove_leaves_value_unchanged() -> boo
 	b.remove_modifier(m)
 	assert(emit_count[0] == 0, "expected 0 emits on remove of no-op modifier, got %d" % emit_count[0])
 	return true
+
+# --- Part C: resource current pool ---
+
+func test_get_current_for_resource_returns_full_when_uninitialized() -> bool:
+	var b := _make_block([_make_def(&"health", 100.0, true)])
+	assert(b.get_current(&"health") == 100.0)
+	return true
+
+func test_modify_resource_subtracts() -> bool:
+	var b := _make_block([_make_def(&"health", 100.0, true)])
+	b.modify_resource(&"health", -30.0)
+	assert(b.get_current(&"health") == 70.0)
+	return true
+
+func test_modify_resource_clamps_at_zero() -> bool:
+	var b := _make_block([_make_def(&"health", 100.0, true)])
+	b.modify_resource(&"health", -150.0)
+	assert(b.get_current(&"health") == 0.0)
+	return true
+
+func test_modify_resource_clamps_at_max() -> bool:
+	var b := _make_block([_make_def(&"health", 100.0, true)])
+	b.modify_resource(&"health", -30.0)
+	assert(b.get_current(&"health") == 70.0)
+	b.modify_resource(&"health", 999.0)
+	assert(b.get_current(&"health") == 100.0)
+	return true
+
+func test_modify_resource_on_flat_stat_warns_and_noops() -> bool:
+	var b := _make_block([_make_def(&"attack", 10.0, false)])
+	b.modify_resource(&"attack", -5.0)
+	assert(b.get_value(&"attack") == 10.0)
+	return true
+
+func test_modify_resource_emits_stat_changed() -> bool:
+	var b := _make_block([_make_def(&"health", 100.0, true)])
+	var captured := []
+	b.stat_changed.connect(func(id, old, new_val): captured.append([id, old, new_val]))
+	b.modify_resource(&"health", -30.0)
+	assert(captured.size() == 1)
+	assert(captured[0][0] == &"health")
+	assert(captured[0][1] == 100.0)
+	assert(captured[0][2] == 70.0)
+	return true
+
+func test_resource_depleted_signal_fires_at_zero() -> bool:
+	var b := _make_block([_make_def(&"health", 100.0, true)])
+	var depleted := []
+	b.resource_depleted.connect(func(id): depleted.append(id))
+	b.modify_resource(&"health", -100.0)
+	assert(depleted.size() == 1)
+	assert(depleted[0] == &"health")
+	return true
+
+func test_resource_filled_signal_fires_when_back_to_max() -> bool:
+	var b := _make_block([_make_def(&"health", 100.0, true)])
+	var filled := []
+	b.resource_filled.connect(func(id): filled.append(id))
+	b.modify_resource(&"health", -30.0)
+	# Not yet at max — no emit.
+	assert(filled.size() == 0)
+	b.modify_resource(&"health", 30.0)
+	# Now back to max — emit.
+	assert(filled.size() == 1)
+	assert(filled[0] == &"health")
+	return true
+
+func test_set_current_clamps() -> bool:
+	var b := _make_block([_make_def(&"health", 100.0, true)])
+	b.set_current(&"health", 50.0)
+	assert(b.get_current(&"health") == 50.0)
+	b.set_current(&"health", -10.0)
+	assert(b.get_current(&"health") == 0.0)
+	b.set_current(&"health", 9999.0)
+	assert(b.get_current(&"health") == 100.0)
+	return true
