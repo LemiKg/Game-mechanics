@@ -2,12 +2,13 @@
 
 [ext_resource type="Script" path="res://addons/inventory_system/core/consumable_item.gd" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://d3amswjnbi248" path="res://items/icons/health_potion.svg" id="2_icon"]
-[ext_resource type="Script" path="res://addons/inventory_system/core/heal_effect.gd" id="3_heal"]
+[ext_resource type="Script" path="res://addons/stat_system/effects/resource_effect.gd" id="3_resource_effect"]
 
 [sub_resource type="Resource" id="heal_effect"]
-script = ExtResource("3_heal")
+script = ExtResource("3_resource_effect")
 effect_name = "Heal"
-value = 50.0
+target_stat = &"health"
+delta = 50.0
 
 [resource]
 script = ExtResource("1_script")
