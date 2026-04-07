@@ -193,7 +193,22 @@ func tick(delta: float) -> void:
 		_remove_modifier_with_reason(m, StatModifier.RemoveReason.EXPIRED)
 
 func serialize() -> Dictionary:
-	return {}
+	# Convert StringName keys to String for save-file readability.
+	var cr_out := {}
+	for key in current_resources:
+		cr_out[String(key)] = current_resources[key]
+	return {
+		"current_resources": cr_out,
+	}
 
-func deserialize(_data: Dictionary) -> void:
-	pass
+func deserialize(data: Dictionary) -> void:
+	current_resources.clear()
+	_value_cache.clear()
+	var cr: Dictionary = data.get("current_resources", {})
+	for key in cr:
+		var id := StringName(key)
+		var def := _find_definition(id)
+		if def == null or not def.is_resource:
+			continue
+		var max_v := get_max(id)
+		current_resources[id] = clampf(cr[key], 0.0, max_v)
