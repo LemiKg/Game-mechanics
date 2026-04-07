@@ -229,3 +229,31 @@ func test_set_current_clamps() -> bool:
 	b.set_current(&"health", 9999.0)
 	assert(b.get_current(&"health") == 100.0)
 	return true
+
+func test_set_current_emits_depleted_when_crossing_zero() -> bool:
+	var b := _make_block([_make_def(&"health", 100.0, true)])
+	var depleted := []
+	b.resource_depleted.connect(func(id): depleted.append(id))
+	b.set_current(&"health", 0.0)
+	assert(depleted.size() == 1)
+	assert(depleted[0] == &"health")
+	return true
+
+func test_set_current_emits_filled_when_restoring_to_max() -> bool:
+	var b := _make_block([_make_def(&"health", 100.0, true)])
+	b.set_current(&"health", 50.0)
+	var filled := []
+	b.resource_filled.connect(func(id): filled.append(id))
+	b.set_current(&"health", 100.0)
+	assert(filled.size() == 1)
+	assert(filled[0] == &"health")
+	return true
+
+func test_modify_resource_already_at_zero_does_not_double_fire_depleted() -> bool:
+	var b := _make_block([_make_def(&"health", 100.0, true)])
+	b.modify_resource(&"health", -100.0)  # depletes
+	var depleted_count := [0]
+	b.resource_depleted.connect(func(_id): depleted_count[0] += 1)
+	b.modify_resource(&"health", -50.0)  # already at zero, no-op
+	assert(depleted_count[0] == 0, "expected 0 emits, got %d" % depleted_count[0])
+	return true

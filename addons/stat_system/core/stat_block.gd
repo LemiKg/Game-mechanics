@@ -75,6 +75,9 @@ func modify_resource(id: StringName, delta: float) -> void:
 		return
 
 	var max_v := get_max(id)
+	if max_v <= 0.0:
+		push_warning("StatBlock.modify_resource: '%s' has non-positive max %f; cannot modify resource" % [id, max_v])
+		return
 	var old_current := get_current(id)
 	var new_current := clampf(old_current + delta, 0.0, max_v)
 
@@ -97,6 +100,9 @@ func set_current(id: StringName, value: float) -> void:
 		push_warning("StatBlock.set_current: '%s' is not a resource stat" % id)
 		return
 	var max_v := get_max(id)
+	if max_v <= 0.0:
+		push_warning("StatBlock.set_current: '%s' has non-positive max %f; cannot modify resource" % [id, max_v])
+		return
 	var old_current := get_current(id)
 	var new_current := clampf(value, 0.0, max_v)
 	if new_current == old_current:
