@@ -39,7 +39,8 @@ func test_serialize_omits_modifiers() -> bool:
 	b.add_modifier(m)
 	var data := b.serialize()
 	# Modifiers must NOT be persisted — equipment re-pushes them on load.
-	assert(not data.has("modifiers"))
+	# Stronger check: the only top-level key must be "current_resources".
+	assert(data.keys() == ["current_resources"])
 	return true
 
 func test_deserialize_restores_current_resources() -> bool:
@@ -73,4 +74,23 @@ func test_round_trip_preserves_state() -> bool:
 	assert(b2.get_current(&"health") == 75.0)
 	assert(b2.get_current(&"mana") == 40.0)
 	assert(b2.get_value(&"attack") == 10.0)
+	return true
+
+func test_round_trip_clamps_when_loaded_max_is_lower() -> bool:
+	# Save with an inflated max (via modifier), load on a fresh block where
+	# the modifier is gone — saved current must clamp down to the base max.
+	var b1 := _make_block()
+	var m := StatModifier.new()
+	m.stat_id = &"health"
+	m.op = StatModifier.Op.FLAT
+	m.value = 100.0  # inflates max from 100 to 200
+	b1.add_modifier(m)
+	b1.set_current(&"health", 150.0)
+	assert(b1.get_current(&"health") == 150.0)
+	var data := b1.serialize()
+
+	# Fresh block — no modifier, max is back to 100.
+	var b2 := _make_block()
+	b2.deserialize(data)
+	assert(b2.get_current(&"health") == 100.0, "expected clamp to 100, got %f" % b2.get_current(&"health"))
 	return true
