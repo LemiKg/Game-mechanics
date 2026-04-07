@@ -20,12 +20,18 @@ func _init() -> void:
 	if formula == null:
 		formula = AdditivePercentFormula.new()
 
-## Look up a StatDefinition by id. Returns null and warns if not found.
+## Look up a StatDefinition by id. Returns null if not found.
+## Callers are responsible for issuing warnings.
 func _find_definition(id: StringName) -> StatDefinition:
 	for d in definitions:
 		if d != null and d.id == id:
 			return d
 	return null
+
+## Invalidate the cached value for one stat, forcing recomputation on next read.
+## Called by add/remove modifier paths in Task 7+.
+func _invalidate(id: StringName) -> void:
+	_value_cache.erase(id)
 
 func get_value(id: StringName) -> float:
 	if _value_cache.has(id):
@@ -66,13 +72,13 @@ func set_current(_id: StringName, _value: float) -> void:
 	pass
 
 func add_modifier(_modifier: StatModifier) -> void:
-	pass
+	pass  # Task 7: append + _invalidate(_modifier.stat_id) + emit signals
 
 func remove_modifier(_modifier: StatModifier) -> void:
-	pass
+	pass  # Task 7: remove + _invalidate(stat_id) + emit signals
 
 func remove_modifiers_by_source(_source_id: StringName) -> void:
-	pass
+	pass  # Task 7: filter + _invalidate per stat + emit signals
 
 func get_active_modifiers() -> Array[StatModifier]:
 	return _modifiers.duplicate()

@@ -13,8 +13,9 @@ func _make_def(id: StringName, base: float, is_resource: bool = false, max_v: fl
 func _make_block(defs: Array[StatDefinition]) -> StatBlock:
 	var b := StatBlock.new()
 	b.definitions = defs
-	# StatBlock._init assigns AdditivePercentFormula by default; re-trigger
-	# in case the array assignment happened after _init.
+	# Safety net: a StatBlock loaded from a .tres with formula=null would have
+	# its _init default overwritten by the loader. Harmless in tests but
+	# documents the real edge case the guard exists for.
 	if b.formula == null:
 		b.formula = AdditivePercentFormula.new()
 	return b
