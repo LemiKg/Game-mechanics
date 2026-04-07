@@ -25,7 +25,7 @@ ItemDatabase="*res://addons/inventory_system/core/item_database.gd"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/inventory_system/plugin.cfg", "res://addons/player_control_3rd_person/plugin.cfg", "res://addons/player_control_core/plugin.cfg", "res://addons/player_control_fps/plugin.cfg", "res://addons/pose_warping/plugin.cfg", "res://addons/procedural_world/plugin.cfg")
+enabled=PackedStringArray("res://addons/inventory_system/plugin.cfg", "res://addons/player_control_3rd_person/plugin.cfg", "res://addons/player_control_core/plugin.cfg", "res://addons/player_control_fps/plugin.cfg", "res://addons/pose_warping/plugin.cfg", "res://addons/procedural_world/plugin.cfg", "res://addons/stat_system/plugin.cfg")
 
 [input]
 
