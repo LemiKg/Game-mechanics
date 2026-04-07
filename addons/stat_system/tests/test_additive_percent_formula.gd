@@ -77,7 +77,7 @@ func test_multiple_percents_sum_additively() -> bool:
 	assert(result == 160.0, "expected 160.0, got %f" % result)
 	return true
 
-func test_negative_percent_caps_at_zero() -> bool:
+func test_negative_100_percent_reduces_to_zero() -> bool:
 	# 100 * (1 + (-100)/100) = 100 * 0 = 0
 	var f := AdditivePercentFormula.new()
 	var d := _make_def(100.0)
@@ -108,4 +108,24 @@ func test_max_value_zero_means_unbounded() -> bool:
 	var mods: Array[StatModifier] = [_make_mod(StatModifier.Op.FLAT, 999999.0)]
 	var result := f.compute(d, mods)
 	assert(result == 1000099.0, "expected 1000099.0, got %f" % result)
+	return true
+
+func test_stat_id_filter_excludes_foreign_modifiers() -> bool:
+	# Modifiers targeting a different stat_id must be silently skipped.
+	var f := AdditivePercentFormula.new()
+	var d := _make_def(10.0)  # id is &"test"
+	var foreign := StatModifier.new()
+	foreign.stat_id = &"other"
+	foreign.op = StatModifier.Op.FLAT
+	foreign.value = 999.0
+	var matching := _make_mod(StatModifier.Op.FLAT, 5.0)
+	var mods: Array[StatModifier] = [foreign, matching]
+	var result := f.compute(d, mods)
+	assert(result == 15.0, "expected 15.0 (foreign skipped), got %f" % result)
+	return true
+
+func test_null_definition_returns_zero() -> bool:
+	var f := AdditivePercentFormula.new()
+	var result := f.compute(null, [])
+	assert(result == 0.0, "expected 0.0 from null definition, got %f" % result)
 	return true
