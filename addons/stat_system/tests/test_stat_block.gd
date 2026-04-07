@@ -105,7 +105,7 @@ func test_add_modifier_with_unknown_stat_is_noop() -> bool:
 func test_stat_changed_signal_fires_on_add() -> bool:
 	var b := _make_block([_make_def(&"attack", 5.0)])
 	var captured := []
-	b.stat_changed.connect(func(id, old, new): captured.append([id, old, new]))
+	b.stat_changed.connect(func(id, old, new_val): captured.append([id, old, new_val]))
 	b.add_modifier(_make_mod(&"attack", StatModifier.Op.FLAT, 3.0))
 	assert(captured.size() == 1, "expected 1 emit, got %d" % captured.size())
 	assert(captured[0][0] == &"attack")
@@ -142,4 +142,14 @@ func test_modifier_removed_signal_carries_reason() -> bool:
 	assert(captured.size() == 1)
 	assert(captured[0][0] == mod)
 	assert(captured[0][1] == StatModifier.RemoveReason.SOURCE_REMOVED)
+	return true
+
+func test_stat_changed_does_not_fire_when_remove_leaves_value_unchanged() -> bool:
+	var b := _make_block([_make_def(&"attack", 5.0)])
+	var m := _make_mod(&"attack", StatModifier.Op.FLAT, 0.0)
+	b.add_modifier(m)
+	var emit_count := [0]
+	b.stat_changed.connect(func(_id, _old, _new): emit_count[0] += 1)
+	b.remove_modifier(m)
+	assert(emit_count[0] == 0, "expected 0 emits on remove of no-op modifier, got %d" % emit_count[0])
 	return true
