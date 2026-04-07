@@ -91,3 +91,27 @@ func test_bar_with_unknown_stat_renders_empty() -> bool:
 	var w := _make_widget(c, &"nope")
 	assert(w._bar.value == 0.0)
 	return true
+
+func test_rebind_disconnects_old_component() -> bool:
+	# After rebinding to a new component, changes to the OLD component must
+	# not update the bar. This pins the disconnect path in _bind().
+	var c1 := _make_component([_make_def(&"health", 200.0)])
+	var c2 := _make_component([_make_def(&"health", 80.0)])
+	var w := _make_widget(c1, &"health")
+	# Pin c1's current to 100/200 so the bar starts at 0.5
+	c1.set_current(&"health", 100.0)
+	assert(w._bar.value == 0.5, "expected 0.5 from c1, got %f" % w._bar.value)
+
+	# Rebind to c2 (full bar at 80/80 = 1.0)
+	w.stat_component = c2
+	w._bind()
+	assert(w._bar.value == 1.0, "expected 1.0 from c2 after rebind, got %f" % w._bar.value)
+
+	# Mutate the OLD component — the bar must NOT change
+	c1.modify_resource(&"health", -50.0)
+	assert(w._bar.value == 1.0, "old component should not drive bar after rebind, got %f" % w._bar.value)
+
+	# Mutate the NEW component — the bar SHOULD change
+	c2.modify_resource(&"health", -40.0)
+	assert(w._bar.value == 0.5, "new component should drive bar, got %f" % w._bar.value)
+	return true

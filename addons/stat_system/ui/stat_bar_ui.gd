@@ -5,8 +5,10 @@ class_name StatBarUI
 ## stat_changed signal.
 ##
 ## The scene file `stat_bar_ui.tscn` provides a default ProgressBar + Label
-## hierarchy. Authors can replace either child node in their own scene
-## without touching this script — only the @export node references matter.
+## hierarchy. Authors can replace either child node in their own scene as
+## long as the names "ProgressBar" and "Label" are preserved (the script
+## looks them up by name in `_ready`). Missing children produce a warning
+## and a no-op render rather than a crash.
 
 @export var stat_component: StatComponent
 @export var stat_id: StringName = &"health"
@@ -20,9 +22,14 @@ var _label: Label
 var _reader: StatReader
 
 func _ready() -> void:
-	_bar = $ProgressBar
-	_label = $Label
-	_label.visible = show_label
+	_bar = get_node_or_null("ProgressBar") as ProgressBar
+	_label = get_node_or_null("Label") as Label
+	if _bar == null:
+		push_warning("StatBarUI: no ProgressBar child found on '%s'" % name)
+	if _label == null:
+		push_warning("StatBarUI: no Label child found on '%s'" % name)
+	else:
+		_label.visible = show_label
 	_bind()
 
 ## Public setter so consumers can swap the data source at runtime.
@@ -47,7 +54,7 @@ func _bind() -> void:
 		push_warning("StatBarUI: stat_id '%s' not found in stat block" % stat_id)
 	elif not def.is_resource:
 		push_warning("StatBarUI: stat_id '%s' is a flat stat, not a resource — bar will read 0" % stat_id)
-	elif def.color != Color.WHITE:
+	elif def.color != Color.WHITE and _bar != null:
 		_bar.modulate = def.color
 
 	_refresh()
@@ -65,13 +72,13 @@ func _on_stat_changed(id: StringName, _old: float, _new: float) -> void:
 		_refresh()
 
 func _refresh() -> void:
-	if not _reader:
+	if not _reader or _bar == null:
 		return
 	var def := _find_definition()
 	# Flat stat or unknown stat — render empty.
 	if def == null or not def.is_resource:
 		_bar.value = 0.0
-		if show_label:
+		if show_label and _label != null:
 			_label.text = label_format % [0, 0]
 		return
 
@@ -81,5 +88,5 @@ func _refresh() -> void:
 		_bar.value = 0.0
 	else:
 		_bar.value = current / max_v
-	if show_label:
+	if show_label and _label != null:
 		_label.text = label_format % [int(current), int(max_v)]
