@@ -123,16 +123,19 @@ func add_modifier(modifier: StatModifier) -> void:
 		push_warning("StatBlock.add_modifier: unknown stat id '%s'" % modifier.stat_id)
 		return
 
-	var old_value := get_value(modifier.stat_id)
-	_modifiers.append(modifier)
-	# Initialize timed-modifier remaining counter.
-	modifier.remaining = modifier.duration
-	_invalidate(modifier.stat_id)
-	modifier_added.emit(modifier)
+	# Duplicate so the caller's resource (often a shared .tres-loaded instance)
+	# isn't mutated by our remaining-counter or removed from another block.
+	var owned: StatModifier = modifier.duplicate()
+	owned.remaining = owned.duration
 
-	var new_value := get_value(modifier.stat_id)
+	var old_value := get_value(modifier.stat_id)
+	_modifiers.append(owned)
+	_invalidate(owned.stat_id)
+	modifier_added.emit(owned)
+
+	var new_value := get_value(owned.stat_id)
 	if new_value != old_value:
-		stat_changed.emit(modifier.stat_id, old_value, new_value)
+		stat_changed.emit(owned.stat_id, old_value, new_value)
 
 func remove_modifier(modifier: StatModifier) -> void:
 	_remove_modifier_with_reason(modifier, StatModifier.RemoveReason.MANUAL)

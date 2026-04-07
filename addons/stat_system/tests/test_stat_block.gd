@@ -72,9 +72,10 @@ func test_add_modifier_changes_value() -> bool:
 
 func test_remove_modifier_restores_value() -> bool:
 	var b := _make_block([_make_def(&"attack", 5.0)])
-	var m := _make_mod(&"attack", StatModifier.Op.FLAT, 3.0)
-	b.add_modifier(m)
-	b.remove_modifier(m)
+	var captured: Array[StatModifier] = []
+	b.modifier_added.connect(func(m): captured.append(m))
+	b.add_modifier(_make_mod(&"attack", StatModifier.Op.FLAT, 3.0))
+	b.remove_modifier(captured[0])
 	assert(b.get_value(&"attack") == 5.0)
 	return true
 
@@ -129,7 +130,9 @@ func test_modifier_added_signal_fires() -> bool:
 	var mod := _make_mod(&"attack", StatModifier.Op.FLAT, 3.0)
 	b.add_modifier(mod)
 	assert(captured.size() == 1)
-	assert(captured[0] == mod)
+	assert(captured[0].stat_id == mod.stat_id)
+	assert(captured[0].op == mod.op)
+	assert(captured[0].value == mod.value)
 	return true
 
 func test_modifier_removed_signal_carries_reason() -> bool:
@@ -140,7 +143,7 @@ func test_modifier_removed_signal_carries_reason() -> bool:
 	b.add_modifier(mod)
 	b.remove_modifiers_by_source(&"helmet")
 	assert(captured.size() == 1)
-	assert(captured[0][0] == mod)
+	assert(captured[0][0].source_id == &"helmet")
 	assert(captured[0][1] == StatModifier.RemoveReason.SOURCE_REMOVED)
 	return true
 
@@ -292,27 +295,32 @@ func test_tick_no_regen_for_flat_stats() -> bool:
 
 func test_tick_decrements_timed_modifier_remaining() -> bool:
 	var b := _make_block([_make_def(&"attack", 5.0)])
-	var m := _make_mod(&"attack", StatModifier.Op.FLAT, 10.0)
-	m.duration = 2.0
-	b.add_modifier(m)
-	assert(m.remaining == 2.0)
+	var captured: Array[StatModifier] = []
+	b.modifier_added.connect(func(m): captured.append(m))
+	var input := _make_mod(&"attack", StatModifier.Op.FLAT, 10.0)
+	input.duration = 2.0
+	b.add_modifier(input)
+	var owned := captured[0]
+	assert(owned.remaining == 2.0)
 	b.tick(0.5)
-	assert(m.remaining == 1.5)
+	assert(owned.remaining == 1.5)
 	assert(b.get_value(&"attack") == 15.0)
 	return true
 
 func test_tick_expires_timed_modifier_at_zero() -> bool:
 	var b := _make_block([_make_def(&"attack", 5.0)])
-	var m := _make_mod(&"attack", StatModifier.Op.FLAT, 10.0)
-	m.duration = 1.0
-	b.add_modifier(m)
+	var added: Array[StatModifier] = []
+	b.modifier_added.connect(func(m): added.append(m))
+	var input := _make_mod(&"attack", StatModifier.Op.FLAT, 10.0)
+	input.duration = 1.0
+	b.add_modifier(input)
 	assert(b.get_value(&"attack") == 15.0)
 	var captured := []
 	b.modifier_removed.connect(func(mod, reason): captured.append([mod, reason]))
 	b.tick(1.5)
 	assert(b.get_value(&"attack") == 5.0)
 	assert(captured.size() == 1)
-	assert(captured[0][0] == m)
+	assert(captured[0][0] == added[0])  # owned instance, not the input
 	assert(captured[0][1] == StatModifier.RemoveReason.EXPIRED)
 	return true
 
