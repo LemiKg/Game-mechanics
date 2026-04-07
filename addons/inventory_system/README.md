@@ -183,6 +183,28 @@ This addon follows **SOLID** principles:
 | **ISP** | `BaseInventoryDisplay` vs `EquippableInventoryDisplay` |
 | **DIP** | Components use `@export` injection, not tree traversal |
 
+## Optional integrations
+
+### Stat System (`addons/stat_system/`)
+
+When the `stat_system` addon is enabled, the inventory system gains:
+
+- **`stat_component` field on `EquipmentComponent`** — when set, equipped
+  items push their `stat_modifiers` onto the StatComponent and unequipping
+  removes them by source.
+- **`stat_modifiers: Array[StatModifier]`** on `EquipmentItem` — express
+  equipment bonuses as modifiers instead of hardcoded `defense`/`damage`
+  fields.
+- **`ResourceEffect`** — replaces the old `HealEffect` / `ManaEffect`. Use
+  in `ConsumableItem.effects` arrays to heal/damage/restore any resource
+  stat by name.
+- **`ApplyModifierEffect`** — pushes a (typically timed) modifier onto the
+  user's StatComponent. Powers buff potions like "+5 attack for 60s".
+
+The inventory addon does not require the stat addon. If `stat_system` is
+not enabled, leave `EquipmentComponent.stat_component` null and equipment
+behaves like a pure container.
+
 ## License
 
 MIT License - See LICENSE file

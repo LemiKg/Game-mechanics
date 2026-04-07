@@ -18,6 +18,7 @@ This project serves as a **library of production-ready game mechanics** that can
 | [Player Control Core](addons/player_control_core/) | Shared player control framework with state machine, motor, and input routing | ✅ Complete |
 | [Player Control FPS](addons/player_control_fps/) | First-person camera controller with mouse look | ✅ Complete |
 | [Player Control 3rd Person](addons/player_control_3rd_person/) | Third-person orbit camera with collision | ✅ Complete |
+| [Stat System](addons/stat_system/) | Resource stats (HP/MP/stamina), flat stats with flat+percent modifiers, timed buffs | ✅ Complete |
 
 ## Addon Dependencies
 
@@ -26,7 +27,7 @@ player_control_fps ─────┐
                         ├──► player_control_core
 player_control_3rd_person ─┘
 
-inventory_system (standalone)
+inventory_system ── (optional) ──▶ stat_system
 ```
 
 ## Planned Addons
@@ -35,7 +36,6 @@ inventory_system (standalone)
 - **Quest System** — Quest tracking with objectives and rewards
 - **Save/Load System** — Serialization framework for Resources and Nodes
 - **Crafting System** — Recipe-based item crafting
-- **Stat System** — RPG stats with modifiers and buffs
 - **Ability System** — Cooldown-based abilities with effects
 
 ## Architecture Philosophy
