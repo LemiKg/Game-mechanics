@@ -8,7 +8,18 @@
       "WebFetch(domain:www.playfault.com)",
       "Bash(gh api:*)",
       "WebFetch(domain:gameprogrammingpatterns.com)",
-      "WebFetch(domain:www.gamedeveloper.com)"
+      "WebFetch(domain:www.gamedeveloper.com)",
+      "WebFetch(domain:ambientcg.com)",
+      "Bash(curl -sL -o Rock035.zip \"https://ambientcg.com/get?file=Rock035_1K-PNG.zip\" -o Rock061.zip \"https://ambientcg.com/get?file=Rock061_1K-PNG.zip\" -o Rock063.zip \"https://ambientcg.com/get?file=Rock063_1K-PNG.zip\" -o Ground037.zip \"https://ambientcg.com/get?file=Ground037_1K-PNG.zip\" -o Ground054.zip \"https://ambientcg.com/get?file=Ground054_1K-PNG.zip\")",
+      "Bash(ls -la *.zip)",
+      "Bash(curl -sL -o Ground080.zip \"https://ambientcg.com/get?file=Ground080_1K-PNG.zip\" -o Ground103.zip \"https://ambientcg.com/get?file=Ground103_1K-PNG.zip\" -o Gravel023.zip \"https://ambientcg.com/get?file=Gravel023_1K-PNG.zip\" -o Snow013.zip \"https://ambientcg.com/get?file=Snow013_1K-PNG.zip\")",
+      "Bash(ls *.zip)",
+      "Bash(cp /tmp/terrain_textures/Grass008/Grass008_1K-PNG_Color.png 'D:/Godot projects/game-systems/assets/textures/terrain/desert/grass_albedo.png')",
+      "Bash(cp /tmp/terrain_textures/Grass008/Grass008_1K-PNG_NormalGL.png 'D:/Godot projects/game-systems/assets/textures/terrain/desert/grass_normal.png')",
+      "Bash(cp /tmp/terrain_textures/Grass008/Grass008_1K-PNG_Roughness.png 'D:/Godot projects/game-systems/assets/textures/terrain/desert/grass_roughness.png')",
+      "Bash(cp /tmp/terrain_textures/Rock061/Rock061_1K-PNG_Color.png 'D:/Godot projects/game-systems/assets/textures/terrain/desert/rock_albedo.png')",
+      "Bash(cp /tmp/terrain_textures/Rock061/Rock061_1K-PNG_NormalGL.png 'D:/Godot projects/game-systems/assets/textures/terrain/desert/rock_normal.png')",
+      "Bash(xargs grep:*)"
     ]
   }
 }
