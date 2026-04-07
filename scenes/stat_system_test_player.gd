@@ -11,6 +11,24 @@ extends Node3D
 
 @export var stat_component: StatComponent
 
+func _ready() -> void:
+	# Auto-bind to a child StatComponent if not explicitly set in the editor.
+	if stat_component == null:
+		stat_component = get_node_or_null("StatComponent") as StatComponent
+	# Auto-bind every StatBarUI/BuffBarUI in the scene's HUD to this component.
+	# Walks the root scene for any widget that needs a binding.
+	var root := get_tree().current_scene
+	if root:
+		_auto_bind_widgets(root)
+
+func _auto_bind_widgets(node: Node) -> void:
+	if node is StatBarUI and (node as StatBarUI).stat_component == null:
+		(node as StatBarUI).set_stat_component(stat_component)
+	elif node is BuffBarUI and (node as BuffBarUI).stat_component == null:
+		(node as BuffBarUI).set_stat_component(stat_component)
+	for child in node.get_children():
+		_auto_bind_widgets(child)
+
 func _input(event: InputEvent) -> void:
 	if not (event is InputEventKey) or not event.pressed or event.echo:
 		return

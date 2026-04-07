@@ -1,0 +1,84 @@
+[gd_scene load_steps=15 format=3]
+
+[ext_resource type="Script" path="res://scenes/stat_system_test_player.gd" id="1_player"]
+[ext_resource type="Script" path="res://addons/stat_system/core/stat_component.gd" id="2_stat_component"]
+[ext_resource type="Script" path="res://addons/stat_system/core/stat_block.gd" id="3_stat_block"]
+[ext_resource type="Script" path="res://addons/stat_system/core/additive_percent_formula.gd" id="4_formula"]
+[ext_resource type="Resource" path="res://addons/stat_system/examples/stats/health.tres" id="5_health"]
+[ext_resource type="Resource" path="res://addons/stat_system/examples/stats/mana.tres" id="6_mana"]
+[ext_resource type="Resource" path="res://addons/stat_system/examples/stats/stamina.tres" id="7_stamina"]
+[ext_resource type="Resource" path="res://addons/stat_system/examples/stats/attack.tres" id="8_attack"]
+[ext_resource type="Resource" path="res://addons/stat_system/examples/stats/defense.tres" id="9_defense"]
+[ext_resource type="PackedScene" path="res://addons/stat_system/ui/stat_bar_ui.tscn" id="10_bar"]
+[ext_resource type="PackedScene" path="res://addons/stat_system/ui/buff_bar_ui.tscn" id="11_buff_bar"]
+
+[sub_resource type="Resource" id="formula"]
+script = ExtResource("4_formula")
+
+[sub_resource type="Resource" id="block"]
+script = ExtResource("3_stat_block")
+definitions = [ExtResource("5_health"), ExtResource("6_mana"), ExtResource("7_stamina"), ExtResource("8_attack"), ExtResource("9_defense")]
+formula = SubResource("formula")
+current_resources = {}
+
+[sub_resource type="Environment" id="env"]
+background_mode = 1
+background_color = Color(0.4, 0.45, 0.5, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.7, 0.7, 0.7, 1)
+
+[node name="StatSystemTestScene" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("env")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.7, -0.5, 0.5, 0, 0.707, 0.707, -0.7, -0.5, 0.5, 0, 5, 0)
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.866, 0.5, 0, -0.5, 0.866, 0, 4, 6)
+
+[node name="Floor" type="CSGBox3D" parent="."]
+size = Vector3(20, 1, 20)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+
+[node name="TestPlayer" type="Node3D" parent="."]
+script = ExtResource("1_player")
+
+[node name="Mesh" type="CSGCylinder3D" parent="TestPlayer"]
+radius = 0.4
+height = 1.8
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+
+[node name="StatComponent" type="Node" parent="TestPlayer"]
+script = ExtResource("2_stat_component")
+stat_block = SubResource("block")
+
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="BarStack" type="VBoxContainer" parent="HUD"]
+anchors_preset = 1
+anchor_left = 0.0
+anchor_right = 0.0
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 216.0
+offset_bottom = 100.0
+
+[node name="HealthBar" parent="HUD/BarStack" instance=ExtResource("10_bar")]
+stat_id = &"health"
+
+[node name="ManaBar" parent="HUD/BarStack" instance=ExtResource("10_bar")]
+stat_id = &"mana"
+
+[node name="StaminaBar" parent="HUD/BarStack" instance=ExtResource("10_bar")]
+stat_id = &"stamina"
+
+[node name="BuffBar" parent="HUD" instance=ExtResource("11_buff_bar")]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -216.0
+offset_top = 16.0
+offset_right = -16.0
+offset_bottom = 52.0
