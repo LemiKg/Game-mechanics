@@ -257,3 +257,70 @@ func test_modify_resource_already_at_zero_does_not_double_fire_depleted() -> boo
 	b.modify_resource(&"health", -50.0)  # already at zero, no-op
 	assert(depleted_count[0] == 0, "expected 0 emits, got %d" % depleted_count[0])
 	return true
+
+# --- Part D: tick (regen + timed modifier countdown) ---
+
+func test_tick_applies_regen_to_resource() -> bool:
+	var def := _make_def(&"health", 100.0, true)
+	def.regen_per_second = 10.0
+	var b := _make_block([def])
+	b.modify_resource(&"health", -50.0)
+	assert(b.get_current(&"health") == 50.0)
+	b.tick(1.0)
+	assert(b.get_current(&"health") == 60.0)
+	b.tick(0.5)
+	assert(b.get_current(&"health") == 65.0)
+	return true
+
+func test_tick_regen_does_not_overshoot_max() -> bool:
+	var def := _make_def(&"health", 100.0, true)
+	def.regen_per_second = 50.0
+	var b := _make_block([def])
+	b.modify_resource(&"health", -10.0)
+	b.tick(10.0)  # would add 500
+	assert(b.get_current(&"health") == 100.0)
+	return true
+
+func test_tick_no_regen_for_flat_stats() -> bool:
+	# Flat stats have no current pool, so tick shouldn't touch them.
+	var def := _make_def(&"attack", 5.0, false)
+	def.regen_per_second = 99.0  # nonsense, but should be ignored
+	var b := _make_block([def])
+	b.tick(1.0)
+	assert(b.get_value(&"attack") == 5.0)
+	return true
+
+func test_tick_decrements_timed_modifier_remaining() -> bool:
+	var b := _make_block([_make_def(&"attack", 5.0)])
+	var m := _make_mod(&"attack", StatModifier.Op.FLAT, 10.0)
+	m.duration = 2.0
+	b.add_modifier(m)
+	assert(m.remaining == 2.0)
+	b.tick(0.5)
+	assert(m.remaining == 1.5)
+	assert(b.get_value(&"attack") == 15.0)
+	return true
+
+func test_tick_expires_timed_modifier_at_zero() -> bool:
+	var b := _make_block([_make_def(&"attack", 5.0)])
+	var m := _make_mod(&"attack", StatModifier.Op.FLAT, 10.0)
+	m.duration = 1.0
+	b.add_modifier(m)
+	assert(b.get_value(&"attack") == 15.0)
+	var captured := []
+	b.modifier_removed.connect(func(mod, reason): captured.append([mod, reason]))
+	b.tick(1.5)
+	assert(b.get_value(&"attack") == 5.0)
+	assert(captured.size() == 1)
+	assert(captured[0][0] == m)
+	assert(captured[0][1] == StatModifier.RemoveReason.EXPIRED)
+	return true
+
+func test_tick_does_not_expire_permanent_modifier() -> bool:
+	var b := _make_block([_make_def(&"attack", 5.0)])
+	var m := _make_mod(&"attack", StatModifier.Op.FLAT, 10.0)
+	# duration = -1 is permanent
+	b.add_modifier(m)
+	b.tick(9999.0)
+	assert(b.get_value(&"attack") == 15.0)
+	return true

@@ -162,8 +162,32 @@ func _remove_modifier_with_reason(modifier: StatModifier, reason: int) -> void:
 func get_active_modifiers() -> Array[StatModifier]:
 	return _modifiers.duplicate()
 
-func tick(_delta: float) -> void:
-	pass
+func tick(delta: float) -> void:
+	if delta <= 0.0:
+		return
+
+	# 1. Regen for resource stats.
+	for def in definitions:
+		if def == null or not def.is_resource or def.regen_per_second == 0.0:
+			continue
+		var current := get_current(def.id)
+		var max_v := get_max(def.id)
+		if current >= max_v:
+			continue
+		modify_resource(def.id, def.regen_per_second * delta)
+
+	# 2. Decrement timed modifiers; remove expired ones.
+	# Snapshot the list because we're going to mutate it.
+	var to_expire: Array[StatModifier] = []
+	for m in _modifiers:
+		if m == null or m.duration < 0.0:
+			continue
+		m.remaining -= delta
+		if m.remaining <= 0.0:
+			to_expire.append(m)
+
+	for m in to_expire:
+		_remove_modifier_with_reason(m, StatModifier.RemoveReason.EXPIRED)
 
 func serialize() -> Dictionary:
 	return {}
