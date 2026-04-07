@@ -16,6 +16,10 @@ func _enter_tree() -> void:
 	# Runtime node.
 	add_custom_type("StatComponent", "Node", preload("core/stat_component.gd"), null)
 
+	# UI widgets.
+	add_custom_type("StatBarUI", "Control", preload("ui/stat_bar_ui.gd"), null)
+	add_custom_type("BuffBarUI", "Control", preload("ui/buff_bar_ui.gd"), null)
+
 	# Conditional effect registration: gated by Task 14.
 	_register_effects_if_inventory_enabled()
 
@@ -27,6 +31,8 @@ func _exit_tree() -> void:
 	remove_custom_type("BaseStatBlock")
 	remove_custom_type("StatBlock")
 	remove_custom_type("StatComponent")
+	remove_custom_type("StatBarUI")
+	remove_custom_type("BuffBarUI")
 	_unregister_effects_if_inventory_enabled()
 
 func _register_effects_if_inventory_enabled() -> void:
