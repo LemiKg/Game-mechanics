@@ -71,14 +71,50 @@ func modify_resource(_id: StringName, _delta: float) -> void:
 func set_current(_id: StringName, _value: float) -> void:
 	pass
 
-func add_modifier(_modifier: StatModifier) -> void:
-	pass  # Task 7: append + _invalidate(_modifier.stat_id) + emit signals
+func add_modifier(modifier: StatModifier) -> void:
+	if modifier == null:
+		push_warning("StatBlock.add_modifier: null modifier")
+		return
+	var def := _find_definition(modifier.stat_id)
+	if def == null:
+		push_warning("StatBlock.add_modifier: unknown stat id '%s'" % modifier.stat_id)
+		return
 
-func remove_modifier(_modifier: StatModifier) -> void:
-	pass  # Task 7: remove + _invalidate(stat_id) + emit signals
+	var old_value := get_value(modifier.stat_id)
+	_modifiers.append(modifier)
+	# Initialize timed-modifier remaining counter.
+	modifier.remaining = modifier.duration
+	_invalidate(modifier.stat_id)
+	modifier_added.emit(modifier)
 
-func remove_modifiers_by_source(_source_id: StringName) -> void:
-	pass  # Task 7: filter + _invalidate per stat + emit signals
+	var new_value := get_value(modifier.stat_id)
+	if new_value != old_value:
+		stat_changed.emit(modifier.stat_id, old_value, new_value)
+
+func remove_modifier(modifier: StatModifier) -> void:
+	_remove_modifier_with_reason(modifier, StatModifier.RemoveReason.MANUAL)
+
+func remove_modifiers_by_source(source_id: StringName) -> void:
+	# Iterate over a copy because we're mutating the list.
+	for m in _modifiers.duplicate():
+		if m != null and m.source_id == source_id:
+			_remove_modifier_with_reason(m, StatModifier.RemoveReason.SOURCE_REMOVED)
+
+func _remove_modifier_with_reason(modifier: StatModifier, reason: int) -> void:
+	if modifier == null:
+		return
+	var idx := _modifiers.find(modifier)
+	if idx < 0:
+		return
+	var stat_id: StringName = modifier.stat_id
+	var old_value := get_value(stat_id)
+	_modifiers.remove_at(idx)
+	_invalidate(stat_id)
+	modifier_removed.emit(modifier, reason)
+
+	var new_value := get_value(stat_id)
+	if new_value != old_value:
+		stat_changed.emit(stat_id, old_value, new_value)
 
 func get_active_modifiers() -> Array[StatModifier]:
 	return _modifiers.duplicate()
