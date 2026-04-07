@@ -29,9 +29,19 @@ func _exit_tree() -> void:
 	remove_custom_type("StatComponent")
 	_unregister_effects_if_inventory_enabled()
 
-# Filled in by Task 14.
 func _register_effects_if_inventory_enabled() -> void:
-	pass
+	if not _inventory_addon_enabled():
+		return
+	add_custom_type("ResourceEffect", "Resource", preload("effects/resource_effect.gd"), null)
+	add_custom_type("ApplyModifierEffect", "Resource", preload("effects/apply_modifier_effect.gd"), null)
 
 func _unregister_effects_if_inventory_enabled() -> void:
-	pass
+	if not _inventory_addon_enabled():
+		return
+	remove_custom_type("ResourceEffect")
+	remove_custom_type("ApplyModifierEffect")
+
+func _inventory_addon_enabled() -> bool:
+	# Detect by looking for the ItemEffect class. ClassDB.class_exists checks
+	# core engine classes only, so use a path probe instead.
+	return ResourceLoader.exists("res://addons/inventory_system/core/item_effect.gd")
