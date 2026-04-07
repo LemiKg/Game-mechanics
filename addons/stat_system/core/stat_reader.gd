@@ -33,7 +33,10 @@ func get_current(id: StringName) -> float:
 	return _block.get_current(id) if _block else 0.0
 
 func get_active_modifiers() -> Array[StatModifier]:
-	return _block.get_active_modifiers() if _block else []
+	if _block:
+		return _block.get_active_modifiers()
+	var empty: Array[StatModifier] = []
+	return empty
 
 func _forward_stat_changed(id: StringName, old_value: float, new_value: float) -> void:
 	stat_changed.emit(id, old_value, new_value)

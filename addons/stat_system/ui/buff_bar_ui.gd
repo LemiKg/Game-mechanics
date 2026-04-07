@@ -78,7 +78,9 @@ func _process(_delta: float) -> void:
 		return
 	# Cheap re-render of countdown labels. We do not need a per-frame signal —
 	# remaining is updated by StatBlock.tick() and we just read it.
-	for m in _running:
+	# Iterate a snapshot in case a modifier expires mid-frame and triggers
+	# _on_modifier_removed (which mutates _running).
+	for m in _running.duplicate():
 		var node = _slots.get(m)
 		if node:
 			var label: Label = node.get_node_or_null("Label")
@@ -101,7 +103,9 @@ func _add_slot(m: StatModifier) -> void:
 		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 		label.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
 		label.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
-		label.text = "%ds" % int(ceil(m.duration))
+		# Use remaining (not duration) so a modifier added mid-life shows
+		# the correct countdown immediately rather than flickering on next frame.
+		label.text = "%ds" % int(ceil(m.remaining))
 		slot.add_child(label)
 	_row.add_child(slot)
 	_slots[m] = slot
