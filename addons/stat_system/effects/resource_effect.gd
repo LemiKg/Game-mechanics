@@ -25,7 +25,7 @@ func apply(user: Node) -> bool:
 	return true
 
 func can_apply(user: Node) -> bool:
-	return user != null and _find_stat_component(user) != null
+	return user != null and target_stat != &"" and _find_stat_component(user) != null
 
 func _find_stat_component(user: Node) -> StatComponent:
 	# Common patterns: a child named "StatComponent", or any descendant.
