@@ -28,6 +28,7 @@ func test_reader_forwards_modifier_added() -> bool:
 	# StatBlock.add_modifier duplicates the input, so the captured instance is
 	# the owned copy — assert by field, not identity.
 	assert(captured[0].stat_id == &"attack")
+	assert(captured[0].op == StatModifier.Op.FLAT)
 	assert(captured[0].value == 3.0)
 	return true
 
@@ -46,4 +47,14 @@ func test_reader_forwards_modifier_removed_with_reason() -> bool:
 	assert(captured.size() == 1)
 	assert(captured[0][0].source_id == &"helmet")
 	assert(captured[0][1] == StatModifier.RemoveReason.SOURCE_REMOVED)
+	return true
+
+func test_reader_with_null_block_does_not_crash() -> bool:
+	# The _init guard must hold even after the signal additions —
+	# StatReader.new(null) must construct safely with no connections.
+	var r := StatReader.new(null)
+	assert(r != null)
+	# Reads should also fall through to safe defaults.
+	assert(r.get_value(&"anything") == 0.0)
+	assert(r.get_active_modifiers().is_empty())
 	return true
