@@ -19,7 +19,16 @@
       "Bash(cp /tmp/terrain_textures/Grass008/Grass008_1K-PNG_Roughness.png 'D:/Godot projects/game-systems/assets/textures/terrain/desert/grass_roughness.png')",
       "Bash(cp /tmp/terrain_textures/Rock061/Rock061_1K-PNG_Color.png 'D:/Godot projects/game-systems/assets/textures/terrain/desert/rock_albedo.png')",
       "Bash(cp /tmp/terrain_textures/Rock061/Rock061_1K-PNG_NormalGL.png 'D:/Godot projects/game-systems/assets/textures/terrain/desert/rock_normal.png')",
-      "Bash(xargs grep:*)"
+      "Bash(xargs grep:*)",
+      "Bash(godot --headless --quit)",
+      "Bash(powershell.exe:*)",
+      "Bash(\"D:/Godot Engine/Godot_v4.6.2-stable_win64_console.exe\" --headless --quit)",
+      "Bash(echo \"EXIT:$?\")",
+      "Bash(echo \"EXIT_CODE:$?\")",
+      "Bash(\"D:/Godot Engine/Godot_v4.6.2-stable_win64_console.exe\" --headless --quit --script \"addons/stat_system/tests/run_tests.gd\")",
+      "Bash(D:/Godot Engine/Godot_v4.6.2-stable_win64_console.exe:*)",
+      "Bash(\"D:/Godot Engine/Godot_v4.6.2-stable_win64_console.exe\" --headless --quit --path \"D:/Godot projects/game-systems\")",
+      "Bash(\"D:/Godot Engine/Godot_v4.6.2-stable_win64_console.exe\" --headless --import --quit)"
     ]
   }
 }
