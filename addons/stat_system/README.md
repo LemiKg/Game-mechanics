@@ -78,6 +78,62 @@ expired modifiers with reason `EXPIRED`. Permanent modifiers use
 Signals: `stat_changed(id, old, new)`, `resource_depleted(id)`,
 `resource_filled(id)`, `modifier_added(m)`, `modifier_removed(m, reason)`.
 
+## UI widgets
+
+The addon ships two reusable `Control` widgets in `addons/stat_system/ui/`:
+
+### `StatBarUI`
+
+A resource bar (HP/MP/stamina) that binds to one stat by id. Built on
+Godot's `ProgressBar` so it picks up your project's themes automatically.
+
+Author either by instancing `stat_bar_ui.tscn` directly, or by adding the
+`StatBarUI` custom type as a Control node.
+
+| Export | Purpose |
+|---|---|
+| `stat_component: StatComponent` | The data source. Required at runtime. |
+| `stat_id: StringName` | Which stat to bind to (must be `is_resource = true`). |
+| `show_label: bool` | Toggle the "current / max" overlay. |
+| `label_format: String` | printf-style format with two `%d` slots. Default: `"%d / %d"`. |
+
+The widget reads `StatDefinition.color` and applies it as `modulate` on
+the inner `ProgressBar`. The Label is a sibling so it isn't tinted.
+
+Bound to a flat stat by mistake? The widget pushes a one-time warning
+and renders an empty bar.
+
+### `BuffBarUI`
+
+A horizontal row of icons + countdown labels for the active timed
+modifiers (`duration > 0`). Permanent modifiers (equipment bonuses) are
+filtered out — they don't belong in a buff bar.
+
+| Export | Purpose |
+|---|---|
+| `stat_component: StatComponent` | The data source. Required at runtime. |
+| `icon_size: int` | Square slot size in pixels. Default 32. |
+| `spacing: int` | Pixel gap between slots. Default 4. |
+| `show_countdown_label: bool` | Toggle the "Ns" remaining-time overlay. |
+
+The widget creates one `PanelContainer` per active timed modifier and
+destroys them when modifiers expire or are removed. Countdown labels
+update each frame via `_process` (no per-tick signal traffic).
+
+### Test scene
+
+`scenes/stat_system_test_scene.tscn` ships as a runnable demo: open it
+in the editor and press F5. The bound keys are:
+
+| Key | Action |
+|---|---|
+| `1` | Damage 10 health |
+| `2` | Spend 15 mana |
+| `3` | Spend 25 stamina |
+| `4` | Apply 5-second +5 attack buff |
+| `5` | Apply 10-second -3 defense debuff |
+| `R` | Reset all resources to full |
+
 ## Inventory integration (optional)
 
 If `inventory_system` is enabled, two effects ship in `effects/`:
